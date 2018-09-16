@@ -18,7 +18,7 @@ public enum BatteryService: String, ServiceCharacteristic {
         return BatteryService.uuids[self]!
     }
 
-    public var characteristicType: CharacteristicType {
+    public var characteristicType: GattCharacteristicType {
         return .integer
     }
 

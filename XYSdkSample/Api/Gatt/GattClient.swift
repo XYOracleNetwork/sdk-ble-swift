@@ -18,6 +18,18 @@ enum GattError: Error {
     case dataNotPresent
 }
 
+enum GattOperation: String {
+    case read
+    case write
+}
+
+// Used for proper upacking of the data result from reading characteristcs
+public enum GattCharacteristicType {
+    case string
+    case integer
+    case byte
+}
+
 class GattClient: NSObject {
     // Promises that resolve locating the characteristic and returning the
     fileprivate let
@@ -62,24 +74,23 @@ class GattClient: NSObject {
             self.device?.unsubscribe(for: self.delegateKey(deviceUuid: device.uuid))
         }
     }
-
-}
-
-// MARK: Internal getters
-private extension GattClient {
-
+    
     func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<CBCharacteristic> {
         guard
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
             else { return Promise(error: GattError.notConnected) }
-
+        
         self.device = device
         device.subscribe(self, key: self.delegateKey(deviceUuid: device.uuid))
         peripheral.discoverServices(nil)
-
+        
         return self.characteristicPromise
     }
+}
+
+// MARK: Internal getters
+private extension GattClient {
 
     func read(_ device: XYBluetoothDevice, characteristic: CBCharacteristic) -> Promise<Data?> {
         guard

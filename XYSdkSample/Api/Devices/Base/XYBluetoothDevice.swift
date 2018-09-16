@@ -88,31 +88,35 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
 
 public extension XYBluetoothDevice {
 
-    // Fetches values from the specified service characteristics
-    // Uses a set to ensure only one of each characteristic is made in this connection session'
-    // Passes result objects in to collect the data and then returns those
-    // The promise chain ensures only one call is made at a time
-    func read(from serviceCharacteristics: Set<SerivceCharacteristicWrapper>, complete: @escaping ([XYBluetoothValue]) -> Void) {
+    func connectAndProcess(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: @escaping ([XYBluetoothValue]) -> Void) {
+        // Build a dictionary of the results
         var values = [XYBluetoothValue]()
+        
+        // The chain ensures each call is made in sequence
         var promiseChain = Promise()
+
+        // TODO Connect
+        
         serviceCharacteristics.forEach { serviceCharacteristic in
-            let newVal = XYBluetoothValue(serviceCharacteristic.serviceCharacteristic)
-            values.append(newVal)
-            promiseChain = promiseChain.then { _ in
-                serviceCharacteristic.serviceCharacteristic.get(from: self, value: newVal)
+            switch serviceCharacteristic.operation {
+            case .read:
+                let newVal = XYBluetoothValue(serviceCharacteristic.serviceCharacteristic)
+                values.append(newVal)
+                promiseChain = promiseChain.then { _ in
+                    serviceCharacteristic.serviceCharacteristic.get(from: self, value: newVal)
+                }
+            case .write:
+                guard let value = serviceCharacteristic.value else { break }
+                promiseChain = promiseChain.then { _ in
+                    serviceCharacteristic.serviceCharacteristic.set(to: self, value: value)
+                }
             }
         }
 
+        // TODO Disconnect
+        
         promiseChain.done { _ in
             complete(values)
-        }.catch {
-            print($0)
-        }
-    }
-
-    func write(to serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue, complete: @escaping (Bool) -> Void) {
-        serviceCharacteristic.set(to: self, value: value).done {
-            complete(true)
         }.catch {
             print($0)
         }

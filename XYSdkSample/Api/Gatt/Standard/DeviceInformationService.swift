@@ -24,7 +24,7 @@ public enum DeviceInformationService: String, ServiceCharacteristic {
         return DeviceInformationService.uuids[self]!
     }
 
-    public var characteristicType: CharacteristicType {
+    public var characteristicType: GattCharacteristicType {
         switch self {
         case .systemId:
             return .integer

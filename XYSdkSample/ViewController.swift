@@ -40,26 +40,29 @@ class ViewController: UIViewController {
     }
 
     @IBAction func writeTapped(_ sender: Any) {
-        guard let device = xy4Device else { return }
-
-        self.spinner.startAnimating()
-        let buzzData = Data([UInt8(0x0b), 0x03])
-        device.write(to: PrimaryService.buzzer, value: XYBluetoothValue(PrimaryService.buzzer, data: buzzData)) { _ in
-            self.spinner.stopAnimating()
-        }
+//        guard let device = xy4Device else { return }
+//
+//        self.spinner.startAnimating()
+//        let buzzData = Data([UInt8(0x0b), 0x03])
+//        device.write(to: PrimaryService.buzzer, value: XYBluetoothValue(PrimaryService.buzzer, data: buzzData)) { _ in
+//            self.spinner.stopAnimating()
+//        }
     }
 
     @IBAction func actionTapped(_ sender: Any) {
         guard let device = xy4Device else { return }
 
-        let calls: Set<SerivceCharacteristicWrapper> = [
-            DeviceInformationService.firmwareRevisionString.wrapper,
-            DeviceInformationService.manufacturerNameString.wrapper,
-            BatteryService.level.wrapper
+        let buzzData = Data([UInt8(0x0b), 0x03])
+        
+        let calls: Set<SerivceCharacteristicDirective> = [
+            DeviceInformationService.firmwareRevisionString.read,
+            DeviceInformationService.manufacturerNameString.read,
+            BatteryService.level.read,
+            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
         ]
 
         self.spinner.startAnimating()
-        device.read(from: calls, complete: self.processResult)
+        device.connectAndProcess(for: calls, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {

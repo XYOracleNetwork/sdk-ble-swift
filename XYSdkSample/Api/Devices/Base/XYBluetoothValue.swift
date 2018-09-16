@@ -25,7 +25,7 @@ public class XYBluetoothValue {
         self.data = data
     }
 
-    public var type: CharacteristicType {
+    public var type: GattCharacteristicType {
         return serviceCharacteristic.characteristicType
     }
 }

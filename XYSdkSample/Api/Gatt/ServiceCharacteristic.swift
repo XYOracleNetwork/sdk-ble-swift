@@ -12,17 +12,30 @@ import PromiseKit
 public protocol ServiceCharacteristic {
     var uuid: CBUUID { get }
     var characteristic: CBUUID { get }
-    var characteristicType: CharacteristicType { get }
-    var wrapper: SerivceCharacteristicWrapper { get }
+    var characteristicType: GattCharacteristicType { get }
 }
 
-// Used since you can't have protocols as firm types for use in dictionaries, sets, etc.
-public struct SerivceCharacteristicWrapper: Hashable {
+// Used since you can't have protocols as firm types for use in dictionaries, sets, etc. but also to
+// provide a way to do read and write operations in the same connection set
+public struct SerivceCharacteristicDirective: Hashable {
+    let operation: GattOperation
     let serviceCharacteristic: ServiceCharacteristic
-    public var hashValue: Int { return [serviceCharacteristic.uuid.uuidString, serviceCharacteristic.characteristic.uuidString].joined(separator: ":").hashValue }
+    let value: XYBluetoothValue?
+    public var hashValue: Int {
+        return [
+            serviceCharacteristic.uuid.uuidString,
+            serviceCharacteristic.characteristic.uuidString,
+            operation.rawValue].joined(separator: ":").hashValue
+    }
+    
+    init(_ operation: GattOperation, serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue? = nil) {
+        self.operation = operation
+        self.serviceCharacteristic = serviceCharacteristic
+        self.value = value
+    }
 }
 
-public func ==(lhs: SerivceCharacteristicWrapper, rhs: SerivceCharacteristicWrapper) -> Bool
+public func ==(lhs: SerivceCharacteristicDirective, rhs: SerivceCharacteristicDirective) -> Bool
 {
     // false if runtime type is different
     guard ("\(type(of: lhs.serviceCharacteristic))" == "\(type(of: rhs.serviceCharacteristic))") else {return false}
@@ -32,21 +45,20 @@ public func ==(lhs: SerivceCharacteristicWrapper, rhs: SerivceCharacteristicWrap
 // Global methods for all service characteristics
 public extension ServiceCharacteristic {
 
-    public func get(from device: XYBluetoothDevice, value: XYBluetoothValue) -> Promise<Void> {
+    func get(from device: XYBluetoothDevice, value: XYBluetoothValue) -> Promise<Void> {
         return GattClient(self).get(from: device, valueObj: value)
     }
 
-    public func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
+    func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
         return GattClient(self).set(to: device, valueObj: value, withResponse: withResponse)
     }
 
-    public var wrapper: SerivceCharacteristicWrapper { return SerivceCharacteristicWrapper(serviceCharacteristic: self) }
+    var read: SerivceCharacteristicDirective {
+        return SerivceCharacteristicDirective(.read, serviceCharacteristic: self)
+    }
+    
+    func write(_ value: XYBluetoothValue) -> SerivceCharacteristicDirective {
+        return SerivceCharacteristicDirective(.write, serviceCharacteristic: self, value: value)
+    }
 
-}
-
-// Used for proper upacking of the data result from reading characteristcs
-public enum CharacteristicType {
-    case string
-    case integer
-    case byte
 }
