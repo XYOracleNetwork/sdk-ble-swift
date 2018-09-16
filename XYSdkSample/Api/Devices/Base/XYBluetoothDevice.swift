@@ -14,13 +14,24 @@ public protocol XY4BluetoothDeviceDelegate {
     func foundServices()
 }
 
+public typealias GattSuccessCallback = ([XYBluetoothValue]) -> Void
+public typealias GattErrorCallback = (Error) -> Void
+// public typealias GattTimeout = () -> Void
+
 public class XYBluetoothDevice: NSObject {
     fileprivate var rssi: Int = XYDeviceProximity.none.rawValue
     fileprivate var peripheral: CBPeripheral?
     fileprivate var services = [ServiceCharacteristic]()
+    fileprivate var connection: BLEConnect?
 
+    // The chain ensures each call is made in sequence
+    fileprivate lazy var promiseChain = Promise()
+    
     fileprivate var delegates = [String: CBPeripheralDelegate]()
 
+    fileprivate var successCallback: GattSuccessCallback?
+    fileprivate var errorCallback: GattErrorCallback?
+    
     public let
     uuid: UUID,
     id: String
@@ -86,17 +97,23 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 }
 
+// TODO may want to rethink this, as this does overload device will all these callbacks
 public extension XYBluetoothDevice {
-
-    func connectAndProcess(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: @escaping ([XYBluetoothValue]) -> Void) {
+    
+    func connectAndProcess(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: GattSuccessCallback?) {
         // Build a dictionary of the results
         var values = [XYBluetoothValue]()
         
-        // The chain ensures each call is made in sequence
-        var promiseChain = Promise()
-
-        // TODO Connect
+        // Connect
+        connection = BLEConnect(device: self)
+        guard let connection = self.connection else {
+            complete?([])
+            return
+        }
         
+        promiseChain = connection.connect(to: self)
+        
+        // Iterate through set of requests and fulfill each one
         serviceCharacteristics.forEach { serviceCharacteristic in
             switch serviceCharacteristic.operation {
             case .read:
@@ -112,11 +129,11 @@ public extension XYBluetoothDevice {
                 }
             }
         }
-
+        
         // TODO Disconnect
         
         promiseChain.done { _ in
-            complete(values)
+            complete?(values)
         }.catch {
             print($0)
         }
