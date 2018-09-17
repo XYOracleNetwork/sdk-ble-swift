@@ -107,15 +107,15 @@ public extension XYBluetoothDevice {
         // Build a dictionary of the results
         var values = [XYBluetoothValue]()
         
-        // Connect
+        // Setup connection
         connection = BLEConnect(device: self)
         guard let connection = self.connection else {
             complete?([])
             return
         }
         
-        // Ensure promise completes
-        promiseChain = race(connection.connect(to: self), after(seconds: XYBluetoothDevice.connectionTimeoutInSeconds).asVoid())
+        // Connect
+        promiseChain = connection.connect(to: self)
         
         // Iterate through set of requests and fulfill each one
         serviceCharacteristics.forEach { serviceCharacteristic in
@@ -133,11 +133,14 @@ public extension XYBluetoothDevice {
                 }
             }
         }
-        
-        // TODO Disconnect
-        
+
         promiseChain.done { _ in
             complete?(values)
+        }.ensure {
+            // TODO hook to ensure stays open with new request
+            after(.seconds(3)).done {
+                self.connection?.disconnect()
+            }
         }.catch {
             print($0)
         }

@@ -10,7 +10,7 @@ import CoreBluetooth
 
 public enum DeviceInformationService: String, ServiceCharacteristic {
 
-    public var uuid: CBUUID { return DeviceInformationService.serviceUuid }
+    public var serviceUuid: CBUUID { return DeviceInformationService.serviceUuid }
 
     case systemId
     case firmwareRevisionString
@@ -20,7 +20,7 @@ public enum DeviceInformationService: String, ServiceCharacteristic {
     case softwareRevisionString
     case manufacturerNameString
 
-    public var characteristic: CBUUID {
+    public var characteristicUuid: CBUUID {
         return DeviceInformationService.uuids[self]!
     }
 

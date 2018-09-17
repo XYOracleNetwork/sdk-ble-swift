@@ -68,7 +68,7 @@ public class BLECentral: NSObject {
     }
     
     public func disable() {
-//        self.cbManager?.cancelPeripheralConnection()
+        
     }
 
     // Connect to an already discovered peripheral
@@ -86,13 +86,13 @@ public class BLECentral: NSObject {
     // Ask for devices with the requested/all services until requested to stop()
     public func scan(for services: [ServiceCharacteristic]? = nil) {
         guard ableToConnect else { return }
-        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.uuid }, options: scanOptions)
+        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
 
     // Ask for devices with the requested/all services with a specific timeout/default timeout, and callback with results if desired
     public func start(for services: [ServiceCharacteristic]? = nil, timeout: Int? = nil, complete: BLELocateCallback? = nil) {
         guard ableToConnect else { return }
-        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.uuid }, options: scanOptions)
+        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: scanOptions)
         self.timerQueue.sync {
             self.timeoutSource = DispatchSource.singleTimer(interval: .seconds(timeout ?? defaultScanTimeout), queue: self.timerQueue) { [weak self] in
                 self?.stop()
@@ -127,6 +127,10 @@ public class BLECentral: NSObject {
         self.delegates[key] = delegate
     }
 
+    public func removeDelegate(for key: String) {
+        self.delegates.removeValue(forKey: key)
+    }
+    
     func decodePeripheralState(peripheralState: CBPeripheralState) {
         switch peripheralState {
         case .disconnected:

@@ -10,7 +10,7 @@ import CoreBluetooth
 
 public enum PrimaryService: String, ServiceCharacteristic {
 
-    public var uuid: CBUUID { return PrimaryService.serviceUuid }
+    public var serviceUuid: CBUUID { return PrimaryService.serviceUuid }
 
     case stayAwake
     case unlock
@@ -37,7 +37,7 @@ public enum PrimaryService: String, ServiceCharacteristic {
 
     private static let serviceUuid = CBUUID(string: "a44eacf4-0104-0001-0000-5f784c9977b5")
 
-    public var characteristic: CBUUID {
+    public var characteristicUuid: CBUUID {
         return PrimaryService.uuids[self]!
     }
 

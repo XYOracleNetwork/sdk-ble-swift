@@ -10,8 +10,8 @@ import CoreBluetooth
 import PromiseKit
 
 public protocol ServiceCharacteristic {
-    var uuid: CBUUID { get }
-    var characteristic: CBUUID { get }
+    var serviceUuid: CBUUID { get }
+    var characteristicUuid: CBUUID { get }
     var characteristicType: GattCharacteristicType { get }
 }
 
@@ -23,8 +23,8 @@ public struct SerivceCharacteristicDirective: Hashable {
     let value: XYBluetoothValue?
     public var hashValue: Int {
         return [
-            serviceCharacteristic.uuid.uuidString,
-            serviceCharacteristic.characteristic.uuidString,
+            serviceCharacteristic.serviceUuid.uuidString,
+            serviceCharacteristic.characteristicUuid.uuidString,
             operation.rawValue].joined(separator: ":").hashValue
     }
     

@@ -31,9 +31,6 @@ class BLEConnect {
         self.delegate = delegate
 
         self.central.setDelegate(self, key: "BLEConnect")
-//        if central.isAbleToConnect {
-//            connect()
-//        }
     }
 
     private func connect() {
@@ -52,7 +49,7 @@ class BLEConnect {
 extension BLEConnect {
     func connect(to device: XYBluetoothDevice) -> Promise<Void> {
         // Ensure central can use ble
-        firstly {
+        _ = firstly {
             central.enable()
         }.done {
             self.central.scan()
@@ -86,7 +83,7 @@ extension BLEConnect: BLELocateDelegate {
             let connectableServices = (self.device as? XYFinderDevice)?.connectableServices,
             services.contains(connectableServices[0]) || services.contains(connectableServices[1])
             else { return }
-
+        
         self.device.setPeripheral(peripheral.peripheral)
         self.delegate?.located(peripheral: peripheral)
 

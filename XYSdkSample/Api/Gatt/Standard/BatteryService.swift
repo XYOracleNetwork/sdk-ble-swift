@@ -10,11 +10,11 @@ import CoreBluetooth
 
 public enum BatteryService: String, ServiceCharacteristic {
 
-    public var uuid: CBUUID { return BatteryService.serviceUuid }
+    public var serviceUuid: CBUUID { return BatteryService.serviceUuid }
 
     case level
 
-    public var characteristic: CBUUID {
+    public var characteristicUuid: CBUUID {
         return BatteryService.uuids[self]!
     }
 

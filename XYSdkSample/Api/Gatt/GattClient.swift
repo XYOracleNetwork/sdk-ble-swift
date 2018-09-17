@@ -54,7 +54,7 @@ class GattClient: NSObject {
     
     // TODO: Change to a per-session token for the key
     func delegateKey(deviceUuid: UUID) -> String {
-        return ["GC", deviceUuid.uuidString, serviceCharacteristic.uuid.uuidString, serviceCharacteristic.characteristic.uuidString].joined(separator: ":")
+        return ["GC", deviceUuid.uuidString, serviceCharacteristic.serviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
     }
 
     func get(from device: XYBluetoothDevice, valueObj: XYBluetoothValue) -> Promise<Void> {
@@ -136,10 +136,10 @@ extension GattClient: CBPeripheralDelegate {
             else { self.characteristicSeal.reject(GattError.mismatchedPeripheral); return }
 
         guard
-            let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.uuid }).first
+            let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.serviceUuid }).first
             else { self.characteristicSeal.reject(GattError.serviceNotFound); return }
 
-        peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristic], for: service)
+        peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
@@ -148,7 +148,7 @@ extension GattClient: CBPeripheralDelegate {
             else { self.characteristicSeal.reject(GattError.mismatchedPeripheral); return }
 
         guard
-            let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristic }).first
+            let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristicUuid }).first
             else { self.characteristicSeal.reject(GattError.characteristicNotFound); return }
 
         self.characteristic = characteristic
@@ -161,7 +161,7 @@ extension GattClient: CBPeripheralDelegate {
             self.device?.getPeripheral() == peripheral
             else { self.operationSeal.reject(GattError.mismatchedPeripheral); return }
 
-        guard characteristic.uuid == self.serviceCharacteristic.characteristic
+        guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
             else { self.operationSeal.reject(GattError.characteristicNotFound); return }
 
         guard
