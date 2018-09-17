@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreBluetooth
+import PromiseKit
 
 public struct BLEPeripheral {
     public let
@@ -26,7 +27,11 @@ public typealias BLELocateCallback = ([BLEPeripheral]) -> Void
 
 public class BLECentral: NSObject {
 
+    // TODO weak refs
     fileprivate var delegates = [String: BLELocateDelegate?]()
+    
+    fileprivate let
+    (poweredPromise, poweredSeal) = Promise<Void>.pending()
     
     public static let instance = BLECentral()
 
@@ -46,14 +51,24 @@ public class BLECentral: NSObject {
 
     private override init() {
         super.init()
-        self.cbManager = CBCentralManager(
-            delegate: self,
-            queue: BLECentral.dispatchQueue,
-            options: nil) // [CBCentralManagerOptionRestoreIdentifierKey : "com.xyfindables.sdk.BLELocateQueue"]
     }
 
     public var isAbleToConnect: Bool {
         return self.ableToConnect
+    }
+    
+    public func enable() -> Promise<Void> {
+        // Create central
+        self.cbManager = CBCentralManager(
+            delegate: self,
+            queue: BLECentral.dispatchQueue,
+            options: nil) // [CBCentralManagerOptionRestoreIdentifierKey : "com.xyfindables.sdk.BLELocateQueue"]
+        
+        return poweredPromise
+    }
+    
+    public func disable() {
+//        self.cbManager?.cancelPeripheralConnection()
     }
 
     // Connect to an already discovered peripheral
@@ -129,8 +144,11 @@ public class BLECentral: NSObject {
 extension BLECentral: CBCentralManagerDelegate {
 
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        // TODO Disconnect everything
+        
         self.ableToConnect = central.state == .poweredOn
         if self.ableToConnect { self.delegates.forEach { $1?.ableToConnect() } }
+        poweredSeal.fulfill(Void())
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {

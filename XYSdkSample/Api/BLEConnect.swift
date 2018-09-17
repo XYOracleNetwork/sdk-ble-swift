@@ -51,11 +51,17 @@ class BLEConnect {
 
 extension BLEConnect {
     func connect(to device: XYBluetoothDevice) -> Promise<Void> {
-        central.scan()
-        // TODO need timeout
+        // Ensure central can use ble
+        firstly {
+            central.enable()
+        }.done {
+            self.central.scan()
+        }
+
         return connectPromise
     }
 }
+
 extension BLEConnect: BLELocateDelegate {
     func connected(peripheral: BLEPeripheral) {
         guard peripheral.peripheral == self.device.getPeripheral()
@@ -73,13 +79,13 @@ extension BLEConnect: BLELocateDelegate {
     func located(peripheral: BLEPeripheral) {
         guard
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
-            else { self.connectSeal.reject(BLEConnectError.noServicesFound); return }
+            else { return }
 
         // TODO barf
         guard
             let connectableServices = (self.device as? XYFinderDevice)?.connectableServices,
             services.contains(connectableServices[0]) || services.contains(connectableServices[1])
-            else { self.connectSeal.reject(BLEConnectError.requestedDeviceNotFound); return }
+            else { return }
 
         self.device.setPeripheral(peripheral.peripheral)
         self.delegate?.located(peripheral: peripheral)
@@ -89,6 +95,6 @@ extension BLEConnect: BLELocateDelegate {
     }
 
     func ableToConnect() {
-        connect()
+//        connect()
     }
 }

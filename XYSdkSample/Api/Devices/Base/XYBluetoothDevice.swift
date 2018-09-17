@@ -19,6 +19,7 @@ public typealias GattErrorCallback = (Error) -> Void
 // public typealias GattTimeout = () -> Void
 
 public class XYBluetoothDevice: NSObject {
+    
     fileprivate var rssi: Int = XYDeviceProximity.none.rawValue
     fileprivate var peripheral: CBPeripheral?
     fileprivate var services = [ServiceCharacteristic]()
@@ -35,6 +36,8 @@ public class XYBluetoothDevice: NSObject {
     public let
     uuid: UUID,
     id: String
+    
+    fileprivate static let connectionTimeoutInSeconds: TimeInterval = 5
 
     init(_ uuid: UUID, id: String) {
         self.uuid = uuid
@@ -111,7 +114,8 @@ public extension XYBluetoothDevice {
             return
         }
         
-        promiseChain = connection.connect(to: self)
+        // Ensure promise completes
+        promiseChain = race(connection.connect(to: self), after(seconds: XYBluetoothDevice.connectionTimeoutInSeconds).asVoid())
         
         // Iterate through set of requests and fulfill each one
         serviceCharacteristics.forEach { serviceCharacteristic in

@@ -58,7 +58,7 @@ class ViewController: UIViewController {
             DeviceInformationService.firmwareRevisionString.read,
             DeviceInformationService.manufacturerNameString.read,
             BatteryService.level.read,
-            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
+//            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
         ]
 
         self.spinner.startAnimating()
