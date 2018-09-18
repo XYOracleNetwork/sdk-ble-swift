@@ -123,6 +123,11 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
 
 public extension XYBluetoothDevice {
 
+    func disconnect() {
+        let central = XYCentral.instance
+        central.disconnect(from: self)
+    }
+
     func connect() {
         let central = XYCentral.instance
 

@@ -47,7 +47,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func disconnectTapped(_ sender: Any) {
-//        connect?.disconnect()
+        xy4Device?.disconnect()
     }
 
     @IBAction func writeTapped(_ sender: Any) {
@@ -202,6 +202,8 @@ extension ViewController: XYCentralDelegate {
     }
 
     func disconnected(periperhal: XYPeripheral) {
-        
+        DispatchQueue.main.async {
+            self.deviceStatus.text = "Disconnected"
+        }
     }
 }
