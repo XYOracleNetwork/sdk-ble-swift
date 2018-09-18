@@ -99,6 +99,17 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: XYSmartScanDelegate {
+    func smartScan(location: XYLocationCoordinate2D) {
+        
+    }
+
+    func smartScan(entered device: XYBluetoothDevice) {
+
+    }
+
+    func smartScan(exited device: XYBluetoothDevice) {
+
+    }
 
     // Probably should change this to an array of what it's found
     func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int) {
