@@ -10,14 +10,11 @@ import Foundation
 
 public class XYFinderDeviceFactory {
 
-    class func build(from iBeacon: XYIBeaconDefinition) -> XYBluetoothDevice? {
+    class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) -> XYBluetoothDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }
         switch family {
         case .xy4:
-            return XY4BluetoothDevice(iBeacon)
-        case .xy3:
-            print("xy3 found")
-            fallthrough
+            return XY4BluetoothDevice(iBeacon, rssi: rssi)
         default:
             return nil
         }

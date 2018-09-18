@@ -23,7 +23,7 @@ public enum XY4BluetoothDeviceStatus {
 
 public class XYBluetoothDevice: NSObject {
     
-    fileprivate var rssi: Int = XYDeviceProximity.none.rawValue
+    internal var rssi: Int = XYDeviceProximity.none.rawValue
     fileprivate var peripheral: CBPeripheral?
     fileprivate var services = [ServiceCharacteristic]()
     
@@ -44,9 +44,10 @@ public class XYBluetoothDevice: NSObject {
     
     fileprivate static let connectionTimeoutInSeconds = DispatchTimeInterval.seconds(5)
 
-    init(_ uuid: UUID, id: String) {
+    init(_ uuid: UUID, id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.uuid = uuid
         self.id = id
+        self.rssi = rssi
         super.init()
     }
 

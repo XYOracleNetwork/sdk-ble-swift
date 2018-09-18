@@ -91,7 +91,6 @@ extension XYSmartScan: XYLocationDelegate {
     }
 
     public func didRangeBeacons(_ beacons: [XYBluetoothDevice]) {
-        print("Beacon cound in SmartScan: \(beacons.count)")
         beacons.forEach { beacon in
             if beacon.inRange {
                 // TODO report in range
@@ -103,7 +102,7 @@ extension XYSmartScan: XYLocationDelegate {
             if beacon.powerLevel == UInt(8) { print("found it \(beacon.id)") }
 
             if let xy4iBeacon = beacon as? XY4BluetoothDevice {
-                self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: 0)}
+                self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: beacon.rssi)}
             }
         }
     }

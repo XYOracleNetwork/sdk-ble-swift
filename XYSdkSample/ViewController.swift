@@ -99,15 +99,20 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: XYSmartScanDelegate {
+
+    // Probably should change this to an array of what it's found
     func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int) {
         DispatchQueue.main.async {
             if self.rangedDevices.contains(where: { $0.id == device.id }) {
                 return
             }
 
-            self.rangedDevices.append(device)
-            self.rangedDevicesTableView.reloadData()
-            self.countLabel.text = "\(self.rangedDevices.count)"
+            // Only show those in range
+            if device.rssi != 0 && device.rssi > -95 {
+                self.rangedDevices.append(device)
+                self.rangedDevicesTableView.reloadData()
+                self.countLabel.text = "\(self.rangedDevices.count)"
+            }
         }
     }
 }

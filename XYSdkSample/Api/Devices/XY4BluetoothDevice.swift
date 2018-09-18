@@ -19,13 +19,13 @@ public class XY4BluetoothDevice: XYBluetoothDevice, XYFinderDevice {
     public final var name: String { return family.familyName }
     public final var prefix: String { return family.prefix }
 
-    public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil) {
+    public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.iBeacon = iBeacon
-        super.init(family.uuid, id: id)
+        super.init(family.uuid, id: id, rssi: rssi)
     }
 
-    public convenience init(_ iBeacon: XYIBeaconDefinition) {
-        self.init(iBeacon.xyId(from: .xy4), iBeacon: iBeacon)
+    public convenience init(_ iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
+        self.init(iBeacon.xyId(from: .xy4), iBeacon: iBeacon, rssi: rssi)
     }
 
     public var proximity: XYDeviceProximity = .none

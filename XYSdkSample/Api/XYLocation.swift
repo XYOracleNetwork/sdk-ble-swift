@@ -96,8 +96,7 @@ extension XYLocation {
 extension XYLocation: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
-        print(beacons.count)
-        self.delegate?.didRangeBeacons(beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition) })
+        self.delegate?.didRangeBeacons(beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi) })
     }
 
     public func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
