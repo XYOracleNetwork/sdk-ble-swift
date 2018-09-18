@@ -66,11 +66,6 @@ public class XYBluetoothDevice: NSObject {
 // MARK: Peripheral methods
 extension XYBluetoothDevice {
 
-    public func setPeripheral(_ peripheral: CBPeripheral) {
-        self.peripheral = peripheral
-        self.peripheral?.delegate = self
-    }
-
     public func getPeripheral() -> CBPeripheral? {
         return self.peripheral
     }
@@ -88,6 +83,26 @@ extension XYBluetoothDevice {
 
 }
 
+// MARK: Locate from Central helpers
+public extension XYBluetoothDevice {
+    func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
+        guard
+            let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
+            else { return false }
+
+        // TODO barf
+        guard
+            let connectableServices = (self as? XYFinderDevice)?.connectableServices,
+            services.contains(connectableServices[0]) || services.contains(connectableServices[1])
+            else { return false }
+
+        self.peripheral = peripheral.peripheral
+        self.peripheral?.delegate = self
+        return true
+    }
+}
+
+// MARK: CBPeripheralDelegate
 extension XYBluetoothDevice: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         self.delegates.forEach { $1.peripheral?(peripheral, didDiscoverServices: error) }

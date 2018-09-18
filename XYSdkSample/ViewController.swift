@@ -160,18 +160,21 @@ extension ViewController: UITableViewDelegate {
         guard central.state == .poweredOn else { return }
 
         deviceName.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
-        deviceStatus.text = "Connecting..."
+        deviceStatus.text = "Scanning..."
 
         self.spinner.startAnimating()
 
-        central.scan()
+        self.xy4Device = device
+
+        central.scan() // TOOD add timeout
     }
 
 }
 
 extension ViewController: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
-
+        self.spinner.stopAnimating()
+        self.deviceStatus.text = "Could not connect"
     }
 
     func stateChanged(newState: CBManagerState) {
@@ -182,13 +185,19 @@ extension ViewController: XYCentralDelegate {
     }
 
     func connected(peripheral: XYPeripheral) {
-        
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+            self.deviceStatus.text = "Connected"
+        }
     }
 
     func located(peripheral: XYPeripheral) {
-        DispatchQueue.main.async {
-            self.spinner.stopAnimating()
-            print(peripheral.peripheral.name ?? "don't know")
+        if xy4Device?.attachPeripheral(peripheral) ?? false {
+            central.stop()
+            central.connect(to: self.xy4Device!)
+            DispatchQueue.main.async {
+                self.deviceStatus.text = "Connecting..."
+            }
         }
     }
 

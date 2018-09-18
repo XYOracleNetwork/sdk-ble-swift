@@ -110,7 +110,7 @@ extension XYConnect: XYCentralDelegate {
             services.contains(connectableServices[0]) || services.contains(connectableServices[1])
             else { return }
         
-        self.device.setPeripheral(peripheral.peripheral)
+//        self.device.setPeripheral(peripheral.peripheral)
         self.delegate?.located(peripheral: peripheral)
 
         central.stop()
