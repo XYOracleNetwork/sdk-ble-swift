@@ -15,7 +15,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var deviceLabel: UILabel!
     @IBOutlet weak var countLabel: UILabel!
-
+    @IBOutlet weak var deviceName: UILabel!
+    @IBOutlet weak var deviceStatus: UILabel!
+    
     fileprivate let scanner = XYSmartScan.instance
     fileprivate var central = XYCentral.instance
     fileprivate var xy4Device: XYBluetoothDevice?
@@ -27,22 +29,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.spinner.stopAnimating()
-        xy4Device = XYFinderDeviceFactory.build(from:
-            XYIBeaconDefinition(
-                uuid: UUID(uuidString: "a44eacf4-0104-0000-0000-5f784c9977b5")!,
-                major: UInt16(80),
-                minor: UInt16(59060))
-        )
+//        xy4Device = XYFinderDeviceFactory.build(from:
+//            XYIBeaconDefinition(
+//                uuid: UUID(uuidString: "a44eacf4-0104-0000-0000-5f784c9977b5")!,
+//                major: UInt16(80),
+//                minor: UInt16(59060))
+//        )
 
-        central.setDelegate(self, key: "ViewController")
-        central.enable()
         rangedDevicesTableView.dataSource = self
+        rangedDevicesTableView.delegate = self
     }
 
     @IBAction func connectTapped(_ sender: Any) {
-//        guard let myDevice = xy4Device else { return }
-//        self.spinner.startAnimating()
-//        connect = BLEConnect(device: myDevice, delegate: self)
+        self.spinner.startAnimating()
+        central.setDelegate(self, key: "ViewController")
+        central.enable()
     }
 
     @IBAction func disconnectTapped(_ sender: Any) {
@@ -60,19 +61,21 @@ class ViewController: UIViewController {
     }
 
     @IBAction func actionTapped(_ sender: Any) {
-        guard let device = xy4Device else { return }
 
-        let buzzData = Data([UInt8(0x0b), 0x03])
-        
-        let calls: Set<SerivceCharacteristicDirective> = [
-            DeviceInformationService.firmwareRevisionString.read,
-            DeviceInformationService.manufacturerNameString.read,
-            BatteryService.level.read,
-//            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
-        ]
 
-        self.spinner.startAnimating()
-//        device.connectAndProcess(for: calls, complete: self.processResult)
+//        guard let device = xy4Device else { return }
+//
+//        let buzzData = Data([UInt8(0x0b), 0x03])
+//
+//        let calls: Set<SerivceCharacteristicDirective> = [
+//            DeviceInformationService.firmwareRevisionString.read,
+//            DeviceInformationService.manufacturerNameString.read,
+//            BatteryService.level.read,
+////            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
+//        ]
+//
+//        self.spinner.startAnimating()
+////        device.connectAndProcess(for: calls, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
@@ -89,7 +92,8 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         scanner.start()
         scanner.setDelegate(self, key: "ViewController")
-        guard let myDevice = xy4Device else { return }
+        
+//        guard let myDevice = xy4Device else { return }
 //        scanner.startTracking(for: myDevice)
     }
 
@@ -100,7 +104,7 @@ class ViewController: UIViewController {
 
 extension ViewController: XYSmartScanDelegate {
     func smartScan(location: XYLocationCoordinate2D) {
-        
+
     }
 
     func smartScan(entered device: XYBluetoothDevice) {
@@ -146,7 +150,22 @@ extension ViewController: UITableViewDataSource {
 
         return cell
     }
+}
 
+extension ViewController: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let device = self.rangedDevices[safe: indexPath.row] else { return }
+
+        guard central.state == .poweredOn else { return }
+
+        deviceName.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+        deviceStatus.text = "Connecting..."
+
+        self.spinner.startAnimating()
+
+        central.scan()
+    }
 
 }
 
@@ -157,16 +176,20 @@ extension ViewController: XYCentralDelegate {
 
     func stateChanged(newState: CBManagerState) {
         DispatchQueue.main.async {
+            self.spinner.stopAnimating()
             self.statusLabel.text = newState.toString
         }
     }
 
     func connected(peripheral: XYPeripheral) {
-        spinner.stopAnimating()
+        
     }
 
     func located(peripheral: XYPeripheral) {
-        print(peripheral.peripheral.name ?? "don't know")
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+            print(peripheral.peripheral.name ?? "don't know")
+        }
     }
 
     func disconnected(periperhal: XYPeripheral) {

@@ -46,7 +46,7 @@ public class XYCentral: NSObject {
     
     public static let instance = XYCentral()
 
-    fileprivate var cbManager: CBCentralManager!
+    fileprivate var cbManager: CBCentralManager?
     fileprivate let scanOptions = [CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true]
 
     fileprivate let defaultScanTimeout = 10
@@ -55,19 +55,20 @@ public class XYCentral: NSObject {
 
     fileprivate static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYLocateQueue")
 
-    fileprivate var state: CBManagerState {
-        return self.cbManager.state
-    }
-
     private override init() {
         super.init()
     }
 
     deinit {
-        self.cbManager.delegate = nil
+        self.cbManager?.delegate = nil
+    }
+
+    public var state: CBManagerState {
+        return self.cbManager?.state ?? .unknown
     }
 
     public func enable() {
+        // TODO check if already enabled and ready
         XYCentral.centralQueue.sync {
             self.cbManager = CBCentralManager(
                 delegate: self,
@@ -79,7 +80,7 @@ public class XYCentral: NSObject {
 
     public func reset() {
         XYCentral.centralQueue.sync {
-            self.cbManager.delegate = nil
+            self.cbManager?.delegate = nil
             self.cbManager = CBCentralManager(
                 delegate: self,
                 queue: XYCentral.centralQueue,
@@ -91,29 +92,29 @@ public class XYCentral: NSObject {
     // Connect to an already discovered peripheral
     public func connect(to device: XYBluetoothDevice, options: [String: Any]? = nil) {
         guard let peripheral = device.getPeripheral() else { return }
-        cbManager.connect(peripheral, options: options)
+        cbManager?.connect(peripheral, options: options)
     }
 
     // Disconnect from a peripheral
     public func disconnect(from device: XYBluetoothDevice) {
         guard let peripheral = device.getPeripheral() else { return }
-        cbManager.cancelPeripheralConnection(peripheral)
+        cbManager?.cancelPeripheralConnection(peripheral)
     }
 
     // Ask for devices with the requested/all services until requested to stop()
     public func scan(for services: [ServiceCharacteristic]? = nil, timeout: DispatchTimeInterval = .seconds(10)) {
         guard state == .poweredOn else { return }
-        self.cbManager.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
+        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
 
     public func stop() {
-        self.cbManager.stopScan()
+        self.cbManager?.stopScan()
     }
 
     // Connect to device
     public func connect(to device: XYBluetoothDevice) {
         guard let peripheral = device.getPeripheral() else { return }
-        self.cbManager.connect(peripheral)
+        self.cbManager?.connect(peripheral)
     }
 
     public func setDelegate(_ delegate: XYCentralDelegate, key: String) {
@@ -141,7 +142,7 @@ public class XYCentral: NSObject {
 extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        self.delegates.forEach { $1?.stateChanged(newState: self.state) }
+        self.delegates.forEach { $1?.stateChanged(newState: central.state) }
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
