@@ -87,7 +87,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: BLELocateDelegate {
+extension ViewController: BLECentralDelegate {
     func connected(peripheral: BLEPeripheral) {
         spinner.stopAnimating()
     }
@@ -97,4 +97,8 @@ extension ViewController: BLELocateDelegate {
     }
 
     func ableToConnect() {}
+
+    func disconnected(periperhal: BLEPeripheral) {
+        
+    }
 }

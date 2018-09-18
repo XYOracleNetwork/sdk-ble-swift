@@ -15,6 +15,9 @@ public class XYFinderDeviceFactory {
         switch family {
         case .xy4:
             return XY4BluetoothDevice(iBeacon)
+        case .xy3:
+            print("xy3 found")
+            fallthrough
         default:
             return nil
         }

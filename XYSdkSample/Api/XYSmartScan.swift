@@ -93,9 +93,9 @@ extension XYSmartScan: BLELocationDelegate {
 
             if beacon.powerLevel == UInt(8) { print("found it \(beacon.id)") }
 
-//            if beacon.powerLevel == 8, let device = beacon as? XYFinderDevice {
-//                print(device.iBeacon!.xyId(from: .xy4))
-//            }
+            if beacon.powerLevel == 8, let device = beacon as? XYFinderDevice {
+                print(device.iBeacon!.xyId(from: .xy4))
+            }
         }
     }
 

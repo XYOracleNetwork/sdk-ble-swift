@@ -16,17 +16,27 @@ enum BLEConnectError: Error {
     case couldNotConnect
 }
 
+public enum BLEConnectState {
+    case connected
+    case disconnected
+}
+
 // Creates a connection to one device, loading it and all the services
 class BLEConnect {
     fileprivate let central = BLECentral.instance
     fileprivate let device: XYBluetoothDevice
 
-    fileprivate weak var delegate: BLELocateDelegate?
+    fileprivate weak var delegate: BLECentralDelegate?
+
+    fileprivate(set) var state: BLEConnectState = .disconnected
 
     fileprivate let
     (connectPromise, connectSeal) = Promise<Void>.pending()
-    
-    init(device: XYBluetoothDevice, delegate: BLELocateDelegate? = nil) {
+
+    fileprivate let
+    (disconnectPromise, disconnectSeal) = Promise<Void>.pending()
+
+    init(device: XYBluetoothDevice, delegate: BLECentralDelegate? = nil) {
         self.device = device
         self.delegate = delegate
 
@@ -41,8 +51,13 @@ class BLEConnect {
         central.stop()
     }
 
-    public func disconnect() {
+    public func disconnect() -> Promise<Void> {
         central.disconnect(from: self.device)
+        return disconnectPromise
+    }
+
+    deinit {
+        print("I am one")
     }
 }
 
@@ -59,7 +74,7 @@ extension BLEConnect {
     }
 }
 
-extension BLEConnect: BLELocateDelegate {
+extension BLEConnect: BLECentralDelegate {
     func connected(peripheral: BLEPeripheral) {
         guard peripheral.peripheral == self.device.getPeripheral()
             else { self.connectSeal.reject(BLEConnectError.couldNotConnect); return }
@@ -91,7 +106,9 @@ extension BLEConnect: BLELocateDelegate {
         central.connect(to: self.device)
     }
 
-    func ableToConnect() {
-//        connect()
+    func ableToConnect() {}
+
+    func disconnected(periperhal: BLEPeripheral) {
+        disconnectSeal.fulfill(())
     }
 }

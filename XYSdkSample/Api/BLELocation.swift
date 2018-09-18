@@ -96,6 +96,7 @@ extension BLELocation {
 extension BLELocation: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+        print(beacons.count)
         self.delegate?.didRangeBeacons(beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition) })
     }
 

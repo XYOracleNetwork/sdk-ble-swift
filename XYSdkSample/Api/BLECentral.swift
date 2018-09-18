@@ -17,9 +17,10 @@ public struct BLEPeripheral {
     rssi: NSNumber?
 }
 
-public protocol BLELocateDelegate: class {
+public protocol BLECentralDelegate: class {
     func located(peripheral: BLEPeripheral)
     func connected(peripheral: BLEPeripheral)
+    func disconnected(periperhal: BLEPeripheral)
     func ableToConnect()
 }
 
@@ -28,9 +29,9 @@ public typealias BLELocateCallback = ([BLEPeripheral]) -> Void
 public class BLECentral: NSObject {
 
     // TODO weak refs
-    fileprivate var delegates = [String: BLELocateDelegate?]()
+    fileprivate var delegates = [String: BLECentralDelegate?]()
     
-    fileprivate let
+    fileprivate var
     (poweredPromise, poweredSeal) = Promise<Void>.pending()
     
     public static let instance = BLECentral()
@@ -63,7 +64,9 @@ public class BLECentral: NSObject {
             delegate: self,
             queue: BLECentral.dispatchQueue,
             options: nil) // [CBCentralManagerOptionRestoreIdentifierKey : "com.xyfindables.sdk.BLELocateQueue"]
-        
+
+        (poweredPromise, poweredSeal) = Promise<Void>.pending()
+
         return poweredPromise
     }
     
@@ -123,7 +126,7 @@ public class BLECentral: NSObject {
         self.cbManager?.connect(peripheral)
     }
 
-    public func setDelegate(_ delegate: BLELocateDelegate, key: String) {
+    public func setDelegate(_ delegate: BLECentralDelegate, key: String) {
         self.delegates[key] = delegate
     }
 
@@ -175,6 +178,7 @@ extension BLECentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        print("I disconnected")
+        self.peripherals.removeValue(forKey: peripheral.identifier)
+        self.delegates.forEach { $1?.disconnected(periperhal: BLEPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
     }
 }
