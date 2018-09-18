@@ -10,10 +10,6 @@ import Foundation
 import CoreBluetooth
 import Promises
 
-public protocol XY4BluetoothDeviceDelegate {
-    func foundServices()
-}
-
 public typealias GattSuccessCallback = ([XYBluetoothValue]) -> Void
 public typealias GattErrorCallback = (Error) -> Void
 // public typealias GattTimeout = () -> Void
@@ -30,10 +26,6 @@ public class XYBluetoothDevice: NSObject {
     fileprivate var rssi: Int = XYDeviceProximity.none.rawValue
     fileprivate var peripheral: CBPeripheral?
     fileprivate var services = [ServiceCharacteristic]()
-    fileprivate var connection: BLEConnect?
-
-    // The chain ensures each call is made in sequence
-    fileprivate lazy var promiseChain = Promise<Void>.pending()
     
     fileprivate var delegates = [String: CBPeripheralDelegate]()
 
@@ -56,8 +48,6 @@ public class XYBluetoothDevice: NSObject {
         self.uuid = uuid
         self.id = id
         super.init()
-
-        self.connection = BLEConnect(device: self)
     }
 
     public var powerLevel: UInt8 { return UInt8(4) }
@@ -115,9 +105,15 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 }
 
-// TODO may want to rethink this, as this does overload device will all these callbacks
 public extension XYBluetoothDevice {
-    
+
+    func connect() {
+        let central = XYCentral.instance
+
+        central.connect(to: self)
+    }
+
+    /*
     func connectAndProcess(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: GattSuccessCallback?) {
         // Build a dictionary of the results
         var values = [XYBluetoothValue]()
@@ -180,4 +176,5 @@ public extension XYBluetoothDevice {
 
         return true
     }
+ */
 }

@@ -12,8 +12,9 @@ import CoreBluetooth
 public struct XYPeripheral {
     public let
     peripheral: CBPeripheral,
-    advertisementData: [String: Any]?,
-    rssi: NSNumber?
+    advertisementData: [String: Any]?
+
+    var rssi: NSNumber?
 }
 
 public extension CBManagerState {
@@ -144,13 +145,16 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        guard peripherals[peripheral.identifier] == nil else { return }
-        let wrappedPeripheral = XYPeripheral(
-            peripheral: peripheral,
-            advertisementData: advertisementData,
-            rssi: RSSI)
+        var wrappedPeripheral: XYPeripheral
+        if let alreadySeenPeripehral = peripherals[peripheral.identifier] {
+            wrappedPeripheral = alreadySeenPeripehral
+            guard alreadySeenPeripehral.peripheral == peripheral else { return }
+            wrappedPeripheral.rssi = RSSI
+        } else {
+            wrappedPeripheral = XYPeripheral(peripheral: peripheral, advertisementData: advertisementData, rssi: RSSI)
+            self.peripherals[peripheral.identifier] = wrappedPeripheral
+        }
 
-        self.peripherals[peripheral.identifier] = wrappedPeripheral
         self.delegates.forEach { $1?.located(peripheral: wrappedPeripheral) }
     }
 

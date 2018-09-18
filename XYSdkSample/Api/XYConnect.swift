@@ -22,7 +22,7 @@ public enum BLEConnectState {
 }
 
 // Creates a connection to one device, loading it and all the services
-class BLEConnect {
+class XYConnect {
     fileprivate let central = XYCentral.instance
     fileprivate let device: XYBluetoothDevice
 
@@ -64,7 +64,7 @@ class BLEConnect {
     }
 }
 
-extension BLEConnect {
+extension XYConnect {
 //    func connect(to device: XYBluetoothDevice) -> Promise<Void> {
 //        // Ensure central can use ble
 //        _ = firstly {
@@ -77,7 +77,7 @@ extension BLEConnect {
 //    }
 }
 
-extension BLEConnect: XYCentralDelegate {
+extension XYConnect: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
         
     }

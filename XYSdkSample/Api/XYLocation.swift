@@ -9,7 +9,7 @@
 import CoreLocation
 import CoreBluetooth
 
-public protocol BLELocationDelegate: class {
+public protocol XYLocationDelegate: class {
     func didRangeBeacons(_ beacons: [XYBluetoothDevice])
     func deviceEntered(_ device: XYBluetoothDevice)
     func deviceExited(_ device: XYBluetoothDevice)
@@ -22,7 +22,7 @@ public class XYLocation: NSObject {
 
     fileprivate let manager = CLLocationManager()
 
-    fileprivate weak var delegate: BLELocationDelegate?
+    fileprivate weak var delegate: XYLocationDelegate?
 
     private override init() {
         super.init()
@@ -33,7 +33,7 @@ public class XYLocation: NSObject {
         manager.delegate = self
     }
 
-    public func setDelegate(_ delegate: BLELocationDelegate) {
+    public func setDelegate(_ delegate: XYLocationDelegate) {
         self.delegate = delegate
     }
 

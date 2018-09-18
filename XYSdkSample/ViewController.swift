@@ -14,10 +14,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var deviceLabel: UILabel!
-    
+    @IBOutlet weak var countLabel: UILabel!
+
     fileprivate let scanner = XYSmartScan.instance
     fileprivate var central = XYCentral.instance
     fileprivate var xy4Device: XYBluetoothDevice?
+
+    @IBOutlet weak var rangedDevicesTableView: UITableView!
+
+    fileprivate var rangedDevices = [XY4BluetoothDevice]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +36,7 @@ class ViewController: UIViewController {
 
         central.setDelegate(self, key: "ViewController")
         central.enable()
+        rangedDevicesTableView.dataSource = self
     }
 
     @IBAction func connectTapped(_ sender: Any) {
@@ -66,7 +72,7 @@ class ViewController: UIViewController {
         ]
 
         self.spinner.startAnimating()
-        device.connectAndProcess(for: calls, complete: self.processResult)
+//        device.connectAndProcess(for: calls, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
@@ -81,14 +87,51 @@ class ViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-//        scanner.start()
-//        guard let myDevice = xy4Device else { return }
+        scanner.start()
+        scanner.setDelegate(self, key: "ViewController")
+        guard let myDevice = xy4Device else { return }
 //        scanner.startTracking(for: myDevice)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
 //        connect?.stop()
     }
+}
+
+extension ViewController: XYSmartScanDelegate {
+    func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int) {
+        DispatchQueue.main.async {
+            if self.rangedDevices.contains(where: { $0.id == device.id }) {
+                return
+            }
+
+            self.rangedDevices.append(device)
+            self.rangedDevicesTableView.reloadData()
+            self.countLabel.text = "\(self.rangedDevices.count)"
+        }
+    }
+}
+
+extension ViewController: UITableViewDataSource {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return rangedDevices.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "rangedDevicesCell")!
+
+        let device = rangedDevices[indexPath.row]
+
+        cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+
+        return cell
+    }
+
+
 }
 
 extension ViewController: XYCentralDelegate {

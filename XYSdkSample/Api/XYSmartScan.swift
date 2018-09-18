@@ -8,19 +8,21 @@
 
 import Foundation
 
-//public protocol XYSmartScanDelegate {
-//    func smartScan(_ smartScan:XYSmartScan!, status:XYSmartScanStatus)
-//    func smartScan(_ smartScan:XYSmartScan!, location:XYLocationCoordinate2D)
-//    func smartScan(_ smartScan:XYSmartScan!, detected device: XYDevice!, signalStrength: Int)
-//    func smartScan(_ smartScan:XYSmartScan!, entered device:XYDevice!)
-//    func smartScan(_ smartScan:XYSmartScan!, exiting device:XYDevice!)
-//    func smartScan(_ smartScan:XYSmartScan!, exited device:XYDevice!)
-//    func smartScan(_ smartScan:XYSmartScan!, updated device:XYDevice!)
-//}
+public protocol XYSmartScanDelegate {
+//    func smartScan(status:cXYSmartScanStatus)
+//    func smartScan(location:XYLocationCoordinate2D)
+    func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int)
+//    func smartScan(entered device:XYBluetoothDevice)
+//    func smartScan(exiting device:XYBluetoothDevice)
+//    func smartScan(exited device:XYBluetoothDevice)
+//    func smartScan(updated device:XYBluetoothDevice)
+}
 
 public class XYSmartScan {
 
     public static let instance = XYSmartScan()
+
+    fileprivate var delegates = [String: XYSmartScanDelegate?]()
 
     fileprivate var trackedDevices = [String: XYBluetoothDevice]()
 
@@ -37,13 +39,19 @@ public class XYSmartScan {
         location.startRanging(for: [.xy4])
 
         // TODO find devices from tracked devices
-
-        location.startRangning(for: [])
     }
 
     public func stop() {
         location.clearRanging()
         // TODO clear tracked devices
+    }
+
+    public func setDelegate(_ delegate: XYSmartScanDelegate, key: String) {
+        self.delegates[key] = delegate
+    }
+
+    public func removeDelegate(for key: String) {
+        self.delegates.removeValue(forKey: key)
     }
 }
 
@@ -76,13 +84,14 @@ extension XYSmartScan {
 }
 
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
-extension XYSmartScan: BLELocationDelegate {
+extension XYSmartScan: XYLocationDelegate {
 
     public func locationsUpdated(_ locations: [XYLocationCoordinate2D]) {
         
     }
 
     public func didRangeBeacons(_ beacons: [XYBluetoothDevice]) {
+        print("Beacon cound in SmartScan: \(beacons.count)")
         beacons.forEach { beacon in
             if beacon.inRange {
                 // TODO report in range
@@ -93,18 +102,18 @@ extension XYSmartScan: BLELocationDelegate {
 
             if beacon.powerLevel == UInt(8) { print("found it \(beacon.id)") }
 
-            if beacon.powerLevel == 8, let device = beacon as? XYFinderDevice {
-                print(device.iBeacon!.xyId(from: .xy4))
+            if let xy4iBeacon = beacon as? XY4BluetoothDevice {
+                self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: 0)}
             }
         }
     }
 
     public func deviceEntered(_ device: XYBluetoothDevice) {
-
+        print("ergerteed")
     }
 
     public func deviceExited(_ device: XYBluetoothDevice) {
-
+        print("existered")
     }
     
 }
