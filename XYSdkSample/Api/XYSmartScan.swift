@@ -24,7 +24,7 @@ public class XYSmartScan {
 
     fileprivate var trackedDevices = [String: XYBluetoothDevice]()
 
-    fileprivate let location = BLELocation.instance
+    fileprivate let location = XYLocation.instance
 
     private init() {
         location.setDelegate(self)

@@ -23,10 +23,10 @@ public enum BLEConnectState {
 
 // Creates a connection to one device, loading it and all the services
 class BLEConnect {
-    fileprivate let central = BLECentral.instance
+    fileprivate let central = XYCentral.instance
     fileprivate let device: XYBluetoothDevice
 
-    fileprivate weak var delegate: BLECentralDelegate?
+    fileprivate weak var delegate: XYCentralDelegate?
 
     fileprivate(set) var state: BLEConnectState = .disconnected
 
@@ -36,7 +36,7 @@ class BLEConnect {
     fileprivate let
     (disconnectPromise, disconnectSeal) = Promise<Void>.pending()
 
-    init(device: XYBluetoothDevice, delegate: BLECentralDelegate? = nil) {
+    init(device: XYBluetoothDevice, delegate: XYCentralDelegate? = nil) {
         self.device = device
         self.delegate = delegate
 
@@ -74,7 +74,7 @@ extension BLEConnect {
     }
 }
 
-extension BLEConnect: BLECentralDelegate {
+extension BLEConnect: XYCentralDelegate {
     func connected(peripheral: BLEPeripheral) {
         guard peripheral.peripheral == self.device.getPeripheral()
             else { self.connectSeal.reject(BLEConnectError.couldNotConnect); return }

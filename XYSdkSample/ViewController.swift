@@ -87,7 +87,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: BLECentralDelegate {
+extension ViewController: XYCentralDelegate {
     func connected(peripheral: BLEPeripheral) {
         spinner.stopAnimating()
     }

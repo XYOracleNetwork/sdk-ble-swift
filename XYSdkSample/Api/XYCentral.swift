@@ -1,5 +1,5 @@
 //
-//  BLECentral.swift
+//  XYCentral.swift
 //  XYSdk
 //
 //  Created by Darren Sutherland on 9/6/18.
@@ -17,24 +17,22 @@ public struct BLEPeripheral {
     rssi: NSNumber?
 }
 
-public protocol BLECentralDelegate: class {
+public protocol XYCentralDelegate: class {
     func located(peripheral: BLEPeripheral)
     func connected(peripheral: BLEPeripheral)
     func disconnected(periperhal: BLEPeripheral)
     func ableToConnect()
 }
 
-public typealias BLELocateCallback = ([BLEPeripheral]) -> Void
-
-public class BLECentral: NSObject {
+public class XYCentral: NSObject {
 
     // TODO weak refs
-    fileprivate var delegates = [String: BLECentralDelegate?]()
+    fileprivate var delegates = [String: XYCentralDelegate?]()
     
     fileprivate var
     (poweredPromise, poweredSeal) = Promise<Void>.pending()
     
-    public static let instance = BLECentral()
+    public static let instance = XYCentral()
 
     fileprivate final var cbManager: CBCentralManager?
 
@@ -46,9 +44,6 @@ public class BLECentral: NSObject {
     fileprivate var peripherals = [UUID: BLEPeripheral]()
 
     private static let dispatchQueue = DispatchQueue(label:"com.xyfindables.sdk.BLELocateQueue", attributes: .concurrent)
-
-    private let timerQueue = DispatchQueue(label: "com.xyfindables.sdk.BLELocateTimeoutQueue")
-    private var timeoutSource: DispatchSourceTimer?
 
     private override init() {
         super.init()
@@ -62,7 +57,7 @@ public class BLECentral: NSObject {
         // Create central
         self.cbManager = CBCentralManager(
             delegate: self,
-            queue: BLECentral.dispatchQueue,
+            queue: XYCentral.dispatchQueue,
             options: nil) // [CBCentralManagerOptionRestoreIdentifierKey : "com.xyfindables.sdk.BLELocateQueue"]
 
         (poweredPromise, poweredSeal) = Promise<Void>.pending()
@@ -92,24 +87,6 @@ public class BLECentral: NSObject {
         self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
 
-    // Ask for devices with the requested/all services with a specific timeout/default timeout, and callback with results if desired
-    public func start(for services: [ServiceCharacteristic]? = nil, timeout: Int? = nil, complete: BLELocateCallback? = nil) {
-        guard ableToConnect else { return }
-        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: scanOptions)
-        self.timerQueue.sync {
-            self.timeoutSource = DispatchSource.singleTimer(interval: .seconds(timeout ?? defaultScanTimeout), queue: self.timerQueue) { [weak self] in
-                self?.stop()
-                self?.timeoutSource = nil
-                complete?(self?.peripherals.map { $1 } ?? [])
-            }
-        }
-    }
-
-    // Request to locate a specific device with timeout/default timeout and callback with either the device or empty array
-    public func start(for peripheral: UUID, timeout: Int? = nil, complete: BLELocateCallback) {
-        guard ableToConnect else { return }
-    }
-
     // Poll for devices with the requested/all services, waiting an interval in between, and specifying a max interval
     public func start(for services: [ServiceCharacteristic]? = nil, interval: Int, timeout: Int? = nil, maxIntervals: Int? = nil) {
         guard ableToConnect else { return }
@@ -126,7 +103,7 @@ public class BLECentral: NSObject {
         self.cbManager?.connect(peripheral)
     }
 
-    public func setDelegate(_ delegate: BLECentralDelegate, key: String) {
+    public func setDelegate(_ delegate: XYCentralDelegate, key: String) {
         self.delegates[key] = delegate
     }
 
@@ -148,7 +125,7 @@ public class BLECentral: NSObject {
     }
 }
 
-extension BLECentral: CBCentralManagerDelegate {
+extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         // TODO Disconnect everything

@@ -1,5 +1,5 @@
 //
-//  BLELocation.swift
+//  XYLocation.swift
 //  XYSdkSample
 //
 //  Created by Darren Sutherland on 9/7/18.
@@ -16,9 +16,9 @@ public protocol BLELocationDelegate: class {
     func locationsUpdated(_ locations: [XYLocationCoordinate2D])
 }
 
-public class BLELocation: NSObject {
+public class XYLocation: NSObject {
 
-    public static let instance = BLELocation()
+    public static let instance = XYLocation()
 
     fileprivate let manager = CLLocationManager()
 
@@ -40,7 +40,7 @@ public class BLELocation: NSObject {
 }
 
 // MARK: Ranging methods (used for foreground operations)
-extension BLELocation {
+extension XYLocation {
 
     public func startRanging(for families: [XYFinderDeviceFamily]) {
         families.forEach { startRangning(for: $0) }
@@ -88,12 +88,12 @@ extension BLELocation {
 }
 
 // MARK: Monitoring methods (used for background operation)
-extension BLELocation {
+extension XYLocation {
 
 }
 
 // MARK: CLLocationManagerDelegate
-extension BLELocation: CLLocationManagerDelegate {
+extension XYLocation: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
         print(beacons.count)
