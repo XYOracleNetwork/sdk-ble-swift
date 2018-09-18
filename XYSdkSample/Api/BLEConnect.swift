@@ -78,6 +78,10 @@ extension BLEConnect {
 }
 
 extension BLEConnect: XYCentralDelegate {
+    func couldNotConnect(peripheral: XYPeripheral) {
+        
+    }
+
     func stateChanged(newState: CBManagerState) {
         
     }

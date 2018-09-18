@@ -16,9 +16,24 @@ public struct XYPeripheral {
     rssi: NSNumber?
 }
 
+public extension CBManagerState {
+
+    public var toString: String {
+        switch self {
+        case .poweredOff: return "Powered Off"
+        case .poweredOn: return "Powered On"
+        case .resetting: return "Resetting"
+        case .unauthorized: return "Unauthorized"
+        case .unknown: return "Unknown"
+        case .unsupported: return "Unsupported"
+        }
+    }
+}
+
 public protocol XYCentralDelegate: class {
     func located(peripheral: XYPeripheral)
     func connected(peripheral: XYPeripheral)
+    func couldNotConnect(peripheral: XYPeripheral)
     func disconnected(periperhal: XYPeripheral)
     func stateChanged(newState: CBManagerState)
 }
@@ -45,14 +60,20 @@ public class XYCentral: NSObject {
 
     private override init() {
         super.init()
-        self.cbManager = CBCentralManager(
-            delegate: self,
-            queue: XYCentral.centralQueue,
-            options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
     }
 
     deinit {
         self.cbManager.delegate = nil
+    }
+
+    public func enable() {
+        XYCentral.centralQueue.sync {
+            self.cbManager = CBCentralManager(
+                delegate: self,
+                queue: XYCentral.centralQueue,
+                options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
+            self.peripherals.removeAll()
+        }
     }
 
     public func reset() {
@@ -119,9 +140,7 @@ public class XYCentral: NSObject {
 extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if self.state == .poweredOn {
-            self.delegates.forEach { $1?.stateChanged(newState: self.state) }
-        }
+        self.delegates.forEach { $1?.stateChanged(newState: self.state) }
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
@@ -137,6 +156,10 @@ extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         self.delegates.forEach { $1?.connected(peripheral: XYPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
+    }
+
+    public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+
     }
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {

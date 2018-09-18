@@ -12,7 +12,9 @@ import CoreBluetooth
 class ViewController: UIViewController {
 
     @IBOutlet weak var spinner: UIActivityIndicatorView!
-
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var deviceLabel: UILabel!
+    
     fileprivate let scanner = XYSmartScan.instance
     fileprivate var central = XYCentral.instance
     fileprivate var xy4Device: XYBluetoothDevice?
@@ -28,6 +30,7 @@ class ViewController: UIViewController {
         )
 
         central.setDelegate(self, key: "ViewController")
+        central.enable()
     }
 
     @IBAction func connectTapped(_ sender: Any) {
@@ -89,8 +92,14 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: XYCentralDelegate {
+    func couldNotConnect(peripheral: XYPeripheral) {
+
+    }
+
     func stateChanged(newState: CBManagerState) {
-        print(newState)
+        DispatchQueue.main.async {
+            self.statusLabel.text = newState.toString
+        }
     }
 
     func connected(peripheral: XYPeripheral) {
