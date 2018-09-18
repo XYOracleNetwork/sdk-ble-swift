@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreBluetooth
-import PromiseKit
+import Promises
 
 enum GattError: Error {
     case notConnected
@@ -31,10 +31,10 @@ public enum GattCharacteristicType {
 }
 
 class GattClient: NSObject {
-    // Promises that resolve locating the characteristic and returning the
-    fileprivate var
-    (characteristicPromise, characteristicSeal) = Promise<Void>.pending(),
-    (operationPromise, operationSeal) = Promise<Data?>.pending()
+    // Promises that resolve locating the characteristic and reading and writing data
+    fileprivate var characteristicPromise = Promise<Void>.pending()
+    fileprivate lazy var readPromise = Promise<Data?>.pending()
+    fileprivate lazy var writePromise = Promise<Void>.pending()
 
     fileprivate let serviceCharacteristic: ServiceCharacteristic
 
@@ -48,8 +48,7 @@ class GattClient: NSObject {
     }
     
     deinit {
-        // TODO remove any unfulfilled promiseses if something goes wrong
-//        if !characteristicPromise.isFulfilled { characteristicSeal.reject()
+
     }
     
     // TODO: Change to a per-session token for the key
@@ -58,23 +57,19 @@ class GattClient: NSObject {
     }
 
     func get(from device: XYBluetoothDevice, valueObj: XYBluetoothValue) -> Promise<Void> {
-        return firstly {
-            self.getCharacteristic(device)
-        }.then {
+        return self.getCharacteristic(device).then {
             self.read(device)
-        }.done { result in
+        }.then { result in
             valueObj.setData(result)
-        }.ensure {
+        }.always {
             self.device?.unsubscribe(for: self.delegateKey(deviceUuid: device.uuid))
         }
     }
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
-        return firstly {
-            self.getCharacteristic(device)
-        }.then {
+        return self.getCharacteristic(device).then {
             self.write(device, data: valueObj, withResponse: withResponse)
-        }.ensure {
+        }.always {
             self.device?.unsubscribe(for: self.delegateKey(deviceUuid: device.uuid))
         }
     }
@@ -83,7 +78,10 @@ class GattClient: NSObject {
         guard
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
-            else { return Promise(error: GattError.notConnected) }
+            else {
+                self.characteristicPromise.reject(GattError.notConnected)
+                return self.characteristicPromise
+            }
         
         self.device = device
         device.subscribe(self, key: self.delegateKey(deviceUuid: device.uuid))
@@ -101,11 +99,14 @@ private extension GattClient {
             let characteristic = self.characteristic,
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
-            else { return Promise(error: GattError.notConnected) }
+            else {
+                self.readPromise.reject(GattError.notConnected)
+                return self.readPromise
+            }
 
         peripheral.readValue(for: characteristic)
 
-        return self.operationPromise
+        return self.readPromise
     }
 
 }
@@ -119,11 +120,14 @@ private extension GattClient {
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected,
             let data = data.data
-            else { return Promise(error: GattError.notConnected) }
+            else {
+                self.writePromise.reject(GattError.notConnected)
+                return self.writePromise
+            }
 
         peripheral.writeValue(data, for: characteristic, type: withResponse ? .withResponse : .withoutResponse)
 
-        return self.operationPromise.asVoid()
+        return self.writePromise
     }
 
 }
@@ -133,11 +137,11 @@ extension GattClient: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard
             self.device?.getPeripheral() == peripheral
-            else { self.characteristicSeal.reject(GattError.mismatchedPeripheral); return }
+            else {  return }
 
         guard
             let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.serviceUuid }).first
-            else { self.characteristicSeal.reject(GattError.serviceNotFound); return }
+            else {  return }
 
         peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
     }
@@ -145,38 +149,38 @@ extension GattClient: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard
             self.device?.getPeripheral() == peripheral
-            else { self.characteristicSeal.reject(GattError.mismatchedPeripheral); return }
+            else {  return }
 
         guard
             let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristicUuid }).first
-            else { self.characteristicSeal.reject(GattError.characteristicNotFound); return }
+            else {  return }
 
         self.characteristic = characteristic
         
-        characteristicSeal.fulfill(())
+        self.characteristicPromise.fulfill(())
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard
             self.device?.getPeripheral() == peripheral
-            else { self.operationSeal.reject(GattError.mismatchedPeripheral); return }
+            else {  return }
 
         guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
-            else { self.operationSeal.reject(GattError.characteristicNotFound); return }
+            else {  return }
 
         guard
             let data = characteristic.value
-            else { self.operationSeal.reject(GattError.dataNotPresent); return }
+            else {  return }
 
-        operationSeal.fulfill(data)
+        readPromise.fulfill(data)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         guard
             self.device?.getPeripheral() == peripheral
-            else { self.operationSeal.reject(GattError.mismatchedPeripheral); return }
+            else {  return }
 
-        operationSeal.fulfill(nil)
+        writePromise.fulfill(())
     }
 
 }

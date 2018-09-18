@@ -7,7 +7,7 @@
 //
 
 import CoreBluetooth
-import PromiseKit
+import Promises
 
 public protocol ServiceCharacteristic {
     var serviceUuid: CBUUID { get }

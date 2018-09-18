@@ -8,9 +8,8 @@
 
 import Foundation
 import CoreBluetooth
-import PromiseKit
 
-public struct BLEPeripheral {
+public struct XYPeripheral {
     public let
     peripheral: CBPeripheral,
     advertisementData: [String: Any]?,
@@ -18,10 +17,10 @@ public struct BLEPeripheral {
 }
 
 public protocol XYCentralDelegate: class {
-    func located(peripheral: BLEPeripheral)
-    func connected(peripheral: BLEPeripheral)
-    func disconnected(periperhal: BLEPeripheral)
-    func ableToConnect()
+    func located(peripheral: XYPeripheral)
+    func connected(peripheral: XYPeripheral)
+    func disconnected(periperhal: XYPeripheral)
+    func stateChanged(newState: CBManagerState)
 }
 
 public class XYCentral: NSObject {
@@ -29,78 +28,70 @@ public class XYCentral: NSObject {
     // TODO weak refs
     fileprivate var delegates = [String: XYCentralDelegate?]()
     
-    fileprivate var
-    (poweredPromise, poweredSeal) = Promise<Void>.pending()
-    
     public static let instance = XYCentral()
 
-    fileprivate final var cbManager: CBCentralManager?
-
+    fileprivate var cbManager: CBCentralManager!
     fileprivate let scanOptions = [CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true]
 
-    fileprivate var ableToConnect: Bool = false
     fileprivate let defaultScanTimeout = 10
 
-    fileprivate var peripherals = [UUID: BLEPeripheral]()
+    fileprivate var peripherals = [UUID: XYPeripheral]()
 
-    private static let dispatchQueue = DispatchQueue(label:"com.xyfindables.sdk.BLELocateQueue", attributes: .concurrent)
+    fileprivate static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYLocateQueue")
+
+    fileprivate var state: CBManagerState {
+        return self.cbManager.state
+    }
 
     private override init() {
         super.init()
-    }
-
-    public var isAbleToConnect: Bool {
-        return self.ableToConnect
-    }
-    
-    public func enable() -> Promise<Void> {
-        // Create central
         self.cbManager = CBCentralManager(
             delegate: self,
-            queue: XYCentral.dispatchQueue,
-            options: nil) // [CBCentralManagerOptionRestoreIdentifierKey : "com.xyfindables.sdk.BLELocateQueue"]
-
-        (poweredPromise, poweredSeal) = Promise<Void>.pending()
-
-        return poweredPromise
+            queue: XYCentral.centralQueue,
+            options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
     }
-    
-    public func disable() {
-        
+
+    deinit {
+        self.cbManager.delegate = nil
+    }
+
+    public func reset() {
+        XYCentral.centralQueue.sync {
+            self.cbManager.delegate = nil
+            self.cbManager = CBCentralManager(
+                delegate: self,
+                queue: XYCentral.centralQueue,
+                options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
+            self.peripherals.removeAll()
+        }
     }
 
     // Connect to an already discovered peripheral
     public func connect(to device: XYBluetoothDevice, options: [String: Any]? = nil) {
         guard let peripheral = device.getPeripheral() else { return }
-        cbManager?.connect(peripheral, options: options)
+        cbManager.connect(peripheral, options: options)
     }
 
     // Disconnect from a peripheral
     public func disconnect(from device: XYBluetoothDevice) {
         guard let peripheral = device.getPeripheral() else { return }
-        cbManager?.cancelPeripheralConnection(peripheral)
+        cbManager.cancelPeripheralConnection(peripheral)
     }
 
     // Ask for devices with the requested/all services until requested to stop()
-    public func scan(for services: [ServiceCharacteristic]? = nil) {
-        guard ableToConnect else { return }
-        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
+    public func scan(for services: [ServiceCharacteristic]? = nil, timeout: DispatchTimeInterval = .seconds(10)) {
+        guard state == .poweredOn else { return }
+        self.cbManager.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
 
-    // Poll for devices with the requested/all services, waiting an interval in between, and specifying a max interval
-    public func start(for services: [ServiceCharacteristic]? = nil, interval: Int, timeout: Int? = nil, maxIntervals: Int? = nil) {
-        guard ableToConnect else { return }
-    }
-
-    // Stop scanning. Useful for the polling start() above
     public func stop() {
-        self.cbManager?.stopScan()
+        self.cbManager.stopScan()
     }
 
     // Connect to device
     public func connect(to device: XYBluetoothDevice) {
         guard let peripheral = device.getPeripheral() else { return }
-        self.cbManager?.connect(peripheral)
+        self.cbManager.connect(peripheral)
     }
 
     public func setDelegate(_ delegate: XYCentralDelegate, key: String) {
@@ -128,16 +119,14 @@ public class XYCentral: NSObject {
 extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        // TODO Disconnect everything
-        
-        self.ableToConnect = central.state == .poweredOn
-        if self.ableToConnect { self.delegates.forEach { $1?.ableToConnect() } }
-        poweredSeal.fulfill(Void())
+        if self.state == .poweredOn {
+            self.delegates.forEach { $1?.stateChanged(newState: self.state) }
+        }
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         guard peripherals[peripheral.identifier] == nil else { return }
-        let wrappedPeripheral = BLEPeripheral(
+        let wrappedPeripheral = XYPeripheral(
             peripheral: peripheral,
             advertisementData: advertisementData,
             rssi: RSSI)
@@ -147,7 +136,7 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        self.delegates.forEach { $1?.connected(peripheral: BLEPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
+        self.delegates.forEach { $1?.connected(peripheral: XYPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
     }
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
@@ -156,6 +145,6 @@ extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         self.peripherals.removeValue(forKey: peripheral.identifier)
-        self.delegates.forEach { $1?.disconnected(periperhal: BLEPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
+        self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
     }
 }

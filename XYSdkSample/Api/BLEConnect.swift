@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreBluetooth
-import PromiseKit
+import Promises
 
 enum BLEConnectError: Error {
     case noServicesFound
@@ -30,11 +30,14 @@ class BLEConnect {
 
     fileprivate(set) var state: BLEConnectState = .disconnected
 
-    fileprivate let
-    (connectPromise, connectSeal) = Promise<Void>.pending()
-
-    fileprivate let
-    (disconnectPromise, disconnectSeal) = Promise<Void>.pending()
+//    fileprivate let connectPromise = Promise<Void>.pending()
+//    fileprivate lazy var di
+//
+////    fileprivate let
+////    (connectPromise, connectSeal) = Promise<Void>.pending()
+////
+////    fileprivate let
+////    (disconnectPromise, disconnectSeal) = Promise<Void>.pending()
 
     init(device: XYBluetoothDevice, delegate: XYCentralDelegate? = nil) {
         self.device = device
@@ -51,10 +54,10 @@ class BLEConnect {
         central.stop()
     }
 
-    public func disconnect() -> Promise<Void> {
-        central.disconnect(from: self.device)
-        return disconnectPromise
-    }
+//    public func disconnect() -> Promise<Void> {
+//        central.disconnect(from: self.device)
+//        return disconnectPromise
+//    }
 
     deinit {
         print("I am one")
@@ -62,33 +65,37 @@ class BLEConnect {
 }
 
 extension BLEConnect {
-    func connect(to device: XYBluetoothDevice) -> Promise<Void> {
-        // Ensure central can use ble
-        _ = firstly {
-            central.enable()
-        }.done {
-            self.central.scan()
-        }
-
-        return connectPromise
-    }
+//    func connect(to device: XYBluetoothDevice) -> Promise<Void> {
+//        // Ensure central can use ble
+//        _ = firstly {
+//            central.enable()
+//        }.done {
+//            self.central.scan()
+//        }
+//
+//        return connectPromise
+//    }
 }
 
 extension BLEConnect: XYCentralDelegate {
-    func connected(peripheral: BLEPeripheral) {
-        guard peripheral.peripheral == self.device.getPeripheral()
-            else { self.connectSeal.reject(BLEConnectError.couldNotConnect); return }
+    func stateChanged(newState: CBManagerState) {
         
-        print("Connected to \(device.id)")
-
-        DispatchQueue.main.async {
-            self.delegate?.connected(peripheral: peripheral)
-        }
-        
-        self.connectSeal.fulfill(Void())
     }
 
-    func located(peripheral: BLEPeripheral) {
+    func connected(peripheral: XYPeripheral) {
+//        guard peripheral.peripheral == self.device.getPeripheral()
+//            else { self.connectSeal.reject(BLEConnectError.couldNotConnect); return }
+//
+//        print("Connected to \(device.id)")
+//
+//        DispatchQueue.main.async {
+//            self.delegate?.connected(peripheral: peripheral)
+//        }
+//
+//        self.connectSeal.fulfill(Void())
+    }
+
+    func located(peripheral: XYPeripheral) {
         guard
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
             else { return }
@@ -106,9 +113,8 @@ extension BLEConnect: XYCentralDelegate {
         central.connect(to: self.device)
     }
 
-    func ableToConnect() {}
 
-    func disconnected(periperhal: BLEPeripheral) {
-        disconnectSeal.fulfill(())
+    func disconnected(periperhal: XYPeripheral) {
+//        disconnectSeal.fulfill(())
     }
 }

@@ -8,14 +8,13 @@
 
 import UIKit
 import CoreBluetooth
-import PromiseKit
 
 class ViewController: UIViewController {
 
     @IBOutlet weak var spinner: UIActivityIndicatorView!
 
     fileprivate let scanner = XYSmartScan.instance
-    fileprivate var connect: BLEConnect?
+    fileprivate var central = XYCentral.instance
     fileprivate var xy4Device: XYBluetoothDevice?
 
     override func viewDidLoad() {
@@ -27,16 +26,18 @@ class ViewController: UIViewController {
                 major: UInt16(80),
                 minor: UInt16(59060))
         )
+
+        central.setDelegate(self, key: "ViewController")
     }
 
     @IBAction func connectTapped(_ sender: Any) {
-        guard let myDevice = xy4Device else { return }
-        self.spinner.startAnimating()
-        connect = BLEConnect(device: myDevice, delegate: self)
+//        guard let myDevice = xy4Device else { return }
+//        self.spinner.startAnimating()
+//        connect = BLEConnect(device: myDevice, delegate: self)
     }
 
     @IBAction func disconnectTapped(_ sender: Any) {
-        connect?.disconnect()
+//        connect?.disconnect()
     }
 
     @IBAction func writeTapped(_ sender: Any) {
@@ -83,22 +84,24 @@ class ViewController: UIViewController {
     }
 
     override func viewDidDisappear(_ animated: Bool) {
-        connect?.stop()
+//        connect?.stop()
     }
 }
 
 extension ViewController: XYCentralDelegate {
-    func connected(peripheral: BLEPeripheral) {
+    func stateChanged(newState: CBManagerState) {
+        print(newState)
+    }
+
+    func connected(peripheral: XYPeripheral) {
         spinner.stopAnimating()
     }
 
-    func located(peripheral: BLEPeripheral) {
+    func located(peripheral: XYPeripheral) {
         print(peripheral.peripheral.name ?? "don't know")
     }
 
-    func ableToConnect() {}
-
-    func disconnected(periperhal: BLEPeripheral) {
+    func disconnected(periperhal: XYPeripheral) {
         
     }
 }

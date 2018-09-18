@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreBluetooth
-import PromiseKit
+import Promises
 
 public protocol XY4BluetoothDeviceDelegate {
     func foundServices()
@@ -33,7 +33,7 @@ public class XYBluetoothDevice: NSObject {
     fileprivate var connection: BLEConnect?
 
     // The chain ensures each call is made in sequence
-    fileprivate lazy var promiseChain = Promise()
+    fileprivate lazy var promiseChain = Promise<Void>.pending()
     
     fileprivate var delegates = [String: CBPeripheralDelegate]()
 
@@ -146,20 +146,20 @@ public extension XYBluetoothDevice {
             }
         }
 
-        promiseChain.done { _ in
+        promiseChain.then { _ in
             self.state = .connected
             complete?(values)
-        }.ensure {
+        }.always {
             // Drop after 5 seconds, or maintain if another request is made and we are already connected
-            after(XYBluetoothDevice.connectionTimeoutInSeconds).done {
-                if self.state != .communicating && self.state != .connecting {
-                    self.connection?.disconnect().done {
-                        self.state = .disconnected
-                        self.peripheral = nil
-                        self.connection = BLEConnect(device: self)
-                    }
-                }
-            }
+//            after(XYBluetoothDevice.connectionTimeoutInSeconds).done {
+//                if self.state != .communicating && self.state != .connecting {
+//                    self.connection?.disconnect().done {
+//                        self.state = .disconnected
+//                        self.peripheral = nil
+//                        self.connection = BLEConnect(device: self)
+//                    }
+//                }
+//            }
         }.catch {
             print($0)
         }
@@ -174,7 +174,7 @@ public extension XYBluetoothDevice {
         }
 
         // Connect
-        promiseChain = connection.connect(to: self)
+//        promiseChain = connection.connect(to: self)
 
         self.state = .connecting
 

@@ -6,5 +6,5 @@ target 'XYSdkSample' do
   use_frameworks!
 
   # Pods for XYSdkSample
-  pod "PromiseKit", "~> 6.0"
+  pod 'PromisesSwift', '~> 1.2.3'
 end
