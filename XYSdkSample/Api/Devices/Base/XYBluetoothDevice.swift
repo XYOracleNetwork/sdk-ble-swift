@@ -27,7 +27,7 @@ public class XYBluetoothDevice: NSObject {
     fileprivate var peripheral: CBPeripheral?
     fileprivate var services = [ServiceCharacteristic]()
     
-    fileprivate var delegates = [String: CBPeripheralDelegate]()
+    fileprivate var delegates = [String: CBPeripheralDelegate?]()
 
     fileprivate var successCallback: GattSuccessCallback?
     fileprivate var errorCallback: GattErrorCallback?
@@ -36,11 +36,9 @@ public class XYBluetoothDevice: NSObject {
     uuid: UUID,
     id: String
 
-    public fileprivate(set) var state: XY4BluetoothDeviceStatus = .disconnected {
-        didSet {
-            print("the state is being changed to \(self.state)")
-        }
-    }
+    public fileprivate(set) var state: XY4BluetoothDeviceStatus = .disconnected
+
+    fileprivate let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.WorkQueue")
 
     fileprivate static let connectionTimeoutInSeconds = DispatchTimeInterval.seconds(5)
 
@@ -105,19 +103,19 @@ public extension XYBluetoothDevice {
 // MARK: CBPeripheralDelegate
 extension XYBluetoothDevice: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        self.delegates.forEach { $1.peripheral?(peripheral, didDiscoverServices: error) }
+        self.delegates.forEach { $1?.peripheral?(peripheral, didDiscoverServices: error) }
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        self.delegates.forEach { $1.peripheral?(peripheral, didDiscoverCharacteristicsFor: service, error: error) }
+        self.delegates.forEach { $1?.peripheral?(peripheral, didDiscoverCharacteristicsFor: service, error: error) }
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        self.delegates.forEach { $1.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }
+        self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
-        self.delegates.forEach { $1.peripheral?(peripheral, didWriteValueFor: characteristic, error: error) }
+        self.delegates.forEach { $1?.peripheral?(peripheral, didWriteValueFor: characteristic, error: error) }
     }
 }
 
@@ -146,102 +144,19 @@ public extension XYBluetoothDevice {
             else { error?(GattError.notConnected); return }
 
         let results = XYBluetoothResult()
-        Promise<Void>(on: .global()) { () -> Void in
+        Promise<Void>(on: workQueue) { () -> Void in
+//            try await(PrimaryService.buzzer.set(to: self, value: XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
+
             try await(BatteryService.level.get(from: self, result: results))
             try await(DeviceInformationService.firmwareRevisionString.get(from: self, result: results))
             try await(DeviceInformationService.modelNumberString.get(from: self, result: results))
-//            try await(DeviceInformationService.serialNumberString.get(from: self, result: results))
             try await(DeviceInformationService.hardwareRevisionString.get(from: self, result: results))
-            try await(PrimaryService.buzzer.set(to: self, value: XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
             return try await(DeviceInformationService.manufacturerNameString.get(from: self, result: results))
+
         }.then {
+            self.delegates.removeAll()
             complete?(results.values)
         }
-
-        // Iterate through set of requests and fulfill each one®
-//        serviceCharacteristics.forEach { serviceCharacteristic in
-//            switch serviceCharacteristic.operation {
-//            case .read:
-//                let newVal = XYBluetoothValue(serviceCharacteristic.serviceCharacteristic)
-//                values.append(newVal)
-//                promiseChain = promiseChain.then { _ in
-//                    serviceCharacteristic.serviceCharacteristic.get(from: self, value: newVal)
-//                }
-//            case .write:
-//                guard let value = serviceCharacteristic.value else { break }
-//                promiseChain = promiseChain.then { _ in
-//                    serviceCharacteristic.serviceCharacteristic.set(to: self, value: value)
-//                }
-//            }
-//
-//            promiseChain.then {
-//                complete?(values)
-//            }.fulfill(())
-        }
     }
 
-    /*
-    func connectAndProcess(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: GattSuccessCallback?) {
-        // Build a dictionary of the results
-        var values = [XYBluetoothValue]()
-
-        if !setupConnection() {
-            complete?([])
-            return
-        }
-
-        self.state = .communicating
-
-        // Iterate through set of requests and fulfill each one
-        serviceCharacteristics.forEach { serviceCharacteristic in
-            switch serviceCharacteristic.operation {
-            case .read:
-                let newVal = XYBluetoothValue(serviceCharacteristic.serviceCharacteristic)
-                values.append(newVal)
-                promiseChain = promiseChain.then { _ in
-                    serviceCharacteristic.serviceCharacteristic.get(from: self, value: newVal)
-                }
-            case .write:
-                guard let value = serviceCharacteristic.value else { break }
-                promiseChain = promiseChain.then { _ in
-                    serviceCharacteristic.serviceCharacteristic.set(to: self, value: value)
-                }
-            }
-        }
-
-        promiseChain.then { _ in
-            self.state = .connected
-            complete?(values)
-        }.always {
-            // Drop after 5 seconds, or maintain if another request is made and we are already connected
-//            after(XYBluetoothDevice.connectionTimeoutInSeconds).done {
-//                if self.state != .communicating && self.state != .connecting {
-//                    self.connection?.disconnect().done {
-//                        self.state = .disconnected
-//                        self.peripheral = nil
-//                        self.connection = BLEConnect(device: self)
-//                    }
-//                }
-//            }
-        }.catch {
-            print($0)
-        }
-    }
-
-    private func setupConnection() -> Bool {
-        guard self.state == .disconnected else { return true }
-
-        // Setup connection
-        guard let connection = self.connection else {
-            return false
-        }
-
-        // Connect
-//        promiseChain = connection.connect(to: self)
-
-        self.state = .connecting
-
-        return true
-    }
- */
-
+}

@@ -162,6 +162,7 @@ extension XYCentral: CBCentralManagerDelegate {
 
         guard central.state == .poweredOn else { return }
 
+        // Destroy anything marked for removal from restore below
         self.knownPeripherals.filter { $1.markedForDisconnect }.forEach {
             self.cbManager?.cancelPeripheralConnection($1.peripheral)
         }
