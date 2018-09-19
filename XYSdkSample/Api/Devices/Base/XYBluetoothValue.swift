@@ -16,7 +16,7 @@ public class XYBluetoothValue {
         self.serviceCharacteristic = serviceCharacteristic
     }
 
-    public convenience init(_ serviceCharacteristic: ServiceCharacteristic, data: Data) {
+    public convenience init(_ serviceCharacteristic: ServiceCharacteristic, data: Data?) {
         self.init(serviceCharacteristic)
         self.data = data
     }

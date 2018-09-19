@@ -63,7 +63,7 @@ class ViewController: UIViewController {
         let calls: Set<SerivceCharacteristicDirective> = [
             DeviceInformationService.firmwareRevisionString.read,
             DeviceInformationService.manufacturerNameString.read,
-            BatteryService.level.read,
+            BatteryService.level.read
 //            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
         ]
 

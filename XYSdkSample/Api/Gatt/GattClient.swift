@@ -33,6 +33,7 @@ public enum GattCharacteristicType {
 class GattClient: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
     fileprivate var characteristicPromise = Promise<Void>.pending()
+    
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
 
@@ -47,22 +48,16 @@ class GattClient: NSObject {
         self.serviceCharacteristic = serviceCharacteristic
     }
     
-    deinit {
-
-    }
-    
     // TODO: Change to a per-session token for the key
     func delegateKey(deviceUuid: UUID) -> String {
         return ["GC", deviceUuid.uuidString, serviceCharacteristic.serviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
     }
 
-    func get(from device: XYBluetoothDevice, valueObj: XYBluetoothValue) -> Promise<Void> {
+    func get(from device: XYBluetoothDevice, resultObj: XYBluetoothResult) -> Promise<Void> {
         return self.getCharacteristic(device).then {
             self.read(device)
         }.then { result in
-            valueObj.setData(result)
-        }.always {
-            self.device?.unsubscribe(for: self.delegateKey(deviceUuid: device.uuid))
+            resultObj.add(for: self.serviceCharacteristic, data: result)
         }
     }
 

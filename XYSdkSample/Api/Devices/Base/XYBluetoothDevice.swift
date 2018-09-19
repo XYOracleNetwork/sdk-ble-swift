@@ -41,7 +41,7 @@ public class XYBluetoothDevice: NSObject {
             print("the state is being changed to \(self.state)")
         }
     }
-    
+
     fileprivate static let connectionTimeoutInSeconds = DispatchTimeInterval.seconds(5)
 
     init(_ uuid: UUID, id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
@@ -121,6 +121,14 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 }
 
+public class XYBluetoothResult {
+    public fileprivate(set) lazy var values = [XYBluetoothValue]()
+
+    func add(for serviceCharacteristic: ServiceCharacteristic, data: Data?) {
+        self.values.append(XYBluetoothValue(serviceCharacteristic, data: data))
+    }
+}
+
 // MARK: Connect and disconnect
 public extension XYBluetoothDevice {
 
@@ -137,15 +145,20 @@ public extension XYBluetoothDevice {
             self.peripheral?.state == .connected
             else { error?(GattError.notConnected); return }
 
-        var values = [XYBluetoothValue]()
-//        var promiseChain = Promise<Void>(on: .global()).pending()
-        Promise<Void>(on: .global()) {
-            return try await(DeviceInformationService.firmwareRevisionString.get(from: self, value: XYBluetoothValue(DeviceInformationService.firmwareRevisionString)))
+        let results = XYBluetoothResult()
+        Promise<Void>(on: .global()) { () -> Void in
+            try await(BatteryService.level.get(from: self, result: results))
+            try await(DeviceInformationService.firmwareRevisionString.get(from: self, result: results))
+            try await(DeviceInformationService.modelNumberString.get(from: self, result: results))
+//            try await(DeviceInformationService.serialNumberString.get(from: self, result: results))
+            try await(DeviceInformationService.hardwareRevisionString.get(from: self, result: results))
+            try await(PrimaryService.buzzer.set(to: self, value: XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
+            return try await(DeviceInformationService.manufacturerNameString.get(from: self, result: results))
         }.then {
-            complete?(values)
+            complete?(results.values)
         }
 
-        // Iterate through set of requests and fulfill each one
+        // Iterate through set of requests and fulfill each one®
 //        serviceCharacteristics.forEach { serviceCharacteristic in
 //            switch serviceCharacteristic.operation {
 //            case .read:
