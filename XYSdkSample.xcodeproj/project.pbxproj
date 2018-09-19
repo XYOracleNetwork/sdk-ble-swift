@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		310B6CDA21531154007FADD2 /* ActionResultTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310B6CD821531154007FADD2 /* ActionResultTableViewCell.swift */; };
+		310B6CDB21531154007FADD2 /* ActionResultTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 310B6CD921531154007FADD2 /* ActionResultTableViewCell.xib */; };
+		3111F6FD215309F8001D76C1 /* ActionResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3111F6FB215309F8001D76C1 /* ActionResultViewController.swift */; };
+		3111F6FE215309F8001D76C1 /* ActionResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3111F6FC215309F8001D76C1 /* ActionResultViewController.xib */; };
 		311B7480214306E1009412FD /* XYLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B747F214306E1009412FD /* XYLocation.swift */; };
 		311B7483214318E2009412FD /* XYFinderDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B7482214318E2009412FD /* XYFinderDevice.swift */; };
 		311B748821431EA0009412FD /* XYConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B748721431EA0009412FD /* XYConstants.swift */; };
@@ -46,6 +50,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		310B6CD821531154007FADD2 /* ActionResultTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionResultTableViewCell.swift; sourceTree = "<group>"; };
+		310B6CD921531154007FADD2 /* ActionResultTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActionResultTableViewCell.xib; sourceTree = "<group>"; };
+		3111F6FB215309F8001D76C1 /* ActionResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionResultViewController.swift; sourceTree = "<group>"; };
+		3111F6FC215309F8001D76C1 /* ActionResultViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActionResultViewController.xib; sourceTree = "<group>"; };
 		311B747F214306E1009412FD /* XYLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYLocation.swift; sourceTree = "<group>"; };
 		311B7482214318E2009412FD /* XYFinderDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYFinderDevice.swift; sourceTree = "<group>"; };
 		311B748721431EA0009412FD /* XYConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYConstants.swift; sourceTree = "<group>"; };
@@ -167,6 +175,10 @@
 				31272E5B2141F8AA001F09A6 /* Assets.xcassets */,
 				31272E5D2141F8AA001F09A6 /* LaunchScreen.storyboard */,
 				31272E602141F8AA001F09A6 /* Info.plist */,
+				3111F6FB215309F8001D76C1 /* ActionResultViewController.swift */,
+				3111F6FC215309F8001D76C1 /* ActionResultViewController.xib */,
+				310B6CD821531154007FADD2 /* ActionResultTableViewCell.swift */,
+				310B6CD921531154007FADD2 /* ActionResultTableViewCell.xib */,
 			);
 			path = XYSdkSample;
 			sourceTree = "<group>";
@@ -338,8 +350,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				31272E5F2141F8AA001F09A6 /* LaunchScreen.storyboard in Resources */,
+				310B6CDB21531154007FADD2 /* ActionResultTableViewCell.xib in Resources */,
 				31272E5C2141F8AA001F09A6 /* Assets.xcassets in Resources */,
 				31272E5A2141F8A8001F09A6 /* Main.storyboard in Resources */,
+				3111F6FE215309F8001D76C1 /* ActionResultViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,10 +420,12 @@
 				311B749221434587009412FD /* Array+extensions.swift in Sources */,
 				311B74A121498AC3009412FD /* GattClient.swift in Sources */,
 				311B748A214321A9009412FD /* XY4BluetoothDevice.swift in Sources */,
+				3111F6FD215309F8001D76C1 /* ActionResultViewController.swift in Sources */,
 				312C55DB2149DAD30016F4F9 /* DeviceInformationService.swift in Sources */,
 				318BEB452142EBF1000580D1 /* ServiceCharacteristic.swift in Sources */,
 				312C55DE214B2DDE0016F4F9 /* XYBluetoothValue.swift in Sources */,
 				311B74902143356E009412FD /* XYFinderDeviceFactory.swift in Sources */,
+				310B6CDA21531154007FADD2 /* ActionResultTableViewCell.swift in Sources */,
 				312C55E0214C2F100016F4F9 /* BatteryService.swift in Sources */,
 				311B749721472674009412FD /* XYBluetoothDevice.swift in Sources */,
 				311B748821431EA0009412FD /* XYConstants.swift in Sources */,

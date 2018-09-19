@@ -41,7 +41,7 @@ extension Data {
     }
 }
 
-extension XYBluetoothValue {
+public extension XYBluetoothValue {
 
     var asString: String? {
         guard let data = self.data else { return nil }

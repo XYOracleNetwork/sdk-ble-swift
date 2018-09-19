@@ -78,6 +78,11 @@ class ViewController: UIViewController {
             default: print("?")
             }
         }
+
+        let modalViewController = ActionResultViewController()
+        modalViewController.set(results: results)
+        modalViewController.modalPresentationStyle = .overCurrentContext
+        present(modalViewController, animated: true, completion: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -86,7 +91,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: XY4BluetoothDeviceNotifyDelegate {
+extension ViewController: XYBluetoothDeviceNotifyDelegate {
     func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue) {
         DispatchQueue.main.async {
             self.notifyLabel.alpha = 1.0

@@ -99,7 +99,9 @@ extension XYSmartScan: XYLocationDelegate {
                 print("I am in range")
             }
 
-            if beacon.powerLevel == UInt(8) { print("found it \(beacon.id)") }
+            if beacon.powerLevel == UInt(8) {
+                // TODO handle button press from scanning
+            }
 
             if let xy4iBeacon = beacon as? XY4BluetoothDevice {
                 self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: beacon.rssi)}

@@ -22,7 +22,7 @@ public enum XY4BluetoothDeviceStatus {
 }
 
 // TODO eh...
-public protocol XY4BluetoothDeviceNotifyDelegate {
+public protocol XYBluetoothDeviceNotifyDelegate {
     func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue)
 }
 
@@ -33,7 +33,7 @@ public class XYBluetoothDevice: NSObject {
     fileprivate var services = [ServiceCharacteristic]()
     
     fileprivate var delegates = [String: CBPeripheralDelegate?]()
-    fileprivate var notifyDelegates = [String: (serviceCharacteristic: ServiceCharacteristic, delegate: XY4BluetoothDeviceNotifyDelegate?)]()
+    fileprivate var notifyDelegates = [String: (serviceCharacteristic: ServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
     fileprivate var successCallback: GattSuccessCallback?
     fileprivate var errorCallback: GattErrorCallback?
@@ -108,7 +108,7 @@ public extension XYBluetoothDevice {
 
 // MARK: Notification subscribe/unsubscribe
 public extension XYBluetoothDevice {
-    func subscribe(to serviceCharacteristic: ServiceCharacteristic, delegate: (key: String, delegate: XY4BluetoothDeviceNotifyDelegate)) {
+    func subscribe(to serviceCharacteristic: ServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
         self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
         setNotify(serviceCharacteristic, notify: true)
     }
