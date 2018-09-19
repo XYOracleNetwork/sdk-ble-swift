@@ -161,9 +161,18 @@ extension ViewController: UITableViewDelegate {
 }
 
 extension ViewController: XYCentralDelegate {
+    func timeout() {
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+            self.statusLabel.text = "Central timeout"
+        }
+    }
+
     func couldNotConnect(peripheral: XYPeripheral) {
-        self.spinner.stopAnimating()
-        self.deviceStatus.text = "Could not connect"
+        DispatchQueue.main.async {
+            self.spinner.stopAnimating()
+            self.deviceStatus.text = "Could not connect"
+        }
     }
 
     func stateChanged(newState: CBManagerState) {

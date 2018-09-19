@@ -34,6 +34,7 @@ public extension CBManagerState {
 public protocol XYCentralDelegate: class {
     func located(peripheral: XYPeripheral)
     func connected(peripheral: XYPeripheral)
+    func timeout()
     func couldNotConnect(peripheral: XYPeripheral)
     func disconnected(periperhal: XYPeripheral)
     func stateChanged(newState: CBManagerState)
@@ -58,6 +59,10 @@ public class XYCentral: NSObject {
     private override init() {
         super.init()
     }
+
+    fileprivate let timeoutQueue = DispatchQueue(label: "com.xyfindables.sdk.XYLocateTimeoutQueue")
+    fileprivate var timeoutTimer: DispatchSourceTimer?
+    fileprivate var isConnecting: Bool = false
 
     deinit {
         self.cbManager?.delegate = nil
@@ -102,7 +107,7 @@ public class XYCentral: NSObject {
     }
 
     // Ask for devices with the requested/all services until requested to stop()
-    public func scan(for services: [ServiceCharacteristic]? = nil, timeout: DispatchTimeInterval = .seconds(10)) {
+    public func scan(for services: [ServiceCharacteristic]? = nil) {
         guard state == .poweredOn else { return }
         self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
