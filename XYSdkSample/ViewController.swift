@@ -40,35 +40,26 @@ class ViewController: UIViewController {
         central.enable()
     }
 
+    @IBAction func scanStart(_ sender: Any) {
+        scanner.start()
+        scanner.setDelegate(self, key: "ViewController")
+    }
+
+    @IBAction func scanStop(_ sender: Any) {
+        scanner.stop()
+        rangedDevices.removeAll()
+        self.countLabel.text = nil
+        rangedDevicesTableView.reloadData()
+    }
+
     @IBAction func disconnectTapped(_ sender: Any) {
         xy4Device?.disconnect()
     }
 
-    @IBAction func writeTapped(_ sender: Any) {
-//        guard let device = xy4Device else { return }
-//
-//        self.spinner.startAnimating()
-//        let buzzData = Data([UInt8(0x0b), 0x03])
-//        device.write(to: PrimaryService.buzzer, value: XYBluetoothValue(PrimaryService.buzzer, data: buzzData)) { _ in
-//            self.spinner.stopAnimating()
-//        }
-    }
-
     @IBAction func actionTapped(_ sender: Any) {
-
         guard let device = xy4Device else { return }
-
-//        let buzzData = Data([UInt8(0x0b), 0x03])
-
-        let calls: Set<SerivceCharacteristicDirective> = [
-            DeviceInformationService.firmwareRevisionString.read,
-            DeviceInformationService.manufacturerNameString.read,
-            BatteryService.level.read
-//            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
-        ]
-
         self.spinner.startAnimating()
-        device.request(for: calls, complete: self.processResult)
+        device.request(self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
@@ -83,9 +74,6 @@ class ViewController: UIViewController {
     }
 
     override func viewDidAppear(_ animated: Bool) {
-        scanner.start()
-        scanner.setDelegate(self, key: "ViewController")
-        
 //        guard let myDevice = xy4Device else { return }
 //        scanner.startTracking(for: myDevice)
     }

@@ -137,7 +137,7 @@ public extension XYBluetoothDevice {
         central.disconnect(from: self)
     }
 
-    func request(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: GattSuccessCallback?, error: GattErrorCallback? = nil) {
+    func request(_ complete: GattSuccessCallback?, error: GattErrorCallback? = nil) {
         let central = XYCentral.instance
 
         guard

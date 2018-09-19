@@ -36,7 +36,6 @@ public class XYLocation: NSObject {
     public func setDelegate(_ delegate: XYLocationDelegate) {
         self.delegate = delegate
     }
-
 }
 
 // MARK: Ranging methods (used for foreground operations)
