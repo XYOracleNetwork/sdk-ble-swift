@@ -121,6 +121,7 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 }
 
+// MARK: Connect and disconnect
 public extension XYBluetoothDevice {
 
     func disconnect() {
@@ -128,10 +129,42 @@ public extension XYBluetoothDevice {
         central.disconnect(from: self)
     }
 
-    func connect() {
+    func request(for serviceCharacteristics: Set<SerivceCharacteristicDirective>, complete: GattSuccessCallback?, error: GattErrorCallback? = nil) {
         let central = XYCentral.instance
 
-        central.connect(to: self)
+        guard
+            central.state == .poweredOn,
+            self.peripheral?.state == .connected
+            else { error?(GattError.notConnected); return }
+
+        var values = [XYBluetoothValue]()
+//        var promiseChain = Promise<Void>(on: .global()).pending()
+        Promise<Void>(on: .global()) {
+            return try await(DeviceInformationService.firmwareRevisionString.get(from: self, value: XYBluetoothValue(DeviceInformationService.firmwareRevisionString)))
+        }.then {
+            complete?(values)
+        }
+
+        // Iterate through set of requests and fulfill each one
+//        serviceCharacteristics.forEach { serviceCharacteristic in
+//            switch serviceCharacteristic.operation {
+//            case .read:
+//                let newVal = XYBluetoothValue(serviceCharacteristic.serviceCharacteristic)
+//                values.append(newVal)
+//                promiseChain = promiseChain.then { _ in
+//                    serviceCharacteristic.serviceCharacteristic.get(from: self, value: newVal)
+//                }
+//            case .write:
+//                guard let value = serviceCharacteristic.value else { break }
+//                promiseChain = promiseChain.then { _ in
+//                    serviceCharacteristic.serviceCharacteristic.set(to: self, value: value)
+//                }
+//            }
+//
+//            promiseChain.then {
+//                complete?(values)
+//            }.fulfill(())
+        }
     }
 
     /*
@@ -198,4 +231,4 @@ public extension XYBluetoothDevice {
         return true
     }
  */
-}
+

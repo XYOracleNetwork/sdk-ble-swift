@@ -51,7 +51,7 @@ public class XYCentral: NSObject {
 
     fileprivate let defaultScanTimeout = 10
 
-    fileprivate var peripherals = [UUID: XYPeripheral]()
+    fileprivate var knownPeripherals = [UUID: XYPeripheral]()
 
     fileprivate static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYLocateQueue")
 
@@ -74,7 +74,7 @@ public class XYCentral: NSObject {
                 delegate: self,
                 queue: XYCentral.centralQueue,
                 options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
-            self.peripherals.removeAll()
+            self.knownPeripherals.removeAll()
         }
     }
 
@@ -85,7 +85,7 @@ public class XYCentral: NSObject {
                 delegate: self,
                 queue: XYCentral.centralQueue,
                 options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
-            self.peripherals.removeAll()
+            self.knownPeripherals.removeAll()
         }
     }
 
@@ -147,13 +147,13 @@ extension XYCentral: CBCentralManagerDelegate {
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         var wrappedPeripheral: XYPeripheral
-        if let alreadySeenPeripehral = peripherals[peripheral.identifier] {
+        if let alreadySeenPeripehral = knownPeripherals[peripheral.identifier] {
             wrappedPeripheral = alreadySeenPeripehral
             guard alreadySeenPeripehral.peripheral == peripheral else { return }
             wrappedPeripheral.rssi = RSSI
         } else {
             wrappedPeripheral = XYPeripheral(peripheral: peripheral, advertisementData: advertisementData, rssi: RSSI)
-            self.peripherals[peripheral.identifier] = wrappedPeripheral
+            self.knownPeripherals[peripheral.identifier] = wrappedPeripheral
         }
 
         self.delegates.forEach { $1?.located(peripheral: wrappedPeripheral) }
@@ -168,11 +168,54 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
-        // TODO
+        if let scanServices = dict[CBCentralManagerRestoredStateScanServicesKey] as? [CBUUID] {
+            for service in scanServices {
+                print(service)
+            }
+            //            if central.isScanning {
+            //                if central.state == .poweredOn {
+            //                    central.stopScan()
+            //                }
+            //            }
+        }
+
+        if let scanOptions = dict[CBCentralManagerRestoredStateScanOptionsKey] as? [String : Any] {
+            print("scanOptions : \(scanOptions)")
+        }
+
+        if let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] {
+            knownPeripherals.removeAll()
+            for peripheral in peripherals {
+                knownPeripherals[peripheral.identifier] = XYPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)
+                print(peripheral.identifier.uuidString + " : " + String(describing: peripheral.state))
+//                XYBase.logExtreme(module:#file, function: #function, message: String(format:"%@", (peripheral)))
+                //peripheral.delegate = self
+                if peripheral.state == .connected {
+                    if self.cbManager?.state == .poweredOn {
+
+                        //                        peripheral.discoverServices(nil);
+                        //self.centralManager?.cancelPeripheralConnection(peripheral)
+                        //self.centralManager?.connect(peripheral, options: [:])
+                    }
+
+                }
+                if peripheral.state == .connecting && central.state == .poweredOn {
+                    //                    peripheral.delegate = self
+                    //                    central.cancelPeripheralConnection(peripheral)
+                }
+                //                if peripheral.state == .connected && central.state == .poweredOn {
+                //                    peripheral.delegate = self
+                //                    //central.cancelPeripheralConnection(peripheral)
+                //                }
+            }
+        }
+        //        for (_, value) in delegates {
+        //            value.centralManager!(central, willRestoreState: dict)
+        //        }
     }
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        self.peripherals.removeValue(forKey: peripheral.identifier)
+        self.knownPeripherals.removeValue(forKey: peripheral.identifier)
         self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral: peripheral, advertisementData: nil, rssi: nil)) }
     }
 }

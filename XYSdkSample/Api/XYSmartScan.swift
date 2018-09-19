@@ -116,8 +116,3 @@ extension XYSmartScan: XYLocationDelegate {
     }
     
 }
-
-// MARK: Handle connections to devices
-extension XYSmartScan {
-
-}

@@ -29,12 +29,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.spinner.stopAnimating()
-//        xy4Device = XYFinderDeviceFactory.build(from:
-//            XYIBeaconDefinition(
-//                uuid: UUID(uuidString: "a44eacf4-0104-0000-0000-5f784c9977b5")!,
-//                major: UInt16(80),
-//                minor: UInt16(59060))
-//        )
 
         rangedDevicesTableView.dataSource = self
         rangedDevicesTableView.delegate = self
@@ -62,20 +56,19 @@ class ViewController: UIViewController {
 
     @IBAction func actionTapped(_ sender: Any) {
 
+        guard let device = xy4Device else { return }
 
-//        guard let device = xy4Device else { return }
-//
 //        let buzzData = Data([UInt8(0x0b), 0x03])
-//
-//        let calls: Set<SerivceCharacteristicDirective> = [
-//            DeviceInformationService.firmwareRevisionString.read,
-//            DeviceInformationService.manufacturerNameString.read,
-//            BatteryService.level.read,
-////            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
-//        ]
-//
-//        self.spinner.startAnimating()
-////        device.connectAndProcess(for: calls, complete: self.processResult)
+
+        let calls: Set<SerivceCharacteristicDirective> = [
+            DeviceInformationService.firmwareRevisionString.read,
+            DeviceInformationService.manufacturerNameString.read,
+            BatteryService.level.read,
+//            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: buzzData))
+        ]
+
+        self.spinner.startAnimating()
+        device.request(for: calls, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
@@ -95,10 +88,6 @@ class ViewController: UIViewController {
         
 //        guard let myDevice = xy4Device else { return }
 //        scanner.startTracking(for: myDevice)
-    }
-
-    override func viewDidDisappear(_ animated: Bool) {
-//        connect?.stop()
     }
 }
 
