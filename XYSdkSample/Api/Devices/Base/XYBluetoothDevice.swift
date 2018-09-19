@@ -123,12 +123,10 @@ public extension XYBluetoothDevice {
             let peripheral = self.peripheral,
             peripheral.state == .connected else { return }
 
-
-        if let services = peripheral.services {
-            guard
-                let service = services.filter({ $0.uuid == serviceCharacteristic.serviceUuid }).first,
-                let characteristic = service.characteristics?.filter({ $0.uuid == serviceCharacteristic.characteristicUuid }).first
-                else { return }
+        if
+            let services = peripheral.services,
+            let service = services.filter({ $0.uuid == serviceCharacteristic.serviceUuid }).first,
+            let characteristic = service.characteristics?.filter({ $0.uuid == serviceCharacteristic.characteristicUuid }).first {
 
             peripheral.setNotifyValue(notify, for: characteristic)
         } else {
@@ -166,7 +164,6 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        print("watching")
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
 }
@@ -197,12 +194,12 @@ public extension XYBluetoothDevice {
 
         let results = XYBluetoothResult()
         Promise<Void>(on: workQueue) { () -> Void in
-//            try await(PrimaryService.buzzer.set(to: self, value: XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
 
             try await(BatteryService.level.get(from: self, result: results))
             try await(DeviceInformationService.firmwareRevisionString.get(from: self, result: results))
             try await(DeviceInformationService.modelNumberString.get(from: self, result: results))
             try await(DeviceInformationService.hardwareRevisionString.get(from: self, result: results))
+            try await(PrimaryService.major.get(from: self, result: results))
             return try await(DeviceInformationService.manufacturerNameString.get(from: self, result: results))
 
         }.then {
@@ -211,4 +208,5 @@ public extension XYBluetoothDevice {
         }
     }
 
+    //            try await(PrimaryService.buzzer.set(to: self, value: XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
 }

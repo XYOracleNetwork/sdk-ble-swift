@@ -41,7 +41,7 @@ public enum PrimaryService: String, ServiceCharacteristic {
         return PrimaryService.uuids[self]!
     }
 
-    public var characteristicType: GattCharacteristicType { return .byte }
+    public var characteristicType: GattCharacteristicType { return .string }
 
     private static let uuids: [PrimaryService: CBUUID] = [
         .stayAwake          : CBUUID(string: "a44eacf4-0104-0001-0001-5f784c9977b5"),
