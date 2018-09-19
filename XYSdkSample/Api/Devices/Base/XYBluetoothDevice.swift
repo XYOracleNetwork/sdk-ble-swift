@@ -135,7 +135,6 @@ public extension XYBluetoothDevice {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
         }
-
     }
 }
 
