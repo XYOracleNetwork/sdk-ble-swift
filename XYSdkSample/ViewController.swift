@@ -17,7 +17,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var countLabel: UILabel!
     @IBOutlet weak var deviceName: UILabel!
     @IBOutlet weak var deviceStatus: UILabel!
-    
+    @IBOutlet weak var notifyLabel: UILabel!
+
     fileprivate let scanner = XYSmartScan.instance
     fileprivate var central = XYCentral.instance
     fileprivate var xy4Device: XYBluetoothDevice?
@@ -29,6 +30,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.spinner.stopAnimating()
+        self.notifyLabel.alpha = 0.0
 
         rangedDevicesTableView.dataSource = self
         rangedDevicesTableView.delegate = self
@@ -40,6 +42,11 @@ class ViewController: UIViewController {
         central.enable()
     }
 
+    @IBAction func notifyTapped(_ sender: Any) {
+        guard let device = self.xy4Device else { return }
+        device.subscribe(to: PrimaryService.buttonState, delegate: ("ViewController", self))
+    }
+    
     @IBAction func scanStart(_ sender: Any) {
         scanner.start()
         scanner.setDelegate(self, key: "ViewController")
@@ -76,6 +83,17 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
 //        guard let myDevice = xy4Device else { return }
 //        scanner.startTracking(for: myDevice)
+    }
+}
+
+extension ViewController: XY4BluetoothDeviceNotifyDelegate {
+    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue) {
+        DispatchQueue.main.async {
+            self.notifyLabel.alpha = 1.0
+            UIView.animate(withDuration: 2.0) {
+                self.notifyLabel.alpha = 0.0
+            }
+        }
     }
 }
 

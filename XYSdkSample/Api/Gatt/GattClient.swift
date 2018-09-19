@@ -32,7 +32,7 @@ public enum GattCharacteristicType {
 
 class GattClient: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
-    fileprivate var characteristicPromise = Promise<Void>.pending()
+    fileprivate var characteristicPromise = Promise<CBCharacteristic>.pending()
     
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
@@ -54,7 +54,7 @@ class GattClient: NSObject {
     }
 
     func get(from device: XYBluetoothDevice, resultObj: XYBluetoothResult) -> Promise<Void> {
-        return self.getCharacteristic(device).then {
+        return self.getCharacteristic(device).then { _ in
             self.read(device)
         }.then { result in
             resultObj.add(for: self.serviceCharacteristic, data: result)
@@ -62,14 +62,14 @@ class GattClient: NSObject {
     }
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
-        return self.getCharacteristic(device).then {
+        return self.getCharacteristic(device).then { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
         }.always {
             self.device?.unsubscribe(for: self.delegateKey(deviceUuid: device.uuid))
         }
     }
     
-    func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<Void> {
+    func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<CBCharacteristic> {
         guard
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
@@ -152,7 +152,7 @@ extension GattClient: CBPeripheralDelegate {
 
         self.characteristic = characteristic
         
-        self.characteristicPromise.fulfill(())
+        self.characteristicPromise.fulfill(characteristic)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {

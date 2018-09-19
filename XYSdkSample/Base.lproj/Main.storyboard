@@ -51,8 +51,19 @@
                                     <action selector="scanStart:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fX0-Cb-CjE"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PGa-Db-KPU">
+                                <rect key="frame" x="259" y="507" width="45" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0" green="0.066649480849999998" blue="0.60672360749999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <state key="normal" title="Stop">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="scanStop:" destination="BYZ-38-t0r" eventType="touchUpInside" id="29c-hv-wkQ"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YIv-bp-tNN">
-                                <rect key="frame" x="16" y="507" width="229" height="41"/>
+                                <rect key="frame" x="16" y="507" width="108" height="41"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.066649480849999998" blue="0.60672360749999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <state key="normal" title="Read">
@@ -138,15 +149,22 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PGa-Db-KPU">
-                                <rect key="frame" x="259" y="507" width="45" height="41"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="☑️" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wE3-Ny-Vdy">
+                                <rect key="frame" x="280" y="376" width="24" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ztm-Ud-4ao">
+                                <rect key="frame" x="137" y="507" width="108" height="41"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.0" green="0.066649480849999998" blue="0.60672360749999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <state key="normal" title="Stop">
+                                <state key="normal" title="Notify">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
-                                    <action selector="scanStop:" destination="BYZ-38-t0r" eventType="touchUpInside" id="sZy-aF-8UH"/>
+                                    <action selector="notifyTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="TlS-j8-htJ"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -158,6 +176,7 @@
                         <outlet property="deviceLabel" destination="DSc-Ao-Rbb" id="YOY-3e-jBf"/>
                         <outlet property="deviceName" destination="YTW-XZ-Bsy" id="vAR-Ge-qLG"/>
                         <outlet property="deviceStatus" destination="IJk-th-G7G" id="yY6-yk-8u9"/>
+                        <outlet property="notifyLabel" destination="wE3-Ny-Vdy" id="0Vc-H7-LtM"/>
                         <outlet property="rangedDevicesTableView" destination="apY-hy-2D8" id="Ipo-u5-AbS"/>
                         <outlet property="spinner" destination="8ek-D3-z1C" id="J9D-vh-XEM"/>
                         <outlet property="statusLabel" destination="Iol-xw-WUr" id="ixq-lt-V3q"/>

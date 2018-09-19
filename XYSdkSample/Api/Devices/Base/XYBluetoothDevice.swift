@@ -21,6 +21,11 @@ public enum XY4BluetoothDeviceStatus {
     case communicating
 }
 
+// TODO eh...
+public protocol XY4BluetoothDeviceNotifyDelegate {
+    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue)
+}
+
 public class XYBluetoothDevice: NSObject {
     
     internal var rssi: Int = XYDeviceProximity.none.rawValue
@@ -28,6 +33,7 @@ public class XYBluetoothDevice: NSObject {
     fileprivate var services = [ServiceCharacteristic]()
     
     fileprivate var delegates = [String: CBPeripheralDelegate?]()
+    fileprivate var notifyDelegates = [String: (serviceCharacteristic: ServiceCharacteristic, delegate: XY4BluetoothDeviceNotifyDelegate?)]()
 
     fileprivate var successCallback: GattSuccessCallback?
     fileprivate var errorCallback: GattErrorCallback?
@@ -100,6 +106,41 @@ public extension XYBluetoothDevice {
     }
 }
 
+// MARK: Notification subscribe/unsubscribe
+public extension XYBluetoothDevice {
+    func subscribe(to serviceCharacteristic: ServiceCharacteristic, delegate: (key: String, delegate: XY4BluetoothDeviceNotifyDelegate)) {
+        self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
+        setNotify(serviceCharacteristic, notify: true)
+    }
+
+    func unsubscribe(from serviceCharacteristic: ServiceCharacteristic, key: String) {
+        setNotify(serviceCharacteristic, notify: false)
+        self.notifyDelegates.removeValue(forKey: key)
+    }
+
+    private func setNotify(_ serviceCharacteristic: ServiceCharacteristic, notify: Bool) {
+        guard
+            let peripheral = self.peripheral,
+            peripheral.state == .connected else { return }
+
+
+        if let services = peripheral.services {
+            guard
+                let service = services.filter({ $0.uuid == serviceCharacteristic.serviceUuid }).first,
+                let characteristic = service.characteristics?.filter({ $0.uuid == serviceCharacteristic.characteristicUuid }).first
+                else { return }
+
+            peripheral.setNotifyValue(notify, for: characteristic)
+        } else {
+            let client = GattClient(serviceCharacteristic)
+            client.getCharacteristic(self).then { characteristic in
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+        }
+
+    }
+}
+
 // MARK: CBPeripheralDelegate
 extension XYBluetoothDevice: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -111,11 +152,22 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        // TODO barf
+        for notify in self.notifyDelegates {
+            if notify.value.serviceCharacteristic.characteristicUuid == characteristic.uuid {
+                notify.value.delegate?.update(for: notify.value.serviceCharacteristic, value: XYBluetoothValue(notify.value.serviceCharacteristic, data: characteristic.value))
+            }
+        }
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         self.delegates.forEach { $1?.peripheral?(peripheral, didWriteValueFor: characteristic, error: error) }
+    }
+
+    public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        print("watching")
+        self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
 }
 
