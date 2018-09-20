@@ -66,18 +66,20 @@ class ViewController: UIViewController {
     @IBAction func actionTapped(_ sender: Any) {
         guard let device = xy4Device else { return }
         self.spinner.startAnimating()
-        device.request(self.processResult)
+
+        let request = [
+            DeviceInformationService.firmwareRevisionString.read,
+            DeviceInformationService.modelNumberString.read,
+            DeviceInformationService.hardwareRevisionString.read,
+            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
+            BatteryService.level.read
+        ]
+
+        device.request(for: request, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
         self.spinner.stopAnimating()
-        results.forEach { result in
-            switch result.type {
-            case .string: print(result.asString ?? "?")
-            case .integer: print(result.asInteger ?? "?")
-            default: print("?")
-            }
-        }
 
         let modalViewController = ActionResultViewController()
         modalViewController.set(results: results)

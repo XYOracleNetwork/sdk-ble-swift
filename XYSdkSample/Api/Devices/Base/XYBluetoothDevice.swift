@@ -30,7 +30,6 @@ public class XYBluetoothDevice: NSObject {
     
     internal var rssi: Int = XYDeviceProximity.none.rawValue
     fileprivate var peripheral: CBPeripheral?
-    fileprivate var services = [ServiceCharacteristic]()
     
     fileprivate var delegates = [String: CBPeripheralDelegate?]()
     fileprivate var notifyDelegates = [String: (serviceCharacteristic: ServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
@@ -89,6 +88,7 @@ extension XYBluetoothDevice {
 
 // MARK: Locate from Central helpers
 public extension XYBluetoothDevice {
+    // TODO fix this, it's iBeacon releated
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
         guard
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
@@ -183,6 +183,40 @@ public extension XYBluetoothDevice {
         central.disconnect(from: self)
     }
 
+    func request(for serviceCharacteristics: [SerivceCharacteristicDirective], complete: GattSuccessCallback?) {
+        guard
+            XYCentral.instance.state == .poweredOn,
+            self.peripheral?.state == .connected
+            else { return } // TODO error
+
+        let results = XYBluetoothResult()
+
+        func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Void> {
+            switch directive.operation {
+            case .read:
+                return directive.serviceCharacteristic.get(from: self, result: results)
+            case .write:
+                return directive.serviceCharacteristic.set(to: self, value: directive.value!)
+            }
+        }
+
+        // Empty starting promise
+        var chain = Promise<Void>(())
+
+        // Process each directive on the bg work queue
+        // TODO reduce?
+        serviceCharacteristics.forEach { op in
+            chain = chain.then(on: self.workQueue) { perform(op) }
+        }
+
+        // .then defaults to the main thread
+        chain.then {
+            self.delegates.removeAll()
+            complete?(results.values)
+        }
+    }
+
+    // If we wanted to use the await functionality, would look like this...
     func request(_ complete: GattSuccessCallback?, error: GattErrorCallback? = nil) {
         let central = XYCentral.instance
 
@@ -207,5 +241,4 @@ public extension XYBluetoothDevice {
         }
     }
 
-    //            try await(PrimaryService.buzzer.set(to: self, value: XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
 }

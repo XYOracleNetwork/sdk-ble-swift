@@ -32,7 +32,7 @@ public enum GattCharacteristicType {
 
 class GattClient: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
-    fileprivate var characteristicPromise = Promise<CBCharacteristic>.pending()
+    fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
     
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
