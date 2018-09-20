@@ -13,31 +13,36 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var deviceLabel: UILabel!
     @IBOutlet weak var countLabel: UILabel!
-    @IBOutlet weak var deviceName: UILabel!
-    @IBOutlet weak var deviceStatus: UILabel!
     @IBOutlet weak var notifyLabel: UILabel!
+    @IBOutlet weak var deviceStatus: UILabel!
 
     fileprivate let scanner = XYSmartScan.instance
     fileprivate var central = XYCentral.instance
-    fileprivate var xy4Device: XYBluetoothDevice?
 
     @IBOutlet weak var rangedDevicesTableView: UITableView!
+    @IBOutlet weak var locatedDevicesTableView: UITableView!
 
     fileprivate var rangedDevices = [XY4BluetoothDevice]()
+    fileprivate var connectedDevices = [XYBluetoothDevice]()
+    fileprivate var selectedDevice: XYBluetoothDevice?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.spinner.stopAnimating()
         self.notifyLabel.alpha = 0.0
 
+        rangedDevicesTableView.tag = 1
         rangedDevicesTableView.dataSource = self
         rangedDevicesTableView.delegate = self
-    }
+        rangedDevicesTableView.layer.borderWidth = 1.0
+        rangedDevicesTableView.layer.borderColor = UIColor.blue.cgColor
 
-    @IBAction func connectTapped(_ sender: Any) {
-
+        locatedDevicesTableView.tag = 2
+        locatedDevicesTableView.dataSource = self
+        locatedDevicesTableView.delegate = self
+        locatedDevicesTableView.layer.borderWidth = 1.0
+        locatedDevicesTableView.layer.borderColor = UIColor.orange.cgColor
     }
 
     @IBAction func centralSwitchTapped(_ sender: UISwitch) {
@@ -49,27 +54,23 @@ class ViewController: UIViewController {
     }
 
     @IBAction func notifyTapped(_ sender: Any) {
-        guard let device = self.xy4Device else { return }
-        device.subscribe(to: PrimaryService.buttonState, delegate: ("ViewController", self))
+//        guard let device = self.xy4Device else { return }
+//        device.subscribe(to: PrimaryService.buttonState, delegate: ("ViewController", self))
     }
     
-    @IBAction func scanStart(_ sender: Any) {
-
-    }
-
-    @IBAction func scanStop(_ sender: Any) {
-        scanner.stop()
-        rangedDevices.removeAll()
-        self.countLabel.text = nil
-        rangedDevicesTableView.reloadData()
-    }
+//    @IBAction func scanStop(_ sender: Any) {
+//        scanner.stop()
+//        rangedDevices.removeAll()
+//        self.countLabel.text = nil
+//        rangedDevicesTableView.reloadData()
+//    }
 
     @IBAction func disconnectTapped(_ sender: Any) {
-        xy4Device?.disconnect()
+//        xy4Device?.disconnect()
     }
 
     @IBAction func actionTapped(_ sender: Any) {
-        guard let device = xy4Device else { return }
+//        guard let device = xy4Device else { return }
         self.spinner.startAnimating()
 
         let request = [
@@ -80,18 +81,18 @@ class ViewController: UIViewController {
 //            BatteryService.level.read
         ]
 
-        device.request(for: request, complete: self.processResult) { error in
-            if let issue = error as? GattError {
-                switch issue {
-                case .peripheralDisconected(let state):
-                    if state == .disconnected || state == .disconnected {
-                        XYCentral.instance.connect(to: device)
-                    }
-                default:
-                    print("something when wrong")
-                }
-            }
-        }
+//        device.request(for: request, complete: self.processResult) { error in
+//            if let issue = error as? GattError {
+//                switch issue {
+//                case .peripheralDisconected(let state):
+//                    if state == .disconnected || state == .disconnected {
+//                        XYCentral.instance.connect(to: device)
+//                    }
+//                default:
+//                    print("something when wrong")
+//                }
+//            }
+//        }
 
 //        let request2 = [
 //            DeviceInformationService.firmwareRevisionString.read,
@@ -177,7 +178,11 @@ extension ViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return rangedDevices.count
+        if tableView.tag == 1 {
+            return rangedDevices.count
+        } else {
+            return 0
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -194,18 +199,18 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let device = self.rangedDevices[safe: indexPath.row] else { return }
+        if tableView.tag == 1 {
+            guard
+                central.state == .poweredOn,
+                let device = self.rangedDevices[safe: indexPath.row]
+                else { return }
 
-        guard central.state == .poweredOn else { return }
+            deviceStatus.text = "Scanning..."
+            self.spinner.startAnimating()
 
-        deviceName.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
-        deviceStatus.text = "Scanning..."
-
-        self.spinner.startAnimating()
-
-        self.xy4Device = device
-
-        central.scan() // TOOD add timeout
+            self.selectedDevice = device
+            central.scan() // TOOD add timeout
+        }
     }
 
 }
@@ -238,15 +243,16 @@ extension ViewController: XYCentralDelegate {
 
     func connected(peripheral: XYPeripheral) {
         DispatchQueue.main.async {
+            self.connectedDevices.append(self.selectedDevice!)
             self.spinner.stopAnimating()
             self.deviceStatus.text = "Connected"
         }
     }
 
     func located(peripheral: XYPeripheral) {
-        if xy4Device?.attachPeripheral(peripheral) ?? false {
+        if self.selectedDevice?.attachPeripheral(peripheral) ?? false {
             central.stop()
-            central.connect(to: self.xy4Device!)
+            central.connect(to: self.selectedDevice!)
             DispatchQueue.main.async {
                 self.deviceStatus.text = "Connecting..."
             }
