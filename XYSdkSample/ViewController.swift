@@ -54,8 +54,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func scanStart(_ sender: Any) {
-        scanner.start()
-        scanner.setDelegate(self, key: "ViewController")
+
     }
 
     @IBAction func scanStop(_ sender: Any) {
@@ -75,22 +74,54 @@ class ViewController: UIViewController {
 
         let request = [
             DeviceInformationService.firmwareRevisionString.read,
-            DeviceInformationService.modelNumberString.read,
-            DeviceInformationService.hardwareRevisionString.read,
+//            DeviceInformationService.modelNumberString.read,
+//            DeviceInformationService.hardwareRevisionString.read,
             PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
-            BatteryService.level.read
+//            BatteryService.level.read
         ]
 
-        device.request(for: request, complete: self.processResult)
+        device.request(for: request, complete: self.processResult) { error in
+            if let issue = error as? GattError {
+                switch issue {
+                case .peripheralDisconected(let state):
+                    if state == .disconnected || state == .disconnected {
+                        XYCentral.instance.connect(to: device)
+                    }
+                default:
+                    print("something when wrong")
+                }
+            }
+        }
+
+//        let request2 = [
+//            DeviceInformationService.firmwareRevisionString.read,
+//            DeviceInformationService.modelNumberString.read,
+//            DeviceInformationService.hardwareRevisionString.read,
+////            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
+//            BatteryService.level.read
+//        ]
+//
+//        device.request(for: request2, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
         self.spinner.stopAnimating()
 
-        let modalViewController = ActionResultViewController()
-        modalViewController.set(results: results)
-        modalViewController.modalPresentationStyle = .overCurrentContext
-        present(modalViewController, animated: true, completion: nil)
+        results.forEach { value in
+            var result: String
+            switch value.type {
+            case .string: result = value.asString ?? "?"
+            case .integer: result = "\(value.asInteger ?? 0)"
+            default: result = "?"
+            }
+
+            print(result)
+        }
+
+//        let modalViewController = ActionResultViewController()
+//        modalViewController.set(results: results)
+//        modalViewController.modalPresentationStyle = .overCurrentContext
+//        present(modalViewController, animated: true, completion: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -198,6 +229,10 @@ extension ViewController: XYCentralDelegate {
         DispatchQueue.main.async {
             self.spinner.stopAnimating()
             self.statusLabel.text = newState.toString
+            if newState == .poweredOn {
+                self.scanner.start()
+                self.scanner.setDelegate(self, key: "ViewController")
+            }
         }
     }
 

@@ -16,6 +16,8 @@ enum GattError: Error {
     case serviceNotFound
     case characteristicNotFound
     case dataNotPresent
+    case timedOut
+    case peripheralDisconected(state: CBPeripheralState?)
 }
 
 enum GattOperation: String {
@@ -50,7 +52,8 @@ class GattClient: NSObject {
     
     // TODO: Change to a per-session token for the key
     func delegateKey(deviceUuid: UUID) -> String {
-        return ["GC", deviceUuid.uuidString, serviceCharacteristic.serviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
+        let r =  ["GC", deviceUuid.uuidString, serviceCharacteristic.serviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
+        return r
     }
 
     func get(from device: XYBluetoothDevice, resultObj: XYBluetoothResult) -> Promise<Void> {
@@ -62,10 +65,9 @@ class GattClient: NSObject {
     }
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
+        print("Gatt(set): get characteristic")
         return self.getCharacteristic(device).then { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
-        }.always {
-            self.device?.unsubscribe(for: self.delegateKey(deviceUuid: device.uuid))
         }
     }
     
@@ -99,6 +101,8 @@ private extension GattClient {
                 return self.readPromise
             }
 
+        print("Gatt(get): read")
+
         peripheral.readValue(for: characteristic)
 
         return self.readPromise
@@ -116,9 +120,12 @@ private extension GattClient {
             peripheral.state == .connected,
             let data = data.data
             else {
+                print("Gatt(set): write ERROR")
                 self.writePromise.reject(GattError.notConnected)
                 return self.writePromise
             }
+
+        print("Gatt(set): write")
 
         peripheral.writeValue(data, for: characteristic, type: withResponse ? .withResponse : .withoutResponse)
 
@@ -167,6 +174,8 @@ extension GattClient: CBPeripheralDelegate {
             let data = characteristic.value
             else {  return }
 
+        print("Gatt(get): read delegate called, done")
+
         readPromise.fulfill(data)
     }
 
@@ -174,6 +183,11 @@ extension GattClient: CBPeripheralDelegate {
         guard
             self.device?.getPeripheral() == peripheral
             else {  return }
+
+        guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
+            else {  return }
+
+        print("Gatt(set): write delegate called, done")
 
         writePromise.fulfill(())
     }

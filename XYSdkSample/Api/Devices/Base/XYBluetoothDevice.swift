@@ -27,7 +27,9 @@ public protocol XYBluetoothDeviceNotifyDelegate {
 }
 
 public class XYBluetoothDevice: NSObject {
-    
+
+    fileprivate static var counter = 1
+
     internal var rssi: Int = XYDeviceProximity.none.rawValue
     fileprivate var peripheral: CBPeripheral?
     
@@ -43,9 +45,14 @@ public class XYBluetoothDevice: NSObject {
 
     public fileprivate(set) var state: XY4BluetoothDeviceStatus = .disconnected
 
-    fileprivate let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.WorkQueue")
+    fileprivate static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.WorkQueue")
+    fileprivate static let operationsQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
 
-    fileprivate static let connectionTimeoutInSeconds = DispatchTimeInterval.seconds(5)
+    fileprivate static let lockTimeoutInSeconds = DispatchTimeInterval.seconds(15)
+    fileprivate static let operationTimeoutInSeconds = DispatchTimeInterval.seconds(15)
+
+    // Locks
+    fileprivate let bleLock = DispatchSemaphore(value: 1)
 
     init(_ uuid: UUID, id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.uuid = uuid
@@ -183,36 +190,57 @@ public extension XYBluetoothDevice {
         central.disconnect(from: self)
     }
 
-    func request(for serviceCharacteristics: [SerivceCharacteristicDirective], complete: GattSuccessCallback?) {
+    func request(for serviceCharacteristics: [SerivceCharacteristicDirective], complete: GattSuccessCallback?, error: GattErrorCallback?) {
         guard
-            XYCentral.instance.state == .poweredOn,
-            self.peripheral?.state == .connected
-            else { return } // TODO error
+            XYCentral.instance.state == .poweredOn else { return }
 
-        let results = XYBluetoothResult()
-
-        func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Void> {
-            switch directive.operation {
-            case .read:
-                return directive.serviceCharacteristic.get(from: self, result: results)
-            case .write:
-                return directive.serviceCharacteristic.set(to: self, value: directive.value!)
+        guard self.peripheral?.state == .connected else {
+                error?(GattError.peripheralDisconected(state: self.peripheral?.state))
+                return
             }
-        }
 
-        // Empty starting promise
-        var chain = Promise<Void>(())
+        XYBluetoothDevice.operationsQueue.async {
 
-        // Process each directive on the bg work queue
-        // TODO reduce?
-        serviceCharacteristics.forEach { op in
-            chain = chain.then(on: self.workQueue) { perform(op) }
-        }
+            let counter = XYBluetoothDevice.counter
+            XYBluetoothDevice.counter = XYBluetoothDevice.counter + 1
 
-        // .then defaults to the main thread
-        chain.then {
-            self.delegates.removeAll()
-            complete?(results.values)
+            print("\(counter) bleLock: Trying to get lock")
+            if self.bleLock.wait(timeout: .now() + XYBluetoothDevice.lockTimeoutInSeconds) == .timedOut {
+                print("\(counter) bleLock: Timed out getting the lock")
+                self.bleLock.signal()
+                error?(GattError.timedOut)
+                return
+            }
+            print("\(counter) bleLock: Got a lock")
+
+            let results = XYBluetoothResult()
+
+            func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Void> {
+                switch directive.operation {
+                case .read:
+                    return directive.serviceCharacteristic.get(from: self, result: results)
+                case .write:
+                    return directive.serviceCharacteristic.set(to: self, value: directive.value!)
+                }
+            }
+
+            // Empty starting promise
+            var chain = Promise<Void>(())
+
+            // Process each directive on the bg work queue
+            // TODO reduce?
+            serviceCharacteristics.forEach { op in
+                chain = chain.then(on: XYBluetoothDevice.workQueue) { perform(op) }
+            }
+
+            // .then defaults to the main thread
+            chain.then {
+                self.delegates.removeAll()
+                complete?(results.values)
+                print("\(counter) bleLock: Work done, unlocking")
+                self.bleLock.signal()
+                print("\(counter) bleLock: Unlocked")
+            }
         }
     }
 
@@ -226,7 +254,7 @@ public extension XYBluetoothDevice {
             else { error?(GattError.notConnected); return }
 
         let results = XYBluetoothResult()
-        Promise<Void>(on: workQueue) { () -> Void in
+        Promise<Void>(on: XYBluetoothDevice.workQueue) { () -> Void in
 
             try await(BatteryService.level.get(from: self, result: results))
             try await(DeviceInformationService.firmwareRevisionString.get(from: self, result: results))

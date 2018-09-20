@@ -187,7 +187,7 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        // TODO Notify
+        self.delegates.forEach { $1?.couldNotConnect(peripheral: XYPeripheral(peripheral)) }
     }
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
