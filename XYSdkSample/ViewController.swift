@@ -37,9 +37,15 @@ class ViewController: UIViewController {
     }
 
     @IBAction func connectTapped(_ sender: Any) {
-        self.spinner.startAnimating()
-        central.setDelegate(self, key: "ViewController")
-        central.enable()
+
+    }
+
+    @IBAction func centralSwitchTapped(_ sender: UISwitch) {
+        if sender.isOn {
+            self.spinner.startAnimating()
+            central.setDelegate(self, key: "ViewController")
+            central.enable()
+        }
     }
 
     @IBAction func notifyTapped(_ sender: Any) {
