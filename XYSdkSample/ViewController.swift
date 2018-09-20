@@ -17,11 +17,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var notifyLabel: UILabel!
     @IBOutlet weak var deviceStatus: UILabel!
 
+    @IBOutlet weak var readButton: UIButton!
+    @IBOutlet weak var notifyButton: UIButton!
+    @IBOutlet weak var disconnectButton: UIButton!
+
     fileprivate let scanner = XYSmartScan.instance
     fileprivate var central = XYCentral.instance
 
     @IBOutlet weak var rangedDevicesTableView: UITableView!
-    @IBOutlet weak var locatedDevicesTableView: UITableView!
+    @IBOutlet weak var connectedDevicesTableView: UITableView!
 
     fileprivate var rangedDevices = [XY4BluetoothDevice]()
     fileprivate var connectedDevices = [XYBluetoothDevice]()
@@ -38,11 +42,11 @@ class ViewController: UIViewController {
         rangedDevicesTableView.layer.borderWidth = 1.0
         rangedDevicesTableView.layer.borderColor = UIColor.blue.cgColor
 
-        locatedDevicesTableView.tag = 2
-        locatedDevicesTableView.dataSource = self
-        locatedDevicesTableView.delegate = self
-        locatedDevicesTableView.layer.borderWidth = 1.0
-        locatedDevicesTableView.layer.borderColor = UIColor.orange.cgColor
+        connectedDevicesTableView.tag = 2
+        connectedDevicesTableView.dataSource = self
+        connectedDevicesTableView.delegate = self
+        connectedDevicesTableView.layer.borderWidth = 1.0
+        connectedDevicesTableView.layer.borderColor = UIColor.orange.cgColor
     }
 
     @IBAction func centralSwitchTapped(_ sender: UISwitch) {
@@ -66,7 +70,8 @@ class ViewController: UIViewController {
 //    }
 
     @IBAction func disconnectTapped(_ sender: Any) {
-//        xy4Device?.disconnect()
+        guard let device = self.selectedDevice else { return }
+        device.disconnect()
     }
 
     @IBAction func actionTapped(_ sender: Any) {
@@ -181,18 +186,22 @@ extension ViewController: UITableViewDataSource {
         if tableView.tag == 1 {
             return rangedDevices.count
         } else {
-            return 0
+            return connectedDevices.count
         }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "rangedDevicesCell")!
-
-        let device = rangedDevices[indexPath.row]
-
-        cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
-
-        return cell
+        if tableView.tag == 1 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "rangedDevicesCell")!
+            let device = rangedDevices[indexPath.row]
+            cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "connectedDeviceCell")!
+            let device = connectedDevices[indexPath.row] as! XYFinderDevice
+            cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+            return cell
+        }
     }
 }
 
@@ -210,6 +219,11 @@ extension ViewController: UITableViewDelegate {
 
             self.selectedDevice = device
             central.scan() // TOOD add timeout
+        } else {
+            if let device = self.connectedDevices[safe: indexPath.row] {
+                self.selectedDevice = device
+                print(device.id)
+            }
         }
     }
 
@@ -244,6 +258,8 @@ extension ViewController: XYCentralDelegate {
     func connected(peripheral: XYPeripheral) {
         DispatchQueue.main.async {
             self.connectedDevices.append(self.selectedDevice!)
+            self.selectedDevice = nil
+            self.connectedDevicesTableView.reloadData()
             self.spinner.stopAnimating()
             self.deviceStatus.text = "Connected"
         }
@@ -262,6 +278,14 @@ extension ViewController: XYCentralDelegate {
     func disconnected(periperhal: XYPeripheral) {
         DispatchQueue.main.async {
             self.deviceStatus.text = "Disconnected"
+            if
+                let device = self.selectedDevice,
+                let indexToRemove = self.connectedDevices.index(where: { $0.id == device.id }) {
+
+                self.connectedDevices.remove(at: indexToRemove)
+                self.selectedDevice = nil
+                self.connectedDevicesTableView.reloadData()
+            }
         }
     }
 }

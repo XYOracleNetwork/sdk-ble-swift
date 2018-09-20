@@ -132,7 +132,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Ubv-00-EBD">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="connectedDeviceCell" id="Ubv-00-EBD">
                                         <rect key="frame" x="0.0" y="28" width="342" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Ubv-00-EBD" id="Uha-MO-Eur">
@@ -156,11 +156,14 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="connectedDevicesTableView" destination="A3r-to-gAU" id="PyS-2t-ac1"/>
                         <outlet property="countLabel" destination="bSH-tH-kva" id="ilt-rD-xCQ"/>
                         <outlet property="deviceStatus" destination="P7y-F2-Tn8" id="Lpe-Pf-BE9"/>
-                        <outlet property="locatedDevicesTableView" destination="A3r-to-gAU" id="PyS-2t-ac1"/>
+                        <outlet property="disconnectButton" destination="rSL-Y4-06F" id="Vmm-Sg-Iy1"/>
+                        <outlet property="notifyButton" destination="ztm-Ud-4ao" id="xpB-BF-Sxz"/>
                         <outlet property="notifyLabel" destination="wE3-Ny-Vdy" id="0Vc-H7-LtM"/>
                         <outlet property="rangedDevicesTableView" destination="apY-hy-2D8" id="Ipo-u5-AbS"/>
+                        <outlet property="readButton" destination="YIv-bp-tNN" id="jmi-FV-Iw4"/>
                         <outlet property="spinner" destination="8ek-D3-z1C" id="J9D-vh-XEM"/>
                         <outlet property="statusLabel" destination="Iol-xw-WUr" id="ixq-lt-V3q"/>
                     </connections>
