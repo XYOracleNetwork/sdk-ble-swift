@@ -75,7 +75,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func actionTapped(_ sender: Any) {
-//        guard let device = xy4Device else { return }
+        guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
         let request = [
@@ -85,6 +85,11 @@ class ViewController: UIViewController {
             PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
 //            BatteryService.level.read
         ]
+
+        device.request(for: request, complete: self.processResult) { error in
+            print(error)
+        }
+
 
 //        device.request(for: request, complete: self.processResult) { error in
 //            if let issue = error as? GattError {
@@ -113,21 +118,21 @@ class ViewController: UIViewController {
     func processResult(_ results: [XYBluetoothValue]) -> Void {
         self.spinner.stopAnimating()
 
-        results.forEach { value in
-            var result: String
-            switch value.type {
-            case .string: result = value.asString ?? "?"
-            case .integer: result = "\(value.asInteger ?? 0)"
-            default: result = "?"
-            }
+//        results.forEach { value in
+//            var result: String
+//            switch value.type {
+//            case .string: result = value.asString ?? "?"
+//            case .integer: result = "\(value.asInteger ?? 0)"
+//            default: result = "?"
+//            }
+//
+//            print(result)
+//        }
 
-            print(result)
-        }
-
-//        let modalViewController = ActionResultViewController()
-//        modalViewController.set(results: results)
-//        modalViewController.modalPresentationStyle = .overCurrentContext
-//        present(modalViewController, animated: true, completion: nil)
+        let modalViewController = ActionResultViewController()
+        modalViewController.set(results: results)
+        modalViewController.modalPresentationStyle = .overCurrentContext
+        present(modalViewController, animated: true, completion: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -285,6 +290,13 @@ extension ViewController: XYCentralDelegate {
                 self.connectedDevices.remove(at: indexToRemove)
                 self.selectedDevice = nil
                 self.connectedDevicesTableView.reloadData()
+
+                UIView.animate(withDuration: 1.0, animations: {
+                    self.deviceStatus.alpha = 0.0
+                }, completion: { _ in
+                    self.deviceStatus.text = nil
+                    self.deviceStatus.alpha = 1.0
+                })
             }
         }
     }
