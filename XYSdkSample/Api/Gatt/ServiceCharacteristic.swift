@@ -45,8 +45,10 @@ public func ==(lhs: SerivceCharacteristicDirective, rhs: SerivceCharacteristicDi
 // Global methods for all service characteristics
 public extension ServiceCharacteristic {
 
-    func get(from device: XYBluetoothDevice, result: XYBluetoothResult) -> Promise<Data?> {
-        return GattClient(self).get(from: device, resultObj: result)
+    func get(from device: XYBluetoothDevice) -> Promise<XYBluetoothValue> {
+        return GattClient(self).get(from: device).then { value in
+            XYBluetoothValue(self, data: value)
+        }
     }
 
     func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Data?> {

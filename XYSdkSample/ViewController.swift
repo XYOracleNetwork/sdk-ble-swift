@@ -84,23 +84,21 @@ class ViewController: UIViewController {
         guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
-        let results = XYBluetoothResult()
+        var values = [XYBluetoothValue?]()
         device.request {
-            let x = try await(BatteryService.level.get(from: device, result: results))
-            try await(DeviceInformationService.firmwareRevisionString.get(from: device, result: results))
-
-            let q = abs(34567)
-
-            try await(DeviceInformationService.modelNumberString.get(from: device, result: results))
-            try await(DeviceInformationService.hardwareRevisionString.get(from: device, result: results))
-            try await(PrimaryService.major.get(from: device, result: results))
-            return try await(DeviceInformationService.manufacturerNameString.get(from: device, result: results))
+            values.append(try await(BatteryService.level.get(from: device)))
+            values.append(try await(DeviceInformationService.firmwareRevisionString.get(from: device)))
+            values.append(try await(DeviceInformationService.modelNumberString.get(from: device)))
+            values.append(try await(DeviceInformationService.hardwareRevisionString.get(from: device)))
+            values.append(try await(PrimaryService.major.get(from: device)))
+            values.append(try await(DeviceInformationService.manufacturerNameString.get(from: device)))
+            return nil
         }.then { _ in
-            self.processResult(results.values)
+            self.processResult(values)
         }
     }
 
-    func processResult(_ results: [XYBluetoothValue]) -> Void {
+    func processResult(_ results: [XYBluetoothValue?]) -> Void {
         self.spinner.stopAnimating()
 
         let modalViewController = ActionResultViewController()

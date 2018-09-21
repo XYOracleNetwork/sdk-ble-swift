@@ -56,11 +56,9 @@ class GattClient: NSObject {
         return r
     }
 
-    func get(from device: XYBluetoothDevice, resultObj: XYBluetoothResult) -> Promise<Data?> {
+    func get(from device: XYBluetoothDevice) -> Promise<Data?> {
         return self.getCharacteristic(device).then { _ in
             self.read(device)
-        }.then { result in
-            resultObj.add(for: self.serviceCharacteristic, data: result)
         }
     }
 

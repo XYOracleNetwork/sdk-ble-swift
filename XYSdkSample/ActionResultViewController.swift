@@ -34,8 +34,8 @@ class ActionResultViewController: UIViewController {
         }
     }
 
-    func set(results: [XYBluetoothValue]) {
-        self.results = results
+    func set(results: [XYBluetoothValue?]) {
+        self.results = results.compactMap { $0 }
     }
 
     func convertValueToString(_ value: XYBluetoothValue) -> String {
