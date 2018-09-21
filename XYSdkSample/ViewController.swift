@@ -89,12 +89,14 @@ class ViewController: UIViewController {
         var level, revision, model: XYBluetoothValue?
 
         var values = [XYBluetoothValue?]()
-        device.request {
+        let request = device.request {
             level = device.op(BatteryService.level.read)
             revision = device.op(DeviceInformationService.firmwareRevisionString.read)
             model = device.op(DeviceInformationService.modelNumberString.read)
             return nil
-        }.then { _ in
+        }
+
+        request.then { _ in
             values.append(level)
             values.append(revision)
             values.append(model)

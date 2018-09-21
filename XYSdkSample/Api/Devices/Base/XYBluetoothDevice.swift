@@ -268,21 +268,12 @@ public extension XYBluetoothDevice {
 
     // If we wanted to use the await functionality, would look like this...
     func request(_ operations: @escaping () throws -> XYBluetoothValue?) -> Promise<XYBluetoothValue?> {
-        let central = XYCentral.instance
-
         guard
-            central.state == .poweredOn,
+            XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected
             else { return Promise<XYBluetoothValue?>(nil) }
 
         return Promise<XYBluetoothValue?>(on: XYBluetoothDevice.workQueue, operations)
-
-//        let results = XYBluetoothResult()
-//        Promise<Void>(on: XYBluetoothDevice.workQueue) {
-
-
-
-//        }
     }
 
 }
