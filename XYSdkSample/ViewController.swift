@@ -51,6 +51,8 @@ class ViewController: UIViewController {
 
         let thing = PromiseTester()
         thing.doItNew()
+        thing.doItNew()
+        thing.doItNew()
     }
 
     @IBAction func centralSwitchTapped(_ sender: UISwitch) {
@@ -84,16 +86,19 @@ class ViewController: UIViewController {
         guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
+        var level, revision, model: XYBluetoothValue?
+
         var values = [XYBluetoothValue?]()
         device.request {
-            values.append(try await(BatteryService.level.get(from: device)))
-            values.append(try await(DeviceInformationService.firmwareRevisionString.get(from: device)))
-            values.append(try await(DeviceInformationService.modelNumberString.get(from: device)))
-            values.append(try await(DeviceInformationService.hardwareRevisionString.get(from: device)))
-            values.append(try await(PrimaryService.major.get(from: device)))
-            values.append(try await(DeviceInformationService.manufacturerNameString.get(from: device)))
+            level = device.op(BatteryService.level.read)
+            revision = device.op(DeviceInformationService.firmwareRevisionString.read)
+            model = device.op(DeviceInformationService.modelNumberString.read)
             return nil
         }.then { _ in
+            values.append(level)
+            values.append(revision)
+            values.append(model)
+
             self.processResult(values)
         }
     }

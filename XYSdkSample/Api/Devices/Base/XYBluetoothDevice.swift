@@ -73,6 +73,25 @@ public class XYBluetoothDevice: NSObject {
     }
 }
 
+// MARK: await() wrapper
+extension XYBluetoothDevice {
+
+    func op(_ directive: SerivceCharacteristicDirective) -> XYBluetoothValue? {
+        do {
+            switch directive.operation {
+            case .read:
+                return try await(directive.serviceCharacteristic.get(from: self))
+            case .write:
+                return nil
+    //            return try await(directive.serviceCharacteristic.set(to: self, value: directive.value!))
+            }
+        } catch {
+            return nil
+        }
+    }
+
+}
+
 // MARK: Peripheral methods
 extension XYBluetoothDevice {
 

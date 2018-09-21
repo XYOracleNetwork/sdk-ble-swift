@@ -11,11 +11,18 @@ import Promises
 
 class PromiseTester {
 
+    fileprivate var pending = Promise<Int>.pending()
+    fileprivate var stringPending = Promise<String>.pending()
+
     func test12() -> Promise<Int> {
-        return Promise<Int>(12)
+        return stringPending.then { _ in
+            self.pending
+        }
     }
 
     func test13(_ add: Int) -> Promise<Int> {
+        stringPending.fulfill("Hi")
+        pending.fulfill(12)
         return Promise<Int>(13 + add)
     }
 
