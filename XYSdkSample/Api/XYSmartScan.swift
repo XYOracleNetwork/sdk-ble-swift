@@ -12,6 +12,7 @@ public protocol XYSmartScanDelegate {
 //    func smartScan(status:cXYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D)
     func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int)
+    func smartScan(detected devices: [XY4BluetoothDevice])
     func smartScan(entered device: XYBluetoothDevice)
 //    func smartScan(exiting device:XYBluetoothDevice)
     func smartScan(exited device: XYBluetoothDevice)
@@ -93,6 +94,7 @@ extension XYSmartScan: XYLocationDelegate {
     }
 
     public func didRangeBeacons(_ beacons: [XYBluetoothDevice]) {
+        var filteredDevices = [XY4BluetoothDevice]() // TODO cheating
         beacons.forEach { beacon in
             if beacon.inRange {
                 // TODO report in range
@@ -100,13 +102,17 @@ extension XYSmartScan: XYLocationDelegate {
             }
 
             if beacon.powerLevel == UInt(8) {
-                // TODO handle button press from scanning
+                // TODO notify that you see the device
             }
 
+            // TODO hardcode
             if let xy4iBeacon = beacon as? XY4BluetoothDevice {
-                self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: beacon.rssi)}
+                filteredDevices.append(xy4iBeacon)
+//                self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: beacon.rssi)}
             }
         }
+
+        self.delegates.forEach { $1?.smartScan(detected: filteredDevices) }
     }
 
     public func deviceEntered(_ device: XYBluetoothDevice) {

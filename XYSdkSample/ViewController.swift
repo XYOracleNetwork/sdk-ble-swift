@@ -58,8 +58,8 @@ class ViewController: UIViewController {
     }
 
     @IBAction func notifyTapped(_ sender: Any) {
-//        guard let device = self.xy4Device else { return }
-//        device.subscribe(to: PrimaryService.buttonState, delegate: ("ViewController", self))
+        guard let device = self.selectedDevice else { return }
+        device.subscribe(to: PrimaryService.buttonState, delegate: ("ViewController-\(device.id)", self))
     }
     
 //    @IBAction func scanStop(_ sender: Any) {
@@ -80,54 +80,19 @@ class ViewController: UIViewController {
 
         let request = [
             DeviceInformationService.firmwareRevisionString.read,
-//            DeviceInformationService.modelNumberString.read,
-//            DeviceInformationService.hardwareRevisionString.read,
-            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
-//            BatteryService.level.read
+            DeviceInformationService.modelNumberString.read,
+            DeviceInformationService.hardwareRevisionString.read,
+//            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
+            BatteryService.level.read
         ]
 
         device.request(for: request, complete: self.processResult) { error in
             print(error)
         }
-
-
-//        device.request(for: request, complete: self.processResult) { error in
-//            if let issue = error as? GattError {
-//                switch issue {
-//                case .peripheralDisconected(let state):
-//                    if state == .disconnected || state == .disconnected {
-//                        XYCentral.instance.connect(to: device)
-//                    }
-//                default:
-//                    print("something when wrong")
-//                }
-//            }
-//        }
-
-//        let request2 = [
-//            DeviceInformationService.firmwareRevisionString.read,
-//            DeviceInformationService.modelNumberString.read,
-//            DeviceInformationService.hardwareRevisionString.read,
-////            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
-//            BatteryService.level.read
-//        ]
-//
-//        device.request(for: request2, complete: self.processResult)
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {
         self.spinner.stopAnimating()
-
-//        results.forEach { value in
-//            var result: String
-//            switch value.type {
-//            case .string: result = value.asString ?? "?"
-//            case .integer: result = "\(value.asInteger ?? 0)"
-//            default: result = "?"
-//            }
-//
-//            print(result)
-//        }
 
         let modalViewController = ActionResultViewController()
         modalViewController.set(results: results)
@@ -165,21 +130,26 @@ extension ViewController: XYSmartScanDelegate {
 
     }
 
-    // Probably should change this to an array of what it's found
-    func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int) {
+    func smartScan(detected devices: [XY4BluetoothDevice]) {
+        // TODO throttle this display a bit?
         DispatchQueue.main.async {
-            if self.rangedDevices.contains(where: { $0.id == device.id }) {
-                return
+            self.rangedDevices.removeAll()
+            var filteredDevices = [XY4BluetoothDevice]()
+
+            devices.forEach { device in
+                // Only show those in range
+                if device.rssi != 0 && device.rssi > -95 {
+                    filteredDevices.append(device)
+                }
             }
 
-            // Only show those in range
-            if device.rssi != 0 && device.rssi > -95 {
-                self.rangedDevices.append(device)
-                self.rangedDevicesTableView.reloadData()
-                self.countLabel.text = "\(self.rangedDevices.count)"
-            }
+            self.rangedDevices = filteredDevices.sorted(by: { ($0.powerLevel, $0.id) > ($1.powerLevel, $1.id) } )
+            self.countLabel.text = "\(self.rangedDevices.count)"
+            self.rangedDevicesTableView.reloadData()
         }
     }
+
+    func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int) {}
 }
 
 extension ViewController: UITableViewDataSource {
@@ -200,6 +170,7 @@ extension ViewController: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "rangedDevicesCell")!
             let device = rangedDevices[indexPath.row]
             cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+            cell.accessoryType = device.powerLevel == UInt(8) ? .checkmark : .none
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "connectedDeviceCell")!
