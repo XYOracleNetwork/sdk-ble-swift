@@ -51,9 +51,18 @@ class ViewController: UIViewController {
 
     @IBAction func centralSwitchTapped(_ sender: UISwitch) {
         if sender.isOn {
-            self.spinner.startAnimating()
-            central.setDelegate(self, key: "ViewController")
-            central.enable()
+            if central.state != .poweredOn {
+                self.spinner.startAnimating()
+                central.setDelegate(self, key: "ViewController")
+                central.enable()
+            } else {
+                scanner.start()
+            }
+        } else {
+            scanner.stop()
+            rangedDevices.removeAll()
+            self.countLabel.text = nil
+            rangedDevicesTableView.reloadData()
         }
     }
 
@@ -62,13 +71,6 @@ class ViewController: UIViewController {
         device.subscribe(to: PrimaryService.buttonState, delegate: ("ViewController-\(device.id)", self))
     }
     
-//    @IBAction func scanStop(_ sender: Any) {
-//        scanner.stop()
-//        rangedDevices.removeAll()
-//        self.countLabel.text = nil
-//        rangedDevicesTableView.reloadData()
-//    }
-
     @IBAction func disconnectTapped(_ sender: Any) {
         guard let device = self.selectedDevice else { return }
         device.disconnect()
@@ -82,7 +84,7 @@ class ViewController: UIViewController {
             DeviceInformationService.firmwareRevisionString.read,
             DeviceInformationService.modelNumberString.read,
             DeviceInformationService.hardwareRevisionString.read,
-//            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
+            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
             BatteryService.level.read
         ]
 
