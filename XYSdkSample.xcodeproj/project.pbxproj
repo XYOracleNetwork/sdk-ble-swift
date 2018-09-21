@@ -38,6 +38,7 @@
 		318BEB452142EBF1000580D1 /* ServiceCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318BEB442142EBF1000580D1 /* ServiceCharacteristic.swift */; };
 		318BEB482142EED5000580D1 /* PrimaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318BEB472142EED5000580D1 /* PrimaryService.swift */; };
 		319173612142008400A40B55 /* XYCentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319173602142008400A40B55 /* XYCentral.swift */; };
+		31BD926021558135007B0AD6 /* PromiseTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BD925F21558135007B0AD6 /* PromiseTester.swift */; };
 		7EDDF6FE7994AFF7F68D295A /* Pods_XYSdkSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB812B6E208626C2C91F7F55 /* Pods_XYSdkSample.framework */; };
 /* End PBXBuildFile section */
 
@@ -87,6 +88,7 @@
 		318BEB442142EBF1000580D1 /* ServiceCharacteristic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCharacteristic.swift; sourceTree = "<group>"; };
 		318BEB472142EED5000580D1 /* PrimaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryService.swift; sourceTree = "<group>"; };
 		319173602142008400A40B55 /* XYCentral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYCentral.swift; sourceTree = "<group>"; };
+		31BD925F21558135007B0AD6 /* PromiseTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseTester.swift; sourceTree = "<group>"; };
 		4FBD8C70A696311253DC8D50 /* Pods-XYSdkSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XYSdkSample.release.xcconfig"; path = "Pods/Target Support Files/Pods-XYSdkSample/Pods-XYSdkSample.release.xcconfig"; sourceTree = "<group>"; };
 		EB812B6E208626C2C91F7F55 /* Pods_XYSdkSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XYSdkSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE85D9400B87C03EE41A560B /* Pods-XYSdkSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XYSdkSample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-XYSdkSample/Pods-XYSdkSample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				3111F6FC215309F8001D76C1 /* ActionResultViewController.xib */,
 				310B6CD821531154007FADD2 /* ActionResultTableViewCell.swift */,
 				310B6CD921531154007FADD2 /* ActionResultTableViewCell.xib */,
+				31BD925F21558135007B0AD6 /* PromiseTester.swift */,
 			);
 			path = XYSdkSample;
 			sourceTree = "<group>";
@@ -422,6 +425,7 @@
 				310B6CDD215316D6007FADD2 /* TxPowerService.swift in Sources */,
 				319173612142008400A40B55 /* XYCentral.swift in Sources */,
 				311B7483214318E2009412FD /* XYFinderDevice.swift in Sources */,
+				31BD926021558135007B0AD6 /* PromiseTester.swift in Sources */,
 				311B748E21432B3B009412FD /* XYIBeaconDefinition.swift in Sources */,
 				311B7480214306E1009412FD /* XYLocation.swift in Sources */,
 				311B749221434587009412FD /* Array+extensions.swift in Sources */,

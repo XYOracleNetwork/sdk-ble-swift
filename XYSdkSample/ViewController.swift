@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreBluetooth
+import Promises
 
 class ViewController: UIViewController {
 
@@ -47,6 +48,9 @@ class ViewController: UIViewController {
         connectedDevicesTableView.delegate = self
         connectedDevicesTableView.layer.borderWidth = 1.0
         connectedDevicesTableView.layer.borderColor = UIColor.orange.cgColor
+
+        let thing = PromiseTester()
+        thing.doItNew()
     }
 
     @IBAction func centralSwitchTapped(_ sender: UISwitch) {
@@ -80,7 +84,20 @@ class ViewController: UIViewController {
         guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
-        device.request(self.processResult, error: { error in print(error) } )
+        let results = XYBluetoothResult()
+        device.request {
+            let x = try await(BatteryService.level.get(from: device, result: results))
+            try await(DeviceInformationService.firmwareRevisionString.get(from: device, result: results))
+
+            let q = abs(34567)
+
+            try await(DeviceInformationService.modelNumberString.get(from: device, result: results))
+            try await(DeviceInformationService.hardwareRevisionString.get(from: device, result: results))
+            try await(PrimaryService.major.get(from: device, result: results))
+            return try await(DeviceInformationService.manufacturerNameString.get(from: device, result: results))
+        }.then { _ in
+            self.processResult(results.values)
+        }
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {

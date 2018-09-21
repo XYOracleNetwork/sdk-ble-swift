@@ -190,89 +190,80 @@ public extension XYBluetoothDevice {
         central.disconnect(from: self)
     }
 
-    func request(for serviceCharacteristics: [SerivceCharacteristicDirective], complete: GattSuccessCallback?, error: GattErrorCallback?) {
-        guard
-            XYCentral.instance.state == .poweredOn else { return }
-
-        guard self.peripheral?.state == .connected else {
-                error?(GattError.peripheralDisconected(state: self.peripheral?.state))
-                return
-            }
-
-        XYBluetoothDevice.operationsQueue.async {
-
-            let counter = XYBluetoothDevice.counter
-            XYBluetoothDevice.counter = XYBluetoothDevice.counter + 1
-
-            print("\(counter) bleLock: Trying to get lock")
-            if self.bleLock.wait(timeout: .now() + XYBluetoothDevice.lockTimeoutInSeconds) == .timedOut {
-                print("\(counter) bleLock: Timed out getting the lock")
-                self.bleLock.signal()
-                error?(GattError.timedOut)
-                return
-            }
-            print("\(counter) bleLock: Got a lock")
-
-            let results = XYBluetoothResult()
-
-            func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Data?> {
-                switch directive.operation {
-                case .read:
-                    return directive.serviceCharacteristic.get(from: self, result: results)
-                case .write:
-                    return directive.serviceCharacteristic.set(to: self, value: directive.value!)
-                }
-            }
-
-            // Empty starting promise
-            var chain = Promise<Void>(())
-
-            // Process each directive on the bg work queue
-            // TODO reduce?
-            serviceCharacteristics.forEach { op in
-                chain = chain.then(on: XYBluetoothDevice.workQueue) { perform(op) }
-            }
-
-            // .then defaults to the main thread
-            chain.timeout(on: XYBluetoothDevice.workQueue, 30).then {
-                self.delegates.removeAll()
-                complete?(results.values)
-                print("\(counter) bleLock: Work done, unlocking")
-                self.bleLock.signal()
-                print("\(counter) bleLock: Unlocked")
-            }.catch { error in
-                print(error)
-                self.bleLock.signal()
-            }
-        }
-    }
+//    func request(for serviceCharacteristics: [SerivceCharacteristicDirective], complete: GattSuccessCallback?, error: GattErrorCallback?) {
+//        guard
+//            XYCentral.instance.state == .poweredOn else { return }
+//
+//        guard self.peripheral?.state == .connected else {
+//                error?(GattError.peripheralDisconected(state: self.peripheral?.state))
+//                return
+//            }
+//
+//        XYBluetoothDevice.operationsQueue.async {
+//
+//            let counter = XYBluetoothDevice.counter
+//            XYBluetoothDevice.counter = XYBluetoothDevice.counter + 1
+//
+//            print("\(counter) bleLock: Trying to get lock")
+//            if self.bleLock.wait(timeout: .now() + XYBluetoothDevice.lockTimeoutInSeconds) == .timedOut {
+//                print("\(counter) bleLock: Timed out getting the lock")
+//                self.bleLock.signal()
+//                error?(GattError.timedOut)
+//                return
+//            }
+//            print("\(counter) bleLock: Got a lock")
+//
+//            let results = XYBluetoothResult()
+//
+//            func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Data?> {
+//                switch directive.operation {
+//                case .read:
+//                    return directive.serviceCharacteristic.get(from: self, result: results)
+//                case .write:
+//                    return directive.serviceCharacteristic.set(to: self, value: directive.value!)
+//                }
+//            }
+//
+//            // Empty starting promise
+//            var chain = Promise<Void>(())
+//
+//            // Process each directive on the bg work queue
+//            // TODO reduce?
+//            serviceCharacteristics.forEach { op in
+//                chain = chain.then(on: XYBluetoothDevice.workQueue) { perform(op) }
+//            }
+//
+//            // .then defaults to the main thread
+//            chain.timeout(on: XYBluetoothDevice.workQueue, 30).then {
+//                self.delegates.removeAll()
+//                complete?(results.values)
+//                print("\(counter) bleLock: Work done, unlocking")
+//                self.bleLock.signal()
+//                print("\(counter) bleLock: Unlocked")
+//            }.catch { error in
+//                print(error)
+//                self.bleLock.signal()
+//            }
+//        }
+//    }
 
     // If we wanted to use the await functionality, would look like this...
-    func request(_ complete: GattSuccessCallback?, error: GattErrorCallback? = nil) {
+    func request(_ operations: @escaping () throws -> Data?) -> Promise<Data?> {
         let central = XYCentral.instance
 
         guard
             central.state == .poweredOn,
             self.peripheral?.state == .connected
-            else { error?(GattError.notConnected); return }
+            else { return Promise<Data?>(nil) }
 
-        let results = XYBluetoothResult()
-        Promise<Void>(on: XYBluetoothDevice.workQueue) {
+        return Promise<Data?>(on: XYBluetoothDevice.workQueue, operations)
 
-            let x = try await(BatteryService.level.get(from: self, result: results))
-            try await(DeviceInformationService.firmwareRevisionString.get(from: self, result: results))
+//        let results = XYBluetoothResult()
+//        Promise<Void>(on: XYBluetoothDevice.workQueue) {
 
-            let q = abs(34567)
 
-            try await(DeviceInformationService.modelNumberString.get(from: self, result: results))
-            try await(DeviceInformationService.hardwareRevisionString.get(from: self, result: results))
-            try await(PrimaryService.major.get(from: self, result: results))
-            try await(DeviceInformationService.manufacturerNameString.get(from: self, result: results))
 
-        }.timeout(on: XYBluetoothDevice.workQueue, 30).then {
-            self.delegates.removeAll()
-            complete?(results.values)
-        }
+//        }
     }
 
 }
