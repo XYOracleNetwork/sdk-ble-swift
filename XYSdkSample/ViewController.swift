@@ -80,17 +80,7 @@ class ViewController: UIViewController {
         guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
-        let request = [
-            DeviceInformationService.firmwareRevisionString.read,
-            DeviceInformationService.modelNumberString.read,
-            DeviceInformationService.hardwareRevisionString.read,
-            PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))),
-            BatteryService.level.read
-        ]
-
-        device.request(for: request, complete: self.processResult) { error in
-            print(error)
-        }
+        device.request(self.processResult, error: { error in print(error) } )
     }
 
     func processResult(_ results: [XYBluetoothValue]) -> Void {

@@ -215,7 +215,7 @@ public extension XYBluetoothDevice {
 
             let results = XYBluetoothResult()
 
-            func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Void> {
+            func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Data?> {
                 switch directive.operation {
                 case .read:
                     return directive.serviceCharacteristic.get(from: self, result: results)
@@ -257,16 +257,19 @@ public extension XYBluetoothDevice {
             else { error?(GattError.notConnected); return }
 
         let results = XYBluetoothResult()
-        Promise<Void>(on: XYBluetoothDevice.workQueue) { () -> Void in
+        Promise<Void>(on: XYBluetoothDevice.workQueue) {
 
-            try await(BatteryService.level.get(from: self, result: results))
+            let x = try await(BatteryService.level.get(from: self, result: results))
             try await(DeviceInformationService.firmwareRevisionString.get(from: self, result: results))
+
+            let q = abs(34567)
+
             try await(DeviceInformationService.modelNumberString.get(from: self, result: results))
             try await(DeviceInformationService.hardwareRevisionString.get(from: self, result: results))
             try await(PrimaryService.major.get(from: self, result: results))
-            return try await(DeviceInformationService.manufacturerNameString.get(from: self, result: results))
+            try await(DeviceInformationService.manufacturerNameString.get(from: self, result: results))
 
-        }.then {
+        }.timeout(on: XYBluetoothDevice.workQueue, 30).then {
             self.delegates.removeAll()
             complete?(results.values)
         }

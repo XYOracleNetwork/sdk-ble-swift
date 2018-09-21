@@ -37,7 +37,7 @@ class GattClient: NSObject {
     fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
     
     fileprivate lazy var readPromise = Promise<Data?>.pending()
-    fileprivate lazy var writePromise = Promise<Void>.pending()
+    fileprivate lazy var writePromise = Promise<Data?>.pending()
 
     fileprivate let serviceCharacteristic: ServiceCharacteristic
 
@@ -56,7 +56,7 @@ class GattClient: NSObject {
         return r
     }
 
-    func get(from device: XYBluetoothDevice, resultObj: XYBluetoothResult) -> Promise<Void> {
+    func get(from device: XYBluetoothDevice, resultObj: XYBluetoothResult) -> Promise<Data?> {
         return self.getCharacteristic(device).then { _ in
             self.read(device)
         }.then { result in
@@ -64,7 +64,7 @@ class GattClient: NSObject {
         }
     }
 
-    func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
+    func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Data?> {
         print("Gatt(set): get characteristic")
         return self.getCharacteristic(device).then { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
@@ -113,7 +113,7 @@ private extension GattClient {
 // MARK: Internal setters
 private extension GattClient {
 
-    func write(_ device: XYBluetoothDevice, data: XYBluetoothValue, withResponse: Bool) -> Promise<Void> {
+    func write(_ device: XYBluetoothDevice, data: XYBluetoothValue, withResponse: Bool) -> Promise<Data?> {
         guard
             let characteristic = self.characteristic,
             let peripheral = device.getPeripheral(),
@@ -189,7 +189,7 @@ extension GattClient: CBPeripheralDelegate {
 
         print("Gatt(set): write delegate called, done")
 
-        writePromise.fulfill(())
+        writePromise.fulfill(nil)
     }
 
 }
