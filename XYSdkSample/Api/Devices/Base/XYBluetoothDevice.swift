@@ -45,7 +45,7 @@ public class XYBluetoothDevice: NSObject {
 
     public fileprivate(set) var state: XY4BluetoothDeviceStatus = .disconnected
 
-    fileprivate static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.WorkQueue")
+    internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.WorkQueue")
     fileprivate static let operationsQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
 
     fileprivate static let lockTimeoutInSeconds = DispatchTimeInterval.seconds(15)
@@ -234,12 +234,15 @@ public extension XYBluetoothDevice {
             }
 
             // .then defaults to the main thread
-            chain.then {
+            chain.timeout(on: XYBluetoothDevice.workQueue, 30).then {
                 self.delegates.removeAll()
                 complete?(results.values)
                 print("\(counter) bleLock: Work done, unlocking")
                 self.bleLock.signal()
                 print("\(counter) bleLock: Unlocked")
+            }.catch { error in
+                print(error)
+                self.bleLock.signal()
             }
         }
     }

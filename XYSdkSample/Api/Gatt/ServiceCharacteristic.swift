@@ -46,11 +46,11 @@ public func ==(lhs: SerivceCharacteristicDirective, rhs: SerivceCharacteristicDi
 public extension ServiceCharacteristic {
 
     func get(from device: XYBluetoothDevice, result: XYBluetoothResult) -> Promise<Void> {
-        return GattClient(self).get(from: device, resultObj: result)
+        return GattClient(self).get(from: device, resultObj: result).timeout(on: XYBluetoothDevice.workQueue, 30)
     }
 
     func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
-        return GattClient(self).set(to: device, valueObj: value, withResponse: withResponse)
+        return GattClient(self).set(to: device, valueObj: value, withResponse: withResponse).timeout(on: XYBluetoothDevice.workQueue, 30)
     }
 
     var read: SerivceCharacteristicDirective {
