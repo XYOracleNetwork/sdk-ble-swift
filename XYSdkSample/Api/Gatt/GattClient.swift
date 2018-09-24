@@ -37,7 +37,7 @@ class GattClient: NSObject {
     fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
     
     fileprivate lazy var readPromise = Promise<Data?>.pending()
-    fileprivate lazy var writePromise = Promise<Data?>.pending()
+    fileprivate lazy var writePromise = Promise<Void>.pending()
 
     fileprivate let serviceCharacteristic: ServiceCharacteristic
 
@@ -49,23 +49,28 @@ class GattClient: NSObject {
     init(_ serviceCharacteristic: ServiceCharacteristic) {
         self.serviceCharacteristic = serviceCharacteristic
     }
-    
+
     // TODO: Change to a per-session token for the key
     func delegateKey(deviceUuid: UUID) -> String {
-        let r =  ["GC", deviceUuid.uuidString, serviceCharacteristic.serviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
+        let r =  ["GC", deviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
         return r
     }
 
     func get(from device: XYBluetoothDevice) -> Promise<Data?> {
+        guard let peripheral = device.getPeripheral() else { return Promise(GattError.notConnected) }
         return self.getCharacteristic(device).then { _ in
             self.read(device)
+        }.always {
+            device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
         }
     }
 
-    func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Data?> {
-        print("Gatt(set): get characteristic")
+    func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
+        guard let peripheral = device.getPeripheral() else { return Promise(GattError.notConnected) }
         return self.getCharacteristic(device).then { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
+        }.always {
+            device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
         }
     }
     
@@ -74,12 +79,11 @@ class GattClient: NSObject {
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
             else {
-                self.characteristicPromise.reject(GattError.notConnected)
-                return self.characteristicPromise
+                return Promise(GattError.notConnected)
             }
         
         self.device = device
-        device.subscribe(self, key: self.delegateKey(deviceUuid: device.uuid))
+        device.subscribe(self, key: self.delegateKey(deviceUuid: peripheral.identifier))
         peripheral.discoverServices(nil)
         
         return self.characteristicPromise
@@ -111,7 +115,7 @@ private extension GattClient {
 // MARK: Internal setters
 private extension GattClient {
 
-    func write(_ device: XYBluetoothDevice, data: XYBluetoothValue, withResponse: Bool) -> Promise<Data?> {
+    func write(_ device: XYBluetoothDevice, data: XYBluetoothValue, withResponse: Bool) -> Promise<Void> {
         guard
             let characteristic = self.characteristic,
             let peripheral = device.getPeripheral(),
@@ -119,8 +123,7 @@ private extension GattClient {
             let data = data.data
             else {
                 print("Gatt(set): write ERROR")
-                self.writePromise.reject(GattError.notConnected)
-                return self.writePromise
+                return Promise(GattError.notConnected)
             }
 
         print("Gatt(set): write")
@@ -187,7 +190,7 @@ extension GattClient: CBPeripheralDelegate {
 
         print("Gatt(set): write delegate called, done")
 
-        writePromise.fulfill(nil)
+        writePromise.fulfill(())
     }
 
 }

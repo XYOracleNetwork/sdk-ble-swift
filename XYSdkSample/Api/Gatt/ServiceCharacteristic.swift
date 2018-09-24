@@ -51,7 +51,7 @@ public extension ServiceCharacteristic {
         }
     }
 
-    func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Data?> {
+    func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
         return GattClient(self).set(to: device, valueObj: value, withResponse: withResponse)
     }
 

@@ -15,14 +15,10 @@ class PromiseTester {
     fileprivate var stringPending = Promise<String>.pending()
 
     func test12() -> Promise<Int> {
-        return stringPending.then { _ in
-            self.pending
-        }
+        return Promise(12)
     }
 
     func test13(_ add: Int) -> Promise<Int> {
-        stringPending.fulfill("Hi")
-        pending.fulfill(12)
         return Promise<Int>(13 + add)
     }
 

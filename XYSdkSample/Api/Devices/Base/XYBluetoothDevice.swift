@@ -82,12 +82,13 @@ extension XYBluetoothDevice {
             case .read:
                 return try await(directive.serviceCharacteristic.get(from: self))
             case .write:
-                return nil
-    //            return try await(directive.serviceCharacteristic.set(to: self, value: directive.value!))
+                try await(directive.serviceCharacteristic.set(to: self, value: directive.value!))
             }
         } catch {
             return nil
         }
+
+        return nil
     }
 
 }
@@ -267,13 +268,13 @@ public extension XYBluetoothDevice {
 //    }
 
     // If we wanted to use the await functionality, would look like this...
-    func request(_ operations: @escaping () throws -> XYBluetoothValue?) -> Promise<XYBluetoothValue?> {
+    func request(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         guard
             XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected
-            else { return Promise<XYBluetoothValue?>(nil) }
+            else { return Promise(()) }
 
-        return Promise<XYBluetoothValue?>(on: XYBluetoothDevice.workQueue, operations)
+        return Promise<Void>(on: XYBluetoothDevice.workQueue, operations)
     }
 
 }

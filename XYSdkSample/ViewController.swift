@@ -93,7 +93,7 @@ class ViewController: UIViewController {
             level = device.op(BatteryService.level.read)
             revision = device.op(DeviceInformationService.firmwareRevisionString.read)
             model = device.op(DeviceInformationService.modelNumberString.read)
-            return nil
+            _ = device.op(PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
         }
 
         request.then { _ in
