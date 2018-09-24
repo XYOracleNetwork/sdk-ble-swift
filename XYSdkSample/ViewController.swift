@@ -190,6 +190,8 @@ extension ViewController: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "connectedDeviceCell")!
             let device = connectedDevices[indexPath.row] as! XYFinderDevice
             cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+            let coreDevice = connectedDevices[indexPath.row]
+            cell.detailTextLabel?.text = "\(coreDevice.getPeripheral()?.identifier.uuidString ?? "Unknown ID")"
             return cell
         }
     }
