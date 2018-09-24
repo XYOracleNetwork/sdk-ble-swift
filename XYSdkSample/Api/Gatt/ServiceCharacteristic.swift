@@ -20,7 +20,7 @@ public protocol ServiceCharacteristic {
 public struct SerivceCharacteristicDirective: Hashable {
     let operation: GattOperation
     let serviceCharacteristic: ServiceCharacteristic
-    let value: XYBluetoothValue?
+    let value: XYBluetoothResult?
     public var hashValue: Int {
         return [
             serviceCharacteristic.serviceUuid.uuidString,
@@ -28,7 +28,7 @@ public struct SerivceCharacteristicDirective: Hashable {
             operation.rawValue].joined(separator: ":").hashValue
     }
     
-    init(_ operation: GattOperation, serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue? = nil) {
+    init(_ operation: GattOperation, serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult? = nil) {
         self.operation = operation
         self.serviceCharacteristic = serviceCharacteristic
         self.value = value
@@ -45,13 +45,13 @@ public func ==(lhs: SerivceCharacteristicDirective, rhs: SerivceCharacteristicDi
 // Global methods for all service characteristics
 public extension ServiceCharacteristic {
 
-    func get(from device: XYBluetoothDevice) -> Promise<XYBluetoothValue> {
+    func get(from device: XYBluetoothDevice) -> Promise<XYBluetoothResult> {
         return GattClient(self).get(from: device).then { value in
-            XYBluetoothValue(self, data: value)
+            XYBluetoothResult(value)
         }
     }
 
-    func set(to device: XYBluetoothDevice, value: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
+    func set(to device: XYBluetoothDevice, value: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
         return GattClient(self).set(to: device, valueObj: value, withResponse: withResponse)
     }
 
@@ -59,7 +59,7 @@ public extension ServiceCharacteristic {
         return SerivceCharacteristicDirective(.read, serviceCharacteristic: self)
     }
     
-    func write(_ value: XYBluetoothValue) -> SerivceCharacteristicDirective {
+    func write(_ value: XYBluetoothResult) -> SerivceCharacteristicDirective {
         return SerivceCharacteristicDirective(.write, serviceCharacteristic: self, value: value)
     }
 

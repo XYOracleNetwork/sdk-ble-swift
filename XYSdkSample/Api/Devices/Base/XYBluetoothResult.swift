@@ -8,26 +8,21 @@
 
 import Foundation
 
-public class XYBluetoothValue {
-    public let serviceCharacteristic: ServiceCharacteristic
+public class XYBluetoothResult {
     public private(set) var data: Data?
+    public private(set) var error: XYBluetoothError?
 
-    public init(_ serviceCharacteristic: ServiceCharacteristic) {
-        self.serviceCharacteristic = serviceCharacteristic
-    }
-
-    public convenience init(_ serviceCharacteristic: ServiceCharacteristic, data: Data?) {
-        self.init(serviceCharacteristic)
+    public init(_ data: Data?) {
         self.data = data
     }
 
-    public func setData(_ data: Data?) {
-        self.data = data
+    public convenience init(_ data: Data?, error: XYBluetoothError?) {
+        self.init(data)
+        self.error = error
     }
 
-    public var type: GattCharacteristicType {
-        return serviceCharacteristic.characteristicType
-    }
+    public func setData(_ data: Data?) { self.data = data }
+    public func setError(_ error: XYBluetoothError?) { self.error = error }
 }
 
 extension Data {
@@ -41,7 +36,7 @@ extension Data {
     }
 }
 
-public extension XYBluetoothValue {
+public extension XYBluetoothResult {
 
     var asString: String? {
         guard let data = self.data else { return nil }

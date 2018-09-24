@@ -86,14 +86,14 @@ class ViewController: UIViewController {
         guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
-        var level, revision, model: XYBluetoothValue?
+        var level, revision, model: XYBluetoothResult?
 
-        var values = [XYBluetoothValue?]()
-        let request = device.request {
+        var values = [XYBluetoothResult?]()
+        let request = device.connect {
             level = device.op(BatteryService.level.read)
             revision = device.op(DeviceInformationService.firmwareRevisionString.read)
             model = device.op(DeviceInformationService.modelNumberString.read)
-            _ = device.op(PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
+//            _ = device.op(PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
         }
 
         request.then { _ in
@@ -105,7 +105,7 @@ class ViewController: UIViewController {
         }
     }
 
-    func processResult(_ results: [XYBluetoothValue?]) -> Void {
+    func processResult(_ results: [XYBluetoothResult?]) -> Void {
         self.spinner.stopAnimating()
 
         let modalViewController = ActionResultViewController()
@@ -121,7 +121,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: XYBluetoothDeviceNotifyDelegate {
-    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue) {
+    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult) {
         DispatchQueue.main.async {
             self.notifyLabel.alpha = 1.0
             UIView.animate(withDuration: 2.0) {

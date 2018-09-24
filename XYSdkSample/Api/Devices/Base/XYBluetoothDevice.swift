@@ -10,7 +10,7 @@ import Foundation
 import CoreBluetooth
 import Promises
 
-public typealias GattSuccessCallback = ([XYBluetoothValue]) -> Void
+public typealias GattSuccessCallback = ([XYBluetoothResult]) -> Void
 public typealias GattErrorCallback = (Error) -> Void
 // public typealias GattTimeout = () -> Void
 
@@ -23,7 +23,7 @@ public enum XY4BluetoothDeviceStatus {
 
 // TODO eh...
 public protocol XYBluetoothDeviceNotifyDelegate {
-    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothValue)
+    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult)
 }
 
 public class XYBluetoothDevice: NSObject {
@@ -76,7 +76,7 @@ public class XYBluetoothDevice: NSObject {
 // MARK: await() wrapper
 extension XYBluetoothDevice {
 
-    func op(_ directive: SerivceCharacteristicDirective) -> XYBluetoothValue? {
+    func op(_ directive: SerivceCharacteristicDirective) -> XYBluetoothResult? {
         do {
             switch directive.operation {
             case .read:
@@ -179,7 +179,7 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
         // TODO barf
         for notify in self.notifyDelegates {
             if notify.value.serviceCharacteristic.characteristicUuid == characteristic.uuid {
-                notify.value.delegate?.update(for: notify.value.serviceCharacteristic, value: XYBluetoothValue(notify.value.serviceCharacteristic, data: characteristic.value))
+                notify.value.delegate?.update(for: notify.value.serviceCharacteristic, value: XYBluetoothResult(characteristic.value))
             }
         }
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }
@@ -191,14 +191,6 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
-    }
-}
-
-public class XYBluetoothResult {
-    public fileprivate(set) lazy var values = [XYBluetoothValue]()
-
-    func add(for serviceCharacteristic: ServiceCharacteristic, data: Data?) {
-        self.values.append(XYBluetoothValue(serviceCharacteristic, data: data))
     }
 }
 
@@ -268,13 +260,13 @@ public extension XYBluetoothDevice {
 //    }
 
     // If we wanted to use the await functionality, would look like this...
-    func request(_ operations: @escaping () throws -> Void) -> Promise<Void> {
+    func connect(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         guard
             XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected
             else { return Promise(()) }
 
-        return Promise<Void>(on: XYBluetoothDevice.workQueue, operations)
+        return Promise<Void>(on: XYBluetoothDevice.workQueue, operations).timeout(30)
     }
 
 }

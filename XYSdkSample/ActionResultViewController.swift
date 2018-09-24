@@ -12,7 +12,7 @@ class ActionResultViewController: UIViewController {
 
     @IBOutlet weak var resultsTableView: UITableView!
 
-    fileprivate var results = [XYBluetoothValue]()
+    fileprivate var results = [XYBluetoothResult]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,17 +34,18 @@ class ActionResultViewController: UIViewController {
         }
     }
 
-    func set(results: [XYBluetoothValue?]) {
+    func set(results: [XYBluetoothResult?]) {
         self.results = results.compactMap { $0 }
     }
 
-    func convertValueToString(_ value: XYBluetoothValue) -> String {
-        var result: String
-        switch value.type {
-        case .string: result = value.asString ?? "?"
-        case .integer: result = "\(value.asInteger ?? 0)"
-        default: result = "?"
-        }
+    func convertValueToString(_ value: XYBluetoothResult) -> String {
+        print(value.asString ?? "?")
+        var result: String = ""
+//        switch value.type {
+//        case .string: result = value.asString ?? "?"
+//        case .integer: result = "\(value.asInteger ?? 0)"
+//        default: result = "?"
+//        }
 
         return result
     }
@@ -64,7 +65,7 @@ extension ActionResultViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "actionResultCell") as! ActionResultTableViewCell
 
         let value = results[indexPath.row]
-        cell.set(value.serviceCharacteristic.characteristicUuid.uuidString, value: convertValueToString(value))
+        cell.set("some value", value: convertValueToString(value))
 
         return cell
     }

@@ -65,7 +65,7 @@ class GattClient: NSObject {
         }
     }
 
-    func set(to device: XYBluetoothDevice, valueObj: XYBluetoothValue, withResponse: Bool = true) -> Promise<Void> {
+    func set(to device: XYBluetoothDevice, valueObj: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
         guard let peripheral = device.getPeripheral() else { return Promise(GattError.notConnected) }
         return self.getCharacteristic(device).then { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
@@ -115,7 +115,7 @@ private extension GattClient {
 // MARK: Internal setters
 private extension GattClient {
 
-    func write(_ device: XYBluetoothDevice, data: XYBluetoothValue, withResponse: Bool) -> Promise<Void> {
+    func write(_ device: XYBluetoothDevice, data: XYBluetoothResult, withResponse: Bool) -> Promise<Void> {
         guard
             let characteristic = self.characteristic,
             let peripheral = device.getPeripheral(),
