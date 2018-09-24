@@ -88,24 +88,24 @@ class ViewController: UIViewController {
 
         var level, revision, model: XYBluetoothResult?
 
-        var values = [XYBluetoothResult?]()
-        let request = device.connect {
-            level = device.op(BatteryService.level.read)
-            revision = device.op(DeviceInformationService.firmwareRevisionString.read)
-            model = device.op(DeviceInformationService.modelNumberString.read)
-//            _ = device.op(PrimaryService.buzzer.write(XYBluetoothValue(PrimaryService.buzzer, data: Data([UInt8(0x0b), 0x03]))))
+        var values = [CBUUID: XYBluetoothResult]()
+        let request = device.connection {
+            level = device.get(BatteryService.level)
+            revision = device.get(DeviceInformationService.firmwareRevisionString)
+            model = device.get(DeviceInformationService.modelNumberString)
+//            device.set(PrimaryService.buzzer, value: XYBluetoothResult(Data([UInt8(0x0b), 0x03])))
         }
 
         request.then { _ in
-            values.append(level)
-            values.append(revision)
-            values.append(model)
+            values[BatteryService.level.characteristicUuid] = level
+            values[DeviceInformationService.firmwareRevisionString.characteristicUuid] = revision
+            values[DeviceInformationService.modelNumberString.characteristicUuid] = model
 
             self.processResult(values)
         }
     }
 
-    func processResult(_ results: [XYBluetoothResult?]) -> Void {
+    func processResult(_ results: [CBUUID: XYBluetoothResult]) -> Void {
         self.spinner.stopAnimating()
 
         let modalViewController = ActionResultViewController()

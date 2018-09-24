@@ -73,22 +73,25 @@ public class XYBluetoothDevice: NSObject {
     }
 }
 
-// MARK: await() wrapper
+// MARK: await() wrapper for set and get characteristic operators
 extension XYBluetoothDevice {
 
-    func op(_ directive: SerivceCharacteristicDirective) -> XYBluetoothResult? {
+    func get(_ serivceCharacteristic: ServiceCharacteristic) -> XYBluetoothResult {
         do {
-            switch directive.operation {
-            case .read:
-                return try await(directive.serviceCharacteristic.get(from: self))
-            case .write:
-                try await(directive.serviceCharacteristic.set(to: self, value: directive.value!))
-            }
+            return try await(serivceCharacteristic.get(from: self))
         } catch {
-            return nil
+
         }
 
-        return nil
+        return XYBluetoothResult(nil)
+    }
+
+    func set(_ serivceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult) {
+        do {
+            try await(serivceCharacteristic.set(to: self, value: value))
+        } catch {
+
+        }
     }
 
 }
@@ -260,7 +263,7 @@ public extension XYBluetoothDevice {
 //    }
 
     // If we wanted to use the await functionality, would look like this...
-    func connect(_ operations: @escaping () throws -> Void) -> Promise<Void> {
+    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         guard
             XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected

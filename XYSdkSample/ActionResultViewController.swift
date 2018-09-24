@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import CoreBluetooth
 
 class ActionResultViewController: UIViewController {
 
     @IBOutlet weak var resultsTableView: UITableView!
 
-    fileprivate var results = [XYBluetoothResult]()
+    fileprivate var results = [(CBUUID, XYBluetoothResult)]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,20 +35,20 @@ class ActionResultViewController: UIViewController {
         }
     }
 
-    func set(results: [XYBluetoothResult?]) {
-        self.results = results.compactMap { $0 }
+    func set(results: [CBUUID: XYBluetoothResult]) {
+        results.forEach { self.results.append(($0, $1))}
     }
 
     func convertValueToString(_ value: XYBluetoothResult) -> String {
-        print(value.asString ?? "?")
-        var result: String = ""
-//        switch value.type {
-//        case .string: result = value.asString ?? "?"
-//        case .integer: result = "\(value.asInteger ?? 0)"
-//        default: result = "?"
-//        }
+//        print(value.asString ?? "?")
+//        var result: String = ""
+////        switch value.type {
+////        case .string: result = value.asString ?? "?"
+////        case .integer: result = "\(value.asInteger ?? 0)"
+////        default: result = "?"
+////        }
 
-        return result
+        return value.asString ?? "?"
     }
 
 }
@@ -64,8 +65,8 @@ extension ActionResultViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "actionResultCell") as! ActionResultTableViewCell
 
-        let value = results[indexPath.row]
-        cell.set("some value", value: convertValueToString(value))
+        let (uuid, value) = results[indexPath.row]
+        cell.set(uuid.uuidString, value: convertValueToString(value))
 
         return cell
     }
