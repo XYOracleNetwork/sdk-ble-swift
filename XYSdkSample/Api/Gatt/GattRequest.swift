@@ -38,7 +38,6 @@ class GattRequest: NSObject {
         self.serviceCharacteristic = serviceCharacteristic
     }
 
-    // TODO: Change to a per-session token for the key
     func delegateKey(deviceUuid: UUID) -> String {
         let r =  ["GC", deviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
         return r

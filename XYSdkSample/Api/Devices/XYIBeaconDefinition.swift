@@ -45,6 +45,7 @@ public struct XYIBeaconDefinition {
     }
 }
 
+// MARK: CLBeacon Convenience
 extension CLBeacon {
     var xyiBeaconDefinition: XYIBeaconDefinition {
         return XYIBeaconDefinition(
@@ -54,7 +55,7 @@ extension CLBeacon {
     }
 }
 
-// MARK: Convenience
+// MARK: CLBeaconRegion Convenience
 extension CLBeaconRegion {
     var xyiBeaconDefinition: XYIBeaconDefinition {
         return XYIBeaconDefinition(

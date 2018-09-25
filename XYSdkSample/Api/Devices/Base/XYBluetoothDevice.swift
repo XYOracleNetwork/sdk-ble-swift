@@ -73,29 +73,6 @@ public class XYBluetoothDevice: NSObject {
     }
 }
 
-// MARK: await() wrapper for set and get characteristic operators
-extension XYBluetoothDevice {
-
-    func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult {
-        do {
-            return try await(serivceCharacteristic.get(from: self))
-        } catch {
-
-        }
-
-        return XYBluetoothResult(nil)
-    }
-
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
-        do {
-            try await(serivceCharacteristic.set(to: self, value: value))
-        } catch {
-
-        }
-    }
-
-}
-
 // MARK: Peripheral methods
 extension XYBluetoothDevice {
 
@@ -197,6 +174,29 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     }
 }
 
+// MARK: await() wrapper for set and get characteristic operators
+extension XYBluetoothDevice {
+
+    func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult {
+        do {
+            return try await(serivceCharacteristic.get(from: self))
+        } catch {
+
+        }
+
+        return XYBluetoothResult(nil)
+    }
+
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
+        do {
+            try await(serivceCharacteristic.set(to: self, value: value))
+        } catch {
+
+        }
+    }
+
+}
+
 // MARK: Connect and disconnect
 public extension XYBluetoothDevice {
 
@@ -213,7 +213,7 @@ public extension XYBluetoothDevice {
 
         // TODO Lock
 
-        return Promise<Void>(on: XYBluetoothDevice.workQueue, operations).timeout(30)
+        return Promise<Void>(on: XYBluetoothDevice.workQueue, operations)
     }
 
 }
