@@ -29,7 +29,7 @@ public class XY4BluetoothDevice: XYBluetoothDevice, XYFinderDevice {
     }
 
     public var proximity: XYDeviceProximity = .none
-    public var services: [ServiceCharacteristic] = []
+    public var services: [XYServiceCharacteristic] = []
 
     override public var powerLevel: UInt8 {
         guard

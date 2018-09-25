@@ -8,7 +8,7 @@
 
 import CoreBluetooth
 
-public enum DeviceInformationService: String, ServiceCharacteristic {
+public enum DeviceInformationService: String, XYServiceCharacteristic {
 
     public var serviceUuid: CBUUID { return DeviceInformationService.serviceUuid }
 

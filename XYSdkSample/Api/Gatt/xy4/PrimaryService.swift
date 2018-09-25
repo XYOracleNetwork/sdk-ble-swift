@@ -8,7 +8,7 @@
 
 import CoreBluetooth
 
-public enum PrimaryService: String, ServiceCharacteristic {
+public enum PrimaryService: String, XYServiceCharacteristic {
 
     public var serviceUuid: CBUUID { return PrimaryService.serviceUuid }
 

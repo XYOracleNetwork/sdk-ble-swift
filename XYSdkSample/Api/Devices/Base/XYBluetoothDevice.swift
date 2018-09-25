@@ -23,7 +23,7 @@ public enum XY4BluetoothDeviceStatus {
 
 // TODO eh...
 public protocol XYBluetoothDeviceNotifyDelegate {
-    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult)
+    func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
 }
 
 public class XYBluetoothDevice: NSObject {
@@ -34,7 +34,7 @@ public class XYBluetoothDevice: NSObject {
     fileprivate var peripheral: CBPeripheral?
     
     fileprivate var delegates = [String: CBPeripheralDelegate?]()
-    fileprivate var notifyDelegates = [String: (serviceCharacteristic: ServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
+    fileprivate var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
     fileprivate var successCallback: GattSuccessCallback?
     fileprivate var errorCallback: GattErrorCallback?
@@ -76,7 +76,7 @@ public class XYBluetoothDevice: NSObject {
 // MARK: await() wrapper for set and get characteristic operators
 extension XYBluetoothDevice {
 
-    func get(_ serivceCharacteristic: ServiceCharacteristic) -> XYBluetoothResult {
+    func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult {
         do {
             return try await(serivceCharacteristic.get(from: self))
         } catch {
@@ -86,7 +86,7 @@ extension XYBluetoothDevice {
         return XYBluetoothResult(nil)
     }
 
-    func set(_ serivceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult) {
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
         do {
             try await(serivceCharacteristic.set(to: self, value: value))
         } catch {
@@ -138,17 +138,17 @@ public extension XYBluetoothDevice {
 
 // MARK: Notification subscribe/unsubscribe
 public extension XYBluetoothDevice {
-    func subscribe(to serviceCharacteristic: ServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
+    func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
         self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
         setNotify(serviceCharacteristic, notify: true)
     }
 
-    func unsubscribe(from serviceCharacteristic: ServiceCharacteristic, key: String) {
+    func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) {
         setNotify(serviceCharacteristic, notify: false)
         self.notifyDelegates.removeValue(forKey: key)
     }
 
-    private func setNotify(_ serviceCharacteristic: ServiceCharacteristic, notify: Bool) {
+    private func setNotify(_ serviceCharacteristic: XYServiceCharacteristic, notify: Bool) {
         guard
             let peripheral = self.peripheral,
             peripheral.state == .connected else { return }
@@ -205,69 +205,13 @@ public extension XYBluetoothDevice {
         central.disconnect(from: self)
     }
 
-//    func request(for serviceCharacteristics: [SerivceCharacteristicDirective], complete: GattSuccessCallback?, error: GattErrorCallback?) {
-//        guard
-//            XYCentral.instance.state == .poweredOn else { return }
-//
-//        guard self.peripheral?.state == .connected else {
-//                error?(GattError.peripheralDisconected(state: self.peripheral?.state))
-//                return
-//            }
-//
-//        XYBluetoothDevice.operationsQueue.async {
-//
-//            let counter = XYBluetoothDevice.counter
-//            XYBluetoothDevice.counter = XYBluetoothDevice.counter + 1
-//
-//            print("\(counter) bleLock: Trying to get lock")
-//            if self.bleLock.wait(timeout: .now() + XYBluetoothDevice.lockTimeoutInSeconds) == .timedOut {
-//                print("\(counter) bleLock: Timed out getting the lock")
-//                self.bleLock.signal()
-//                error?(GattError.timedOut)
-//                return
-//            }
-//            print("\(counter) bleLock: Got a lock")
-//
-//            let results = XYBluetoothResult()
-//
-//            func perform(_ directive: SerivceCharacteristicDirective) -> Promise<Data?> {
-//                switch directive.operation {
-//                case .read:
-//                    return directive.serviceCharacteristic.get(from: self, result: results)
-//                case .write:
-//                    return directive.serviceCharacteristic.set(to: self, value: directive.value!)
-//                }
-//            }
-//
-//            // Empty starting promise
-//            var chain = Promise<Void>(())
-//
-//            // Process each directive on the bg work queue
-//            // TODO reduce?
-//            serviceCharacteristics.forEach { op in
-//                chain = chain.then(on: XYBluetoothDevice.workQueue) { perform(op) }
-//            }
-//
-//            // .then defaults to the main thread
-//            chain.timeout(on: XYBluetoothDevice.workQueue, 30).then {
-//                self.delegates.removeAll()
-//                complete?(results.values)
-//                print("\(counter) bleLock: Work done, unlocking")
-//                self.bleLock.signal()
-//                print("\(counter) bleLock: Unlocked")
-//            }.catch { error in
-//                print(error)
-//                self.bleLock.signal()
-//            }
-//        }
-//    }
-
-    // If we wanted to use the await functionality, would look like this...
     func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         guard
             XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected
             else { return Promise(()) }
+
+        // TODO Lock
 
         return Promise<Void>(on: XYBluetoothDevice.workQueue, operations).timeout(30)
     }

@@ -121,7 +121,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: XYBluetoothDeviceNotifyDelegate {
-    func update(for serviceCharacteristic: ServiceCharacteristic, value: XYBluetoothResult) {
+    func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
         DispatchQueue.main.async {
             self.notifyLabel.alpha = 1.0
             UIView.animate(withDuration: 2.0) {

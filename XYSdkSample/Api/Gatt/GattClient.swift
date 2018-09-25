@@ -39,14 +39,14 @@ class GattClient: NSObject {
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
 
-    fileprivate let serviceCharacteristic: ServiceCharacteristic
+    fileprivate let serviceCharacteristic: XYServiceCharacteristic
 
     fileprivate var
     device: XYBluetoothDevice?,
     service: CBService?,
     characteristic: CBCharacteristic?
 
-    init(_ serviceCharacteristic: ServiceCharacteristic) {
+    init(_ serviceCharacteristic: XYServiceCharacteristic) {
         self.serviceCharacteristic = serviceCharacteristic
     }
 

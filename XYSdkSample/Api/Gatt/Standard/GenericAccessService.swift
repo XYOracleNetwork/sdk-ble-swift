@@ -9,7 +9,7 @@
 
 import CoreBluetooth
 
-public enum GenericAccessService: String, ServiceCharacteristic {
+public enum GenericAccessService: String, XYServiceCharacteristic {
 
     public var serviceUuid: CBUUID { return GenericAccessService.serviceUuid }
 

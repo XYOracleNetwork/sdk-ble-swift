@@ -116,7 +116,7 @@ public class XYCentral: NSObject {
     }
 
     // Ask for devices with the requested/all services until requested to stop()
-    public func scan(for services: [ServiceCharacteristic]? = nil) {
+    public func scan(for services: [XYServiceCharacteristic]? = nil) {
         guard state == .poweredOn else { return }
         self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
