@@ -160,7 +160,7 @@ public extension XYBluetoothDevice {
 
             peripheral.setNotifyValue(notify, for: characteristic)
         } else {
-            let client = GattClient(serviceCharacteristic)
+            let client = GattRequest(serviceCharacteristic)
             client.getCharacteristic(self).then { characteristic in
                 peripheral.setNotifyValue(true, for: characteristic)
             }

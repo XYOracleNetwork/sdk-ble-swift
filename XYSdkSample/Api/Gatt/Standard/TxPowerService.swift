@@ -18,7 +18,7 @@ public enum TxPowerService: String, XYServiceCharacteristic {
         return TxPowerService.uuids[self]!
     }
 
-    public var characteristicType: GattCharacteristicType {
+    public var characteristicType: XYServiceCharacteristicType {
         return .integer
     }
 

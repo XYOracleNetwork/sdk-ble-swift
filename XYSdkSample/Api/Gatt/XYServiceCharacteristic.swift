@@ -9,23 +9,30 @@
 import CoreBluetooth
 import Promises
 
+// Used for proper upacking of the data result from reading characteristcs
+public enum XYServiceCharacteristicType {
+    case string
+    case integer
+    case byte
+}
+
 public protocol XYServiceCharacteristic {
     var serviceUuid: CBUUID { get }
     var characteristicUuid: CBUUID { get }
-    var characteristicType: GattCharacteristicType { get }
+    var characteristicType: XYServiceCharacteristicType { get }
 }
 
 // Global methods for all service characteristics
 public extension XYServiceCharacteristic {
 
     func get(from device: XYBluetoothDevice) -> Promise<XYBluetoothResult> {
-        return GattClient(self).get(from: device).then { value in
+        return GattRequest(self).get(from: device).then { value in
             XYBluetoothResult(value)
         }
     }
 
     func set(to device: XYBluetoothDevice, value: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
-        return GattClient(self).set(to: device, valueObj: value, withResponse: withResponse)
+        return GattRequest(self).set(to: device, valueObj: value, withResponse: withResponse)
     }
 
 }

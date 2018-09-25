@@ -23,7 +23,7 @@ public enum GenericAccessService: String, XYServiceCharacteristic {
         return GenericAccessService.uuids[self]!
     }
 
-    public var characteristicType: GattCharacteristicType {
+    public var characteristicType: XYServiceCharacteristicType {
         return .integer
     }
 

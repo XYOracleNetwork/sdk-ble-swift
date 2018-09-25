@@ -1,5 +1,5 @@
 //
-//  GattClient.swift
+//  GattRequest.swift
 //  XYSdkSample
 //
 //  Created by Darren Sutherland on 9/12/18.
@@ -20,19 +20,7 @@ enum GattError: Error {
     case peripheralDisconected(state: CBPeripheralState?)
 }
 
-enum GattOperation: String {
-    case read
-    case write
-}
-
-// Used for proper upacking of the data result from reading characteristcs
-public enum GattCharacteristicType {
-    case string
-    case integer
-    case byte
-}
-
-class GattClient: NSObject {
+class GattRequest: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
     fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
     
@@ -91,7 +79,7 @@ class GattClient: NSObject {
 }
 
 // MARK: Internal getters
-private extension GattClient {
+private extension GattRequest {
 
     func read(_ device: XYBluetoothDevice) -> Promise<Data?> {
         guard
@@ -113,7 +101,7 @@ private extension GattClient {
 }
 
 // MARK: Internal setters
-private extension GattClient {
+private extension GattRequest {
 
     func write(_ device: XYBluetoothDevice, data: XYBluetoothResult, withResponse: Bool) -> Promise<Void> {
         guard
@@ -135,7 +123,7 @@ private extension GattClient {
 
 }
 
-extension GattClient: CBPeripheralDelegate {
+extension GattRequest: CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard
