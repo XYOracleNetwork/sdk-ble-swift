@@ -85,9 +85,16 @@ class ViewController: UIViewController {
 
         var values = [CBUUID: XYBluetoothResult]()
         let request = device.connection {
-            level = device.get(BatteryService.level)
-            revision = device.get(DeviceInformationService.firmwareRevisionString)
-            model = device.get(DeviceInformationService.modelNumberString)
+            if device is XY4BluetoothDevice {
+                level = device.get(BatteryService.level)
+                revision = device.get(DeviceInformationService.firmwareRevisionString)
+                model = device.get(DeviceInformationService.modelNumberString)
+            }
+
+            if device.family == .xy3 {
+                level = device.get(BatteryService.level)
+                revision = device.get(ControlService.version)
+            }
 //            device.set(PrimaryService.buzzer, value: XYBluetoothResult(Data([UInt8(0x0b), 0x03])))
         }
 
