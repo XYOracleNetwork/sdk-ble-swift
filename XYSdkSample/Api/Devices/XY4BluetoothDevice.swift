@@ -16,9 +16,6 @@ public class XY4BluetoothDevice: XYBluetoothDevice, XYFinderDevice {
 
     public let family: XYFinderDeviceFamily = .xy4
 
-    public final var name: String { return family.familyName }
-    public final var prefix: String { return family.prefix }
-
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.iBeacon = iBeacon
         super.init(family.uuid, id: id, rssi: rssi)
@@ -55,6 +52,6 @@ public class XY4BluetoothDevice: XYBluetoothDevice, XYFinderDevice {
             return CBUUID(data: Data(bytes:uuidBytes, count:16))
         }
 
-        return [0x04, 0x08].map { getServiceUuid($0) }
+        return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { getServiceUuid($0) }
     }
 }

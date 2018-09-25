@@ -13,12 +13,21 @@ import CoreBluetooth
 public protocol XYFinderDevice: class {
     var prefix: String { get }
     var name: String { get }
+    var family: XYFinderDeviceFamily { get }
 
     var iBeacon: XYIBeaconDefinition? { get }
     var connectableServices: [CBUUID] { get }
 }
 
 public extension XYFinderDevice {
+
+    var name: String {
+        return self.family.familyName
+    }
+
+    var prefix: String {
+        return self.family.prefix
+    }
 
     func beaconRegion(_ uuid: UUID, id: String, slot: UInt16? = nil) -> CLBeaconRegion {
         if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {

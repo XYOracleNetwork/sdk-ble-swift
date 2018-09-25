@@ -62,4 +62,7 @@ public enum XYFinderDeviceFamily: Int {
         "9474f7c6-47a4-11e6-beb8-9e71128cae77", // xygps
         "00000000-0000-0000-0000-000000000000"  // xynear
     ]
+
+    public static let powerLow: UInt8 = 0x04
+    public static let powerHigh: UInt8 = 0x08
 }
