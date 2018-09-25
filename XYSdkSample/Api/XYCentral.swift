@@ -106,13 +106,13 @@ public class XYCentral: NSObject {
 
     // Connect to an already discovered peripheral
     public func connect(to device: XYBluetoothDevice, options: [String: Any]? = nil) {
-        guard let peripheral = device.getPeripheral() else { return }
+        guard let peripheral = device.peripheral else { return }
         cbManager?.connect(peripheral, options: options)
     }
 
     // Disconnect from a peripheral
     public func disconnect(from device: XYBluetoothDevice) {
-        guard let peripheral = device.getPeripheral() else { return }
+        guard let peripheral = device.peripheral else { return }
         cbManager?.cancelPeripheralConnection(peripheral)
     }
 
@@ -128,7 +128,7 @@ public class XYCentral: NSObject {
 
     // Connect to device
     public func connect(to device: XYBluetoothDevice) {
-        guard let peripheral = device.getPeripheral() else { return }
+        guard let peripheral = device.peripheral else { return }
         self.cbManager?.connect(peripheral)
     }
 

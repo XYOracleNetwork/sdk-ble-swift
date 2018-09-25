@@ -11,11 +11,11 @@ import Foundation
 public protocol XYSmartScanDelegate {
 //    func smartScan(status:cXYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D)
-    func smartScan(detected device: XY4BluetoothDevice, signalStrength: Int)
-    func smartScan(detected devices: [XY4BluetoothDevice])
-    func smartScan(entered device: XYBluetoothDevice)
+    func smartScan(detected device: XYFinderDevice, signalStrength: Int)
+    func smartScan(detected devices: [XYFinderDevice])
+    func smartScan(entered device: XYFinderDevice)
 //    func smartScan(exiting device:XYBluetoothDevice)
-    func smartScan(exited device: XYBluetoothDevice)
+    func smartScan(exited device: XYFinderDevice)
 //    func smartScan(updated device:XYBluetoothDevice)
 }
 
@@ -25,7 +25,7 @@ public class XYSmartScan {
 
     fileprivate var delegates = [String: XYSmartScanDelegate?]()
 
-    fileprivate var trackedDevices = [String: XYBluetoothDevice]()
+    fileprivate var trackedDevices = [String: XYFinderDevice]()
 
     fileprivate let location = XYLocation.instance
 
@@ -59,7 +59,7 @@ public class XYSmartScan {
 // MARK: Tracking wranglers for known devices
 extension XYSmartScan {
 
-    func startTracking(for device: XYBluetoothDevice) {
+    func startTracking(for device: XYFinderDevice) {
         guard trackedDevices[device.id] == nil else { return }
         trackedDevices[device.id] = device
         updateTracking()
@@ -73,14 +73,14 @@ extension XYSmartScan {
 
     private func updateTracking() {
         // TODO look into reduce here...
-        var devices = Set<XYBluetoothDevice>()
-        trackedDevices.forEach { (arg) in
-            let (_, device) = arg
-            devices.insert(device)
-        }
-
-        // TODO BG mode is monitoring
-        location.startRangning(for: devices)
+//        var devices = Set<XYFinderDevice>()
+//        trackedDevices.forEach { (arg) in
+//            let (_, device) = arg
+//            devices.insert(device)
+//        }
+//
+//        // TODO BG mode is monitoring
+//        location.startRangning(for: devices)
     }
 }
 
@@ -93,8 +93,8 @@ extension XYSmartScan: XYLocationDelegate {
         }
     }
 
-    public func didRangeBeacons(_ beacons: [XYBluetoothDevice]) {
-        var filteredDevices = [XY4BluetoothDevice]() // TODO cheating
+    public func didRangeBeacons(_ beacons: [XYFinderDevice]) {
+        var filteredDevices = [XYFinderDevice]() // TODO cheating
         beacons.forEach { beacon in
             if beacon.inRange {
                 // TODO report in range
@@ -106,20 +106,20 @@ extension XYSmartScan: XYLocationDelegate {
             }
 
             // TODO hardcode
-            if let xy4iBeacon = beacon as? XY4BluetoothDevice {
-                filteredDevices.append(xy4iBeacon)
-//                self.delegates.forEach { $1?.smartScan(detected: xy4iBeacon, signalStrength: beacon.rssi)}
-            }
+//            if let xy4iBeacon = beacon as? XY4BluetoothDevice {
+                filteredDevices.append(beacon)
+                self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi)}
+//            }
         }
 
         self.delegates.forEach { $1?.smartScan(detected: filteredDevices) }
     }
 
-    public func deviceEntered(_ device: XYBluetoothDevice) {
+    public func deviceEntered(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(entered: device) }
     }
 
-    public func deviceExited(_ device: XYBluetoothDevice) {
+    public func deviceExited(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(exited: device) }
     }
     

@@ -10,9 +10,9 @@ import CoreLocation
 import CoreBluetooth
 
 public protocol XYLocationDelegate: class {
-    func didRangeBeacons(_ beacons: [XYBluetoothDevice])
-    func deviceEntered(_ device: XYBluetoothDevice)
-    func deviceExited(_ device: XYBluetoothDevice)
+    func didRangeBeacons(_ beacons: [XYFinderDevice])
+    func deviceEntered(_ device: XYFinderDevice)
+    func deviceExited(_ device: XYFinderDevice)
     func locationsUpdated(_ locations: [XYLocationCoordinate2D])
 }
 
@@ -47,27 +47,27 @@ extension XYLocation {
 
     public func startRangning(for family: XYFinderDeviceFamily) {
         guard let device = XYFinderDeviceFactory.build(from: family) else { return }
-        startRanging(for: device)
+        self.startRanging(for: device)
     }
 
     public func stopRanging(for family: XYFinderDeviceFamily) {
         // TODO not used in old app, should be?
     }
 
-    public func startRangning(for devices: Set<XYBluetoothDevice>) {
-        let rangedDevices = manager.rangedRegions
-            .compactMap { $0 as? CLBeaconRegion }
-            .filter { $0.minor != nil && $0.major != nil }
-            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
+//    public func startRangning(for devices: Set<XYBluetoothDevice>) {
+//        let rangedDevices = manager.rangedRegions
+//            .compactMap { $0 as? CLBeaconRegion }
+//            .filter { $0.minor != nil && $0.major != nil }
+//            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
+//
+//        // Remove devices from rangning that are not on the list
+//        Set<XYBaseBluetoothDevice>.init(rangedDevices).subtracting(devices).forEach { self.stopRanging(for: $0) }
+//
+//        // Add unranged devices
+//        Set<XYBaseBluetoothDevice>.init(devices).subtracting(rangedDevices).forEach { self.startRanging(for: $0) }
+//    }
 
-        // Remove devices from rangning that are not on the list
-        Set<XYBluetoothDevice>.init(rangedDevices).subtracting(devices).forEach { self.stopRanging(for: $0) }
-
-        // Add unranged devices
-        Set<XYBluetoothDevice>.init(devices).subtracting(rangedDevices).forEach { self.startRanging(for: $0) }
-    }
-
-    public func startRanging(for device: XYBluetoothDevice) {
+    public func startRanging(for device: XYFinderDevice) {
         let beaconRegion = CLBeaconRegion(proximityUUID: device.uuid, identifier: device.id)
         manager.startRangingBeacons(in: beaconRegion)
     }
@@ -78,11 +78,11 @@ extension XYLocation {
             .forEach { manager.stopRangingBeacons(in: $0) }
     }
 
-    public func stopRanging(for device: XYBluetoothDevice) {
-        guard let finder = device as? XYFinderDevice else { return }
-        manager.stopRangingBeacons(in: finder.beaconRegion(device.uuid, id: device.id, slot: 4))
-        manager.stopRangingBeacons(in: finder.beaconRegion(device.uuid, id: device.id, slot: 7))
-        manager.stopRangingBeacons(in: finder.beaconRegion(device.uuid, id: device.id, slot: 8))
+    public func stopRanging(for device: XYFinderDevice) {
+//        guard let finder = device as? XYFinderDevice else { return }
+        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 4))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 7))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 8))
     }
 }
 

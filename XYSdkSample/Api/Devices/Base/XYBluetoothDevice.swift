@@ -2,7 +2,7 @@
 //  XYBluetoothDevice.swift
 //  XYSdkSample
 //
-//  Created by Darren Sutherland on 9/10/18.
+//  Created by Darren Sutherland on 9/25/18.
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
 
@@ -10,119 +10,68 @@ import Foundation
 import CoreBluetooth
 import Promises
 
-public typealias GattSuccessCallback = ([XYBluetoothResult]) -> Void
-public typealias GattErrorCallback = (Error) -> Void
-// public typealias GattTimeout = () -> Void
+public protocol XYBluetoothDevice: XYBluetoothBase {
+    var peripheral: CBPeripheral? { get }
+    var inRange: Bool { get }
 
-public enum XY4BluetoothDeviceStatus {
-    case disconnected
-    case connecting
-    case connected
-    case communicating
+    func disconnect()
+    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
+
+    func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
+
+    func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
+    func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String)
+
+    func subscribe(_ delegate: CBPeripheralDelegate, key: String)
+    func unsubscribe(for key: String)
+
+    func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
 }
 
-// TODO eh...
-public protocol XYBluetoothDeviceNotifyDelegate {
-    func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
-}
-
-public class XYBluetoothDevice: NSObject {
-
-    fileprivate static var counter = 1
-
-    internal var rssi: Int = XYDeviceProximity.none.rawValue
-    fileprivate var peripheral: CBPeripheral?
-    
-    fileprivate var delegates = [String: CBPeripheralDelegate?]()
-    fileprivate var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
-
-    fileprivate var successCallback: GattSuccessCallback?
-    fileprivate var errorCallback: GattErrorCallback?
-    
-    public let
-    uuid: UUID,
-    id: String
-
-    public fileprivate(set) var state: XY4BluetoothDeviceStatus = .disconnected
-
-    // The queue for all operations in the connection() method from GattRequest
-    internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
-
-    // Locks
-    fileprivate let bleLock = DispatchSemaphore(value: 1)
-
-    init(_ uuid: UUID, id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
-        self.uuid = uuid
-        self.id = id
-        self.rssi = rssi
-        super.init()
-    }
-
-    public var powerLevel: UInt8 { return UInt8(4) }
-
-    public func subscribe(_ delegate: CBPeripheralDelegate, key: String) {
-        guard self.delegates[key] == nil else { return }
-        self.delegates[key] = delegate
-    }
-
-    public func unsubscribe(for key: String) {
-        self.delegates.removeValue(forKey: key)
-    }
-}
-
-// MARK: Peripheral methods
-extension XYBluetoothDevice {
-
-    public func getPeripheral() -> CBPeripheral? {
-        return self.peripheral
-    }
-
-    var inRange: Bool {
-        let strength = XYDeviceProximity.fromSignalStrength(self.rssi)
-        guard
-            let peripheral = self.peripheral,
-            peripheral.state == .connected,
-            strength != .outOfRange && strength != .none
-            else { return false }
-
-        return true
-    }
-
-}
-
-// MARK: Locate from Central helpers
 public extension XYBluetoothDevice {
-    // TODO fix this, it's iBeacon releated
-    func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
-        guard
-            let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
-            else { return false }
 
-        // TODO barf
-        guard
-            let connectableServices = (self as? XYFinderDevice)?.connectableServices,
-            services.contains(connectableServices[0]) || services.contains(connectableServices[1])
-            else { return false }
+    func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult {
+        do {
+            return try await(serivceCharacteristic.get(from: self))
+        } catch {
 
-        self.peripheral = peripheral.peripheral
-        self.peripheral?.delegate = self
-        return true
+        }
+
+        return XYBluetoothResult(nil)
     }
+
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
+        do {
+            try await(serivceCharacteristic.set(to: self, value: value))
+        } catch {
+
+        }
+    }
+
 }
 
-// MARK: Notification subscribe/unsubscribe
 public extension XYBluetoothDevice {
-    func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
-        self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
-        setNotify(serviceCharacteristic, notify: true)
+
+    func disconnect() {
+        let central = XYCentral.instance
+        central.disconnect(from: self)
     }
 
-    func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) {
-        setNotify(serviceCharacteristic, notify: false)
-        self.notifyDelegates.removeValue(forKey: key)
+    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
+        guard
+            XYCentral.instance.state == .poweredOn,
+            self.peripheral?.state == .connected
+            else { return Promise(()) }
+
+        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, operations)
     }
 
-    private func setNotify(_ serviceCharacteristic: XYServiceCharacteristic, notify: Bool) {
+}
+
+fileprivate extension XYBluetoothDevice {
+
+    func setNotify(_ serviceCharacteristic: XYServiceCharacteristic, notify: Bool) {
         guard
             let peripheral = self.peripheral,
             peripheral.state == .connected else { return }
@@ -140,10 +89,83 @@ public extension XYBluetoothDevice {
             }
         }
     }
+
+}
+
+public class XYBluetoothDeviceBase: NSObject, XYBluetoothDevice, XYBluetoothBase {
+
+    public var
+    rssi: Int,
+    name: String = "",
+    id: String
+
+    public fileprivate(set) var peripheral: CBPeripheral?
+
+    fileprivate var delegates = [String: CBPeripheralDelegate?]()
+    fileprivate var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
+
+    internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
+
+    init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
+        self.id = id
+        self.rssi = rssi
+        super.init()
+    }
+
+}
+
+extension XYBluetoothDeviceBase {
+
+    public var inRange: Bool {
+        let strength = XYDeviceProximity.fromSignalStrength(self.rssi)
+        guard
+            let peripheral = self.peripheral,
+            peripheral.state == .connected,
+            strength != .outOfRange && strength != .none
+            else { return false }
+
+        return true
+    }
+
+    public func subscribe(_ delegate: CBPeripheralDelegate, key: String) {
+        guard self.delegates[key] == nil else { return }
+        self.delegates[key] = delegate
+    }
+
+    public func unsubscribe(for key: String) {
+        self.delegates.removeValue(forKey: key)
+    }
+
+    public func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
+        self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
+        setNotify(serviceCharacteristic, notify: true)
+    }
+
+    public func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) {
+        setNotify(serviceCharacteristic, notify: false)
+        self.notifyDelegates.removeValue(forKey: key)
+    }
+
+    public func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
+        guard
+            let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
+            else { return false }
+
+        // TODO barf
+        guard
+            let connectableServices = (self as? XYFinderDevice)?.connectableServices,
+            services.contains(connectableServices[0]) || services.contains(connectableServices[1])
+            else { return false }
+
+        self.peripheral = peripheral.peripheral
+        self.peripheral?.delegate = self
+        return true
+    }
+
 }
 
 // MARK: CBPeripheralDelegate
-extension XYBluetoothDevice: CBPeripheralDelegate {
+extension XYBluetoothDeviceBase: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         self.delegates.forEach { $1?.peripheral?(peripheral, didDiscoverServices: error) }
     }
@@ -169,46 +191,4 @@ extension XYBluetoothDevice: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
-}
-
-// MARK: await() wrapper for set and get characteristic operators
-extension XYBluetoothDevice {
-
-    func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult {
-        do {
-            return try await(serivceCharacteristic.get(from: self))
-        } catch {
-
-        }
-
-        return XYBluetoothResult(nil)
-    }
-
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
-        do {
-            try await(serivceCharacteristic.set(to: self, value: value))
-        } catch {
-
-        }
-    }
-
-}
-
-// MARK: Connect and disconnect
-public extension XYBluetoothDevice {
-
-    func disconnect() {
-        let central = XYCentral.instance
-        central.disconnect(from: self)
-    }
-
-    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
-        guard
-            XYCentral.instance.state == .poweredOn,
-            self.peripheral?.state == .connected
-            else { return Promise(()) }
-
-        return Promise<Void>(on: XYBluetoothDevice.workQueue, operations)
-    }
-
 }

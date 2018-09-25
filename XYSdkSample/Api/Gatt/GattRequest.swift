@@ -49,7 +49,7 @@ class GattRequest: NSObject {
 
     func get(from device: XYBluetoothDevice) -> Promise<Data?> {
         // TODO Timeouts here
-        guard let peripheral = device.getPeripheral() else { return Promise(XYBluetoothError.notConnected) }
+        guard let peripheral = device.peripheral else { return Promise(XYBluetoothError.notConnected) }
         self.getLock()
         return self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.read(device)
@@ -61,7 +61,7 @@ class GattRequest: NSObject {
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
         // TODO Timeouts here
-        guard let peripheral = device.getPeripheral() else { return Promise(XYBluetoothError.notConnected) }
+        guard let peripheral = device.peripheral else { return Promise(XYBluetoothError.notConnected) }
         self.getLock()
         return self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
@@ -73,7 +73,7 @@ class GattRequest: NSObject {
     
     func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<CBCharacteristic> {
         guard
-            let peripheral = device.getPeripheral(),
+            let peripheral = device.peripheral,
             peripheral.state == .connected
             else {
                 return Promise(XYBluetoothError.notConnected)
@@ -108,7 +108,7 @@ private extension GattRequest {
     func read(_ device: XYBluetoothDevice) -> Promise<Data?> {
         guard
             let characteristic = self.characteristic,
-            let peripheral = device.getPeripheral(),
+            let peripheral = device.peripheral,
             peripheral.state == .connected
             else {
                 self.readPromise.reject(XYBluetoothError.notConnected)
@@ -130,7 +130,7 @@ private extension GattRequest {
     func write(_ device: XYBluetoothDevice, data: XYBluetoothResult, withResponse: Bool) -> Promise<Void> {
         guard
             let characteristic = self.characteristic,
-            let peripheral = device.getPeripheral(),
+            let peripheral = device.peripheral,
             peripheral.state == .connected,
             let data = data.data
             else {
@@ -157,7 +157,7 @@ extension GattRequest: CBPeripheralDelegate {
             }
 
         guard
-            self.device?.getPeripheral() == peripheral
+            self.device?.peripheral == peripheral
             else { return }
 
         guard
@@ -175,7 +175,7 @@ extension GattRequest: CBPeripheralDelegate {
             }
 
         guard
-            self.device?.getPeripheral() == peripheral
+            self.device?.peripheral == peripheral
             else { return }
 
         guard
@@ -195,7 +195,7 @@ extension GattRequest: CBPeripheralDelegate {
             }
 
         guard
-            self.device?.getPeripheral() == peripheral
+            self.device?.peripheral == peripheral
             else { return }
 
         guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
@@ -218,7 +218,7 @@ extension GattRequest: CBPeripheralDelegate {
             }
 
         guard
-            self.device?.getPeripheral() == peripheral
+            self.device?.peripheral == peripheral
             else {  return }
 
         guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
