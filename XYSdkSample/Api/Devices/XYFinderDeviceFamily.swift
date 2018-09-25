@@ -40,6 +40,13 @@ public enum XYFinderDeviceFamily: Int {
         }
     }
 
+    public var connectableSourceUuid: NSUUID? {
+        switch self {
+        case .xy4: return NSUUID(uuidString: "00000000-785F-0000-0000-0401F4AC4EA4")
+        default: return NSUUID(uuidString: XYFinderDeviceFamily.xy1.uuid.uuidString)
+        }
+    }
+
     public var familyName: String {
         switch self {
         case .xy1: return "XY1 Finder"

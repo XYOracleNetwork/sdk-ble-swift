@@ -27,7 +27,7 @@ public class XY4BluetoothDevice: XYBluetoothDeviceBase, XYFinderDevice {
         guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
 
         func getServiceUuid(_ connectablePowerLevel: UInt8) -> CBUUID {
-            let uuidSource = NSUUID(uuidString: "00000000-785F-0000-0000-0401F4AC4EA4")
+            let uuidSource = family.connectableSourceUuid
             let uuidBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: 16)
             uuidSource?.getBytes(uuidBytes)
 
