@@ -10,10 +10,16 @@ import Foundation
 import CoreBluetooth
 import Promises
 
+public enum GattRequestStatus {
+    case disconnected
+    case connecting
+    case communicating
+    case completed
+}
+
 class GattRequest: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
     fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
-    
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
 
@@ -26,6 +32,13 @@ class GattRequest: NSObject {
 
     public fileprivate(set) var error: XYBluetoothError?
 
+    public fileprivate(set) var status: GattRequestStatus = .disconnected
+
+    // Used for locking access to each request
+    private static let lock = DispatchSemaphore(value: 1)
+    private static let waitTimeout: TimeInterval = 30
+    private static let callTimeout: TimeInterval = 30
+
     init(_ serviceCharacteristic: XYServiceCharacteristic) {
         self.serviceCharacteristic = serviceCharacteristic
     }
@@ -37,20 +50,24 @@ class GattRequest: NSObject {
     func get(from device: XYBluetoothDevice) -> Promise<Data?> {
         // TODO Timeouts here
         guard let peripheral = device.getPeripheral() else { return Promise(XYBluetoothError.notConnected) }
-        return self.getCharacteristic(device).then { _ in
+        self.getLock()
+        return self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.read(device)
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+            self.freeLock()
         }
     }
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
         // TODO Timeouts here
         guard let peripheral = device.getPeripheral() else { return Promise(XYBluetoothError.notConnected) }
-        return self.getCharacteristic(device).then { _ in
+        self.getLock()
+        return self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+            self.freeLock()
         }
     }
     
@@ -68,6 +85,21 @@ class GattRequest: NSObject {
         
         return self.characteristicPromise
     }
+}
+
+// MARK: Locking methods
+private extension GattRequest {
+
+    func getLock() {
+        if GattRequest.lock.wait(timeout: .now() + GattRequest.waitTimeout) == .timedOut {
+            freeLock()
+        }
+    }
+
+    func freeLock() {
+        GattRequest.lock.signal()
+    }
+
 }
 
 // MARK: Internal getters

@@ -45,11 +45,8 @@ public class XYBluetoothDevice: NSObject {
 
     public fileprivate(set) var state: XY4BluetoothDeviceStatus = .disconnected
 
-    internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.WorkQueue")
-    fileprivate static let operationsQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
-
-    fileprivate static let lockTimeoutInSeconds = DispatchTimeInterval.seconds(15)
-    fileprivate static let operationTimeoutInSeconds = DispatchTimeInterval.seconds(15)
+    // The queue for all operations in the connection() method from GattRequest
+    internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
 
     // Locks
     fileprivate let bleLock = DispatchSemaphore(value: 1)
@@ -210,8 +207,6 @@ public extension XYBluetoothDevice {
             XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected
             else { return Promise(()) }
-
-        // TODO Lock + timeout
 
         return Promise<Void>(on: XYBluetoothDevice.workQueue, operations)
     }

@@ -63,7 +63,8 @@ public class XYCentral: NSObject {
 
     fileprivate var knownPeripherals = [UUID: XYPeripheral]()
 
-    fileprivate static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYLocateQueue")
+    // All BLE operations should be done on this queue
+    internal static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYCentralWorkQueue")
 
     private override init() {
         super.init()

@@ -14,7 +14,6 @@
 		3111F6FD215309F8001D76C1 /* ActionResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3111F6FB215309F8001D76C1 /* ActionResultViewController.swift */; };
 		3111F6FE215309F8001D76C1 /* ActionResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3111F6FC215309F8001D76C1 /* ActionResultViewController.xib */; };
 		31177F822159AA2700F1494C /* XYBluetoothError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31177F812159AA2700F1494C /* XYBluetoothError.swift */; };
-		31177F842159B52A00F1494C /* XYOperationLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31177F832159B52A00F1494C /* XYOperationLock.swift */; };
 		311B7480214306E1009412FD /* XYLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B747F214306E1009412FD /* XYLocation.swift */; };
 		311B7483214318E2009412FD /* XYFinderDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B7482214318E2009412FD /* XYFinderDevice.swift */; };
 		311B748821431EA0009412FD /* XYConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311B748721431EA0009412FD /* XYConstants.swift */; };
@@ -62,7 +61,6 @@
 		3111F6FB215309F8001D76C1 /* ActionResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionResultViewController.swift; sourceTree = "<group>"; };
 		3111F6FC215309F8001D76C1 /* ActionResultViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ActionResultViewController.xib; sourceTree = "<group>"; };
 		31177F812159AA2700F1494C /* XYBluetoothError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYBluetoothError.swift; sourceTree = "<group>"; };
-		31177F832159B52A00F1494C /* XYOperationLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYOperationLock.swift; sourceTree = "<group>"; };
 		311B747F214306E1009412FD /* XYLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYLocation.swift; sourceTree = "<group>"; };
 		311B7482214318E2009412FD /* XYFinderDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYFinderDevice.swift; sourceTree = "<group>"; };
 		311B748721431EA0009412FD /* XYConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYConstants.swift; sourceTree = "<group>"; };
@@ -144,7 +142,6 @@
 				311B7482214318E2009412FD /* XYFinderDevice.swift */,
 				312C55DD214B2DDE0016F4F9 /* XYBluetoothResult.swift */,
 				31177F812159AA2700F1494C /* XYBluetoothError.swift */,
-				31177F832159B52A00F1494C /* XYOperationLock.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -454,7 +451,6 @@
 				311B74952146F22A009412FD /* XYSmartScan.swift in Sources */,
 				311B749A21474092009412FD /* XYLocationCoordinate2D.swift in Sources */,
 				311B748C21432388009412FD /* XYFinderDeviceFamily.swift in Sources */,
-				31177F842159B52A00F1494C /* XYOperationLock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
