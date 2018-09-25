@@ -6,9 +6,12 @@
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
 
-import Foundation
 import CoreBluetooth
 import Promises
+
+public protocol XYBluetoothDeviceNotifyDelegate {
+    func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
+}
 
 public protocol XYBluetoothDevice: XYBluetoothBase {
     var peripheral: CBPeripheral? { get }

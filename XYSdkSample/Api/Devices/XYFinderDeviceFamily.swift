@@ -24,7 +24,6 @@ public enum XYFinderDeviceFamily: Int {
 
     public static func get(from uuidString: String) -> XYFinderDeviceFamily? {
         guard let index = XYFinderDeviceFamily.uuids.index(of: uuidString.lowercased()) else { return nil }
-        if index != 3 { print("Finder Index: \(index)") }
         return XYFinderDeviceFamily(rawValue: index)
     }
 

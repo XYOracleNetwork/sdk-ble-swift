@@ -37,7 +37,7 @@ public class XYSmartScan {
         // TODO investigate threading on main
         // TODO BG vs FG mode, just FG for now
 
-        location.startRanging(for: [.xy4])
+        location.startRanging(for: [.xy3])
 
         // TODO find devices from tracked devices
     }
@@ -94,7 +94,7 @@ extension XYSmartScan: XYLocationDelegate {
     }
 
     public func didRangeBeacons(_ beacons: [XYFinderDevice]) {
-        var filteredDevices = [XYFinderDevice]() // TODO cheating
+        var filteredDevices = [XYFinderDevice]()
         beacons.forEach { beacon in
             if beacon.inRange {
                 // TODO report in range
@@ -105,11 +105,8 @@ extension XYSmartScan: XYLocationDelegate {
                 // TODO notify that you see the device
             }
 
-            // TODO hardcode
-//            if let xy4iBeacon = beacon as? XY4BluetoothDevice {
-                filteredDevices.append(beacon)
-                self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi)}
-//            }
+            filteredDevices.append(beacon)
+            self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi)}
         }
 
         self.delegates.forEach { $1?.smartScan(detected: filteredDevices) }
