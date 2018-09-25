@@ -6,7 +6,6 @@
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
 
-
 import CoreBluetooth
 
 public enum GenericAccessService: String, XYServiceCharacteristic {

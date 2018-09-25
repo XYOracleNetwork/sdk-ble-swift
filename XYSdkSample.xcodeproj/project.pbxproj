@@ -36,6 +36,9 @@
 		312C55E0214C2F100016F4F9 /* BatteryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312C55DF214C2F100016F4F9 /* BatteryService.swift */; };
 		316277B1215AF04900B5DAAE /* BasicConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316277B0215AF04900B5DAAE /* BasicConfigService.swift */; };
 		316277B3215AF24B00B5DAAE /* ControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316277B2215AF24B00B5DAAE /* ControlService.swift */; };
+		316277B7215AF67900B5DAAE /* LinkLossService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316277B6215AF67900B5DAAE /* LinkLossService.swift */; };
+		316277B9215AF6DF00B5DAAE /* GenericAttributeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316277B8215AF6DF00B5DAAE /* GenericAttributeService.swift */; };
+		316277BB215AF74600B5DAAE /* CurrentTimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316277BA215AF74600B5DAAE /* CurrentTimeService.swift */; };
 		318BEB422142DE0C000580D1 /* Dispatch+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318BEB412142DE0C000580D1 /* Dispatch+extensions.swift */; };
 		318BEB452142EBF1000580D1 /* XYServiceCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318BEB442142EBF1000580D1 /* XYServiceCharacteristic.swift */; };
 		318BEB482142EED5000580D1 /* PrimaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 318BEB472142EED5000580D1 /* PrimaryService.swift */; };
@@ -92,6 +95,9 @@
 		312C55DF214C2F100016F4F9 /* BatteryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryService.swift; sourceTree = "<group>"; };
 		316277B0215AF04900B5DAAE /* BasicConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicConfigService.swift; sourceTree = "<group>"; };
 		316277B2215AF24B00B5DAAE /* ControlService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlService.swift; sourceTree = "<group>"; };
+		316277B6215AF67900B5DAAE /* LinkLossService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkLossService.swift; sourceTree = "<group>"; };
+		316277B8215AF6DF00B5DAAE /* GenericAttributeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericAttributeService.swift; sourceTree = "<group>"; };
+		316277BA215AF74600B5DAAE /* CurrentTimeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentTimeService.swift; sourceTree = "<group>"; };
 		318BEB412142DE0C000580D1 /* Dispatch+extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dispatch+extensions.swift"; sourceTree = "<group>"; };
 		318BEB442142EBF1000580D1 /* XYServiceCharacteristic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYServiceCharacteristic.swift; sourceTree = "<group>"; };
 		318BEB472142EED5000580D1 /* PrimaryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryService.swift; sourceTree = "<group>"; };
@@ -222,6 +228,9 @@
 				312C55DF214C2F100016F4F9 /* BatteryService.swift */,
 				310B6CDC215316D6007FADD2 /* TxPowerService.swift */,
 				310B6CDE2153177F007FADD2 /* GenericAccessService.swift */,
+				316277B6215AF67900B5DAAE /* LinkLossService.swift */,
+				316277B8215AF6DF00B5DAAE /* GenericAttributeService.swift */,
+				316277BA215AF74600B5DAAE /* CurrentTimeService.swift */,
 			);
 			path = Standard;
 			sourceTree = "<group>";
@@ -456,8 +465,11 @@
 				311B748E21432B3B009412FD /* XYIBeaconDefinition.swift in Sources */,
 				311B7480214306E1009412FD /* XYLocation.swift in Sources */,
 				311B749221434587009412FD /* Array+extensions.swift in Sources */,
+				316277B7215AF67900B5DAAE /* LinkLossService.swift in Sources */,
 				3196DBBE215AC1C900E4889E /* XYBluetoothBase.swift in Sources */,
+				316277BB215AF74600B5DAAE /* CurrentTimeService.swift in Sources */,
 				311B74A121498AC3009412FD /* GattRequest.swift in Sources */,
+				316277B9215AF6DF00B5DAAE /* GenericAttributeService.swift in Sources */,
 				311B748A214321A9009412FD /* XY4BluetoothDevice.swift in Sources */,
 				3111F6FD215309F8001D76C1 /* ActionResultViewController.swift in Sources */,
 				312C55DB2149DAD30016F4F9 /* DeviceInformationService.swift in Sources */,
