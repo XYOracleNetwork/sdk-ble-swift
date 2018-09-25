@@ -10,16 +10,6 @@ import Foundation
 import CoreBluetooth
 import Promises
 
-enum GattError: Error {
-    case notConnected
-    case mismatchedPeripheral
-    case serviceNotFound
-    case characteristicNotFound
-    case dataNotPresent
-    case timedOut
-    case peripheralDisconected(state: CBPeripheralState?)
-}
-
 class GattRequest: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
     fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
@@ -34,17 +24,19 @@ class GattRequest: NSObject {
     service: CBService?,
     characteristic: CBCharacteristic?
 
+    public fileprivate(set) var error: XYBluetoothError?
+
     init(_ serviceCharacteristic: XYServiceCharacteristic) {
         self.serviceCharacteristic = serviceCharacteristic
     }
 
     func delegateKey(deviceUuid: UUID) -> String {
-        let r =  ["GC", deviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
-        return r
+        return ["GC", deviceUuid.uuidString, serviceCharacteristic.characteristicUuid.uuidString].joined(separator: ":")
     }
 
     func get(from device: XYBluetoothDevice) -> Promise<Data?> {
-        guard let peripheral = device.getPeripheral() else { return Promise(GattError.notConnected) }
+        // TODO Timeouts here
+        guard let peripheral = device.getPeripheral() else { return Promise(XYBluetoothError.notConnected) }
         return self.getCharacteristic(device).then { _ in
             self.read(device)
         }.always {
@@ -53,7 +45,8 @@ class GattRequest: NSObject {
     }
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
-        guard let peripheral = device.getPeripheral() else { return Promise(GattError.notConnected) }
+        // TODO Timeouts here
+        guard let peripheral = device.getPeripheral() else { return Promise(XYBluetoothError.notConnected) }
         return self.getCharacteristic(device).then { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
         }.always {
@@ -66,7 +59,7 @@ class GattRequest: NSObject {
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
             else {
-                return Promise(GattError.notConnected)
+                return Promise(XYBluetoothError.notConnected)
             }
         
         self.device = device
@@ -86,7 +79,7 @@ private extension GattRequest {
             let peripheral = device.getPeripheral(),
             peripheral.state == .connected
             else {
-                self.readPromise.reject(GattError.notConnected)
+                self.readPromise.reject(XYBluetoothError.notConnected)
                 return self.readPromise
             }
 
@@ -110,7 +103,7 @@ private extension GattRequest {
             let data = data.data
             else {
                 print("Gatt(set): write ERROR")
-                return Promise(GattError.notConnected)
+                return Promise(XYBluetoothError.notConnected)
             }
 
         print("Gatt(set): write")
@@ -126,24 +119,36 @@ extension GattRequest: CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard
+            error == nil else {
+                self.error = XYBluetoothError.cbPeripheralDelegateError(error!)
+                return
+            }
+
+        guard
             self.device?.getPeripheral() == peripheral
-            else {  return }
+            else { return }
 
         guard
             let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.serviceUuid }).first
-            else {  return }
+            else { return }
 
         peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard
+            error == nil else {
+                self.error = XYBluetoothError.cbPeripheralDelegateError(error!)
+                return
+            }
+
+        guard
             self.device?.getPeripheral() == peripheral
-            else {  return }
+            else { return }
 
         guard
             let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristicUuid }).first
-            else {  return }
+            else { return }
 
         self.characteristic = characteristic
         
@@ -152,11 +157,17 @@ extension GattRequest: CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard
+            error == nil else {
+                self.error = XYBluetoothError.cbPeripheralDelegateError(error!)
+                return
+            }
+
+        guard
             self.device?.getPeripheral() == peripheral
-            else {  return }
+            else { return }
 
         guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
-            else {  return }
+            else { return }
 
         guard
             let data = characteristic.value
@@ -168,6 +179,12 @@ extension GattRequest: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        guard
+            error == nil else {
+                self.error = XYBluetoothError.cbPeripheralDelegateError(error!)
+                return
+            }
+
         guard
             self.device?.getPeripheral() == peripheral
             else {  return }

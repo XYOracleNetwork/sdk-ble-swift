@@ -211,7 +211,7 @@ public extension XYBluetoothDevice {
             self.peripheral?.state == .connected
             else { return Promise(()) }
 
-        // TODO Lock
+        // TODO Lock + timeout
 
         return Promise<Void>(on: XYBluetoothDevice.workQueue, operations)
     }

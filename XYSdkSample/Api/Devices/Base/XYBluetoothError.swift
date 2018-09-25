@@ -7,7 +7,15 @@
 //
 
 import Foundation
+import CoreBluetooth
 
-public struct XYBluetoothError: Error {
-
+public enum XYBluetoothError: Error {
+    case notConnected
+    case mismatchedPeripheral
+    case serviceNotFound
+    case characteristicNotFound
+    case dataNotPresent
+    case timedOut
+    case peripheralDisconected(state: CBPeripheralState?)
+    case cbPeripheralDelegateError(Error)
 }
