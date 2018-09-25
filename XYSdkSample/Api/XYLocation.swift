@@ -10,7 +10,7 @@ import CoreLocation
 import CoreBluetooth
 
 public protocol XYLocationDelegate: class {
-    func didRangeBeacons(_ beacons: [XYFinderDevice])
+    func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?)
     func deviceEntered(_ device: XYFinderDevice)
     func deviceExited(_ device: XYFinderDevice)
     func locationsUpdated(_ locations: [XYLocationCoordinate2D])
@@ -79,7 +79,6 @@ extension XYLocation {
     }
 
     public func stopRanging(for device: XYFinderDevice) {
-//        guard let finder = device as? XYFinderDevice else { return }
         manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 4))
         manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 7))
         manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 8))
@@ -95,7 +94,10 @@ extension XYLocation {
 extension XYLocation: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
-        self.delegate?.didRangeBeacons(beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi) })
+        self.delegate?.didRangeBeacons(
+            beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi) },
+            for: region.family
+        )
     }
 
     public func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {

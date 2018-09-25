@@ -8,6 +8,7 @@
 
 import Foundation
 
+// Basic protocol for all BLE devices 
 public protocol XYBluetoothBase {
     var rssi: Int { get }
     var name: String { get }

@@ -53,6 +53,10 @@ extension CLBeacon {
             major: self.major as? UInt16,
             minor: self.minor as? UInt16)
     }
+
+    var family: XYFinderDeviceFamily? {
+        return XYFinderDeviceFamily.get(from: self.xyiBeaconDefinition)
+    }
 }
 
 // MARK: CLBeaconRegion Convenience
@@ -62,5 +66,9 @@ extension CLBeaconRegion {
             uuid: self.proximityUUID,
             major: self.major as? UInt16,
             minor: self.minor as? UInt16)
+    }
+
+    var family: XYFinderDeviceFamily? {
+        return XYFinderDeviceFamily.get(from: self.xyiBeaconDefinition)
     }
 }

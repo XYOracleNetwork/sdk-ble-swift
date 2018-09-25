@@ -11,8 +11,8 @@ import Foundation
 public protocol XYSmartScanDelegate {
 //    func smartScan(status:cXYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D)
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int)
-    func smartScan(detected devices: [XYFinderDevice])
+    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
+    func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
     func smartScan(entered device: XYFinderDevice)
 //    func smartScan(exiting device:XYBluetoothDevice)
     func smartScan(exited device: XYFinderDevice)
@@ -37,7 +37,7 @@ public class XYSmartScan {
         // TODO investigate threading on main
         // TODO BG vs FG mode, just FG for now
 
-        location.startRanging(for: [.xy3])
+        location.startRanging(for: [.xy4, .xy3])
 
         // TODO find devices from tracked devices
     }
@@ -93,7 +93,8 @@ extension XYSmartScan: XYLocationDelegate {
         }
     }
 
-    public func didRangeBeacons(_ beacons: [XYFinderDevice]) {
+    public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
+        guard let family = family else { return }
         var filteredDevices = [XYFinderDevice]()
         beacons.forEach { beacon in
             if beacon.inRange {
@@ -106,10 +107,10 @@ extension XYSmartScan: XYLocationDelegate {
             }
 
             filteredDevices.append(beacon)
-            self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi)}
+            self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)}
         }
 
-        self.delegates.forEach { $1?.smartScan(detected: filteredDevices) }
+        self.delegates.forEach { $1?.smartScan(detected: filteredDevices, family: family) }
     }
 
     public func deviceEntered(_ device: XYFinderDevice) {

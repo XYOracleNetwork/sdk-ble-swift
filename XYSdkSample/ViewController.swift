@@ -127,6 +127,25 @@ extension ViewController: XYBluetoothDeviceNotifyDelegate {
 }
 
 extension ViewController: XYSmartScanDelegate {
+    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
+
+    func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily) {
+        DispatchQueue.main.async {
+            var rangedWithoutCurrent = self.rangedDevices.filter { $0.family != family }
+
+            devices.forEach { device in
+                // Only show those in range
+                if device.rssi != 0 && device.rssi > -95 {
+                    rangedWithoutCurrent.append(device)
+                }
+            }
+
+            self.rangedDevices = rangedWithoutCurrent.sorted(by: { ($0.powerLevel, $0.family.rawValue, $0.id) > ($1.powerLevel, $1.family.rawValue, $1.id) } )
+            self.countLabel.text = "\(self.rangedDevices.count)"
+            self.rangedDevicesTableView.reloadData()
+        }
+    }
+
     func smartScan(location: XYLocationCoordinate2D) {
 
     }
@@ -138,27 +157,6 @@ extension ViewController: XYSmartScanDelegate {
     func smartScan(exited device: XYFinderDevice) {
 
     }
-
-    func smartScan(detected devices: [XYFinderDevice]) {
-        // TODO throttle this display a bit?
-        DispatchQueue.main.async {
-            self.rangedDevices.removeAll()
-            var filteredDevices = [XYFinderDevice]()
-
-            devices.forEach { device in
-                // Only show those in range
-                if device.rssi != 0 && device.rssi > -95 {
-                    filteredDevices.append(device)
-                }
-            }
-
-            self.rangedDevices = filteredDevices.sorted(by: { ($0.powerLevel, $0.id) > ($1.powerLevel, $1.id) } )
-            self.countLabel.text = "\(self.rangedDevices.count)"
-            self.rangedDevicesTableView.reloadData()
-        }
-    }
-
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int) {}
 }
 
 extension ViewController: UITableViewDataSource {
@@ -178,13 +176,13 @@ extension ViewController: UITableViewDataSource {
         if tableView.tag == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "rangedDevicesCell")!
             let device = rangedDevices[indexPath.row]
-            cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+            cell.textLabel?.text = "\(device.family.familyName): \(device.iBeacon?.major ?? 0), \(device.iBeacon?.minor ?? 0)"
             cell.accessoryType = device.powerLevel == UInt(8) ? .checkmark : .none
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "connectedDeviceCell")!
             let device = connectedDevices[indexPath.row]
-            cell.textLabel?.text = "\(device.iBeacon?.major ?? 0) + \(device.iBeacon?.minor ?? 0)"
+            cell.textLabel?.text = "\(device.family.familyName): \(device.iBeacon?.major ?? 0), \(device.iBeacon?.minor ?? 0)"
             let coreDevice = connectedDevices[indexPath.row]
             cell.detailTextLabel?.text = "\(coreDevice.peripheral?.identifier.uuidString ?? "Unknown ID")"
             return cell

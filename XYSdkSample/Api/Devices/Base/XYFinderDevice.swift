@@ -10,6 +10,7 @@ import Foundation
 import CoreLocation
 import CoreBluetooth
 
+// A device from the XY family, has an iBeacon and other XY-specific identifiers
 public protocol XYFinderDevice: XYBluetoothDevice {
     var uuid: UUID { get }
     var iBeacon: XYIBeaconDefinition? { get }
@@ -19,6 +20,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var powerLevel: UInt8 { get }
 }
 
+// MARK: Default implementations of protocol methods and variables
 extension XYFinderDevice {
 
     public var uuid: UUID {

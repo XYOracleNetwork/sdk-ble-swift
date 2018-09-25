@@ -41,6 +41,7 @@
 		3196DBBC215AA28E00E4889E /* XY3BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3196DBBB215AA28E00E4889E /* XY3BluetoothDevice.swift */; };
 		3196DBBE215AC1C900E4889E /* XYBluetoothBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3196DBBD215AC1C900E4889E /* XYBluetoothBase.swift */; };
 		3196DBC0215AC1E800E4889E /* XYBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3196DBBF215AC1E800E4889E /* XYBluetoothDevice.swift */; };
+		3196DBC2215AE3B400E4889E /* XYBluetoothDeviceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3196DBC1215AE3B400E4889E /* XYBluetoothDeviceBase.swift */; };
 		31BD926021558135007B0AD6 /* PromiseTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BD925F21558135007B0AD6 /* PromiseTester.swift */; };
 		7EDDF6FE7994AFF7F68D295A /* Pods_XYSdkSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB812B6E208626C2C91F7F55 /* Pods_XYSdkSample.framework */; };
 /* End PBXBuildFile section */
@@ -94,6 +95,7 @@
 		3196DBBB215AA28E00E4889E /* XY3BluetoothDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XY3BluetoothDevice.swift; sourceTree = "<group>"; };
 		3196DBBD215AC1C900E4889E /* XYBluetoothBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYBluetoothBase.swift; sourceTree = "<group>"; };
 		3196DBBF215AC1E800E4889E /* XYBluetoothDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYBluetoothDevice.swift; sourceTree = "<group>"; };
+		3196DBC1215AE3B400E4889E /* XYBluetoothDeviceBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XYBluetoothDeviceBase.swift; sourceTree = "<group>"; };
 		31BD925F21558135007B0AD6 /* PromiseTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseTester.swift; sourceTree = "<group>"; };
 		4FBD8C70A696311253DC8D50 /* Pods-XYSdkSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XYSdkSample.release.xcconfig"; path = "Pods/Target Support Files/Pods-XYSdkSample/Pods-XYSdkSample.release.xcconfig"; sourceTree = "<group>"; };
 		EB812B6E208626C2C91F7F55 /* Pods_XYSdkSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XYSdkSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,11 +145,12 @@
 		311B749821473D0B009412FD /* Base */ = {
 			isa = PBXGroup;
 			children = (
+				3196DBBD215AC1C900E4889E /* XYBluetoothBase.swift */,
 				311B7482214318E2009412FD /* XYFinderDevice.swift */,
 				312C55DD214B2DDE0016F4F9 /* XYBluetoothResult.swift */,
 				31177F812159AA2700F1494C /* XYBluetoothError.swift */,
-				3196DBBD215AC1C900E4889E /* XYBluetoothBase.swift */,
 				3196DBBF215AC1E800E4889E /* XYBluetoothDevice.swift */,
+				3196DBC1215AE3B400E4889E /* XYBluetoothDeviceBase.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 				31177F822159AA2700F1494C /* XYBluetoothError.swift in Sources */,
 				311B74902143356E009412FD /* XYFinderDeviceFactory.swift in Sources */,
 				310B6CDA21531154007FADD2 /* ActionResultTableViewCell.swift in Sources */,
+				3196DBC2215AE3B400E4889E /* XYBluetoothDeviceBase.swift in Sources */,
 				312C55E0214C2F100016F4F9 /* BatteryService.swift in Sources */,
 				311B748821431EA0009412FD /* XYConstants.swift in Sources */,
 				31272E552141F8A8001F09A6 /* AppDelegate.swift in Sources */,
