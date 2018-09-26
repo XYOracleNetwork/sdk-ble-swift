@@ -40,7 +40,7 @@ public extension XYBluetoothDevice {
         do {
             return try await(serivceCharacteristic.get(from: self))
         } catch {
-
+            print("Something pooped!")
         }
 
         return XYBluetoothResult(nil)

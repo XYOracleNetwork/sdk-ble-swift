@@ -5,6 +5,7 @@
 //  Created by Darren Sutherland on 9/7/18.
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
+//  From: https://www.cocoawithlove.com/blog/2016/07/30/timer-problems.html#a-single-queue-synchronized-timer
 
 import Foundation
 

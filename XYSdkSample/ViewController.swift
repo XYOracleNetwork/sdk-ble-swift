@@ -78,6 +78,10 @@ class ViewController: UIViewController {
     }
 
     @IBAction func actionTapped(_ sender: Any) {
+        doAction()
+    }
+
+    func doAction() {
         guard let device = self.selectedDevice else { return }
         self.spinner.startAnimating()
 
@@ -95,7 +99,7 @@ class ViewController: UIViewController {
                 level = device.get(BatteryService.level)
                 revision = device.get(ControlService.version)
             }
-//            device.set(PrimaryService.buzzer, value: XYBluetoothResult(Data([UInt8(0x0b), 0x03])))
+            //            device.set(PrimaryService.buzzer, value: XYBluetoothResult(Data([UInt8(0x0b), 0x03])))
         }
 
         request.then { _ in
