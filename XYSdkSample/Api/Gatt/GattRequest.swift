@@ -34,18 +34,10 @@ class GattRequest: NSObject {
 
     public fileprivate(set) var error: XYBluetoothError?
 
-    public fileprivate(set) var status: GattRequestStatus = .disconnected {
-        didSet {
-            print(self.status.rawValue)
-        }
-    }
-
-    deinit {
-        print("GATT DE-INIT")
-    }
+    public fileprivate(set) var status: GattRequestStatus = .disconnected
 
     // Used for handling timeouts
-    fileprivate static let callTimeout: DispatchTimeInterval = .microseconds(300) // .seconds(30)
+    fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")
     fileprivate var timer: DispatchSourceTimer?
 
@@ -85,13 +77,31 @@ class GattRequest: NSObject {
     }
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
-        // TODO Timeouts here
         guard let peripheral = device.peripheral else { return Promise(XYBluetoothError.notConnected) }
-        return self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
-            self.write(device, data: valueObj, withResponse: withResponse)
-        }.always {
-            device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+
+        var operationPromise = Promise<Void>.pending()
+
+        // Ensure single execution of operation
+        GattRequest.queue.sync {
+            // Create timeout using the operation queue. Self-cleaning if we timeout
+            timer = DispatchSource.singleTimer(interval: GattRequest.callTimeout, queue: GattRequest.queue) { [weak self] in
+                guard let s = self else { return }
+                s.timer = nil
+                s.status = .timedOut
+                operationPromise.reject(XYBluetoothError.timedOut)
+            }
+
+            // Assign the pending operation promise to the results from getting services/characteristics and
+            // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
+            // request object is properly cleaned up by ARC
+            operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
+                self.write(device, data: valueObj, withResponse: withResponse)
+            }.always {
+                device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+            }
         }
+
+        return operationPromise
     }
 }
 
@@ -100,6 +110,7 @@ internal extension GattRequest {
 
     func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<CBCharacteristic> {
         guard
+            self.status != .timedOut,
             let peripheral = device.peripheral,
             peripheral.state == .connected
             else {
@@ -120,6 +131,7 @@ private extension GattRequest {
 
     func read(_ device: XYBluetoothDevice) -> Promise<Data?> {
         guard
+            self.status != .timedOut,
             let characteristic = self.characteristic,
             let peripheral = device.peripheral,
             peripheral.state == .connected
@@ -164,7 +176,9 @@ private extension GattRequest {
 extension GattRequest: CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+        guard self.status != .disconnected || self.status != .timedOut else {
+            return
+        }
 
         guard
             error == nil else {
@@ -185,7 +199,9 @@ extension GattRequest: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+        guard self.status != .disconnected || self.status != .timedOut else {
+            return
+        }
 
         guard
             error == nil else {
@@ -207,7 +223,9 @@ extension GattRequest: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+        guard self.status != .disconnected || self.status != .timedOut else {
+            return
+        }
 
         guard
             error == nil else {
