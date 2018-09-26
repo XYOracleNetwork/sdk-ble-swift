@@ -83,7 +83,8 @@ public class XYCentral: NSObject {
     }
 
     public func enable() {
-        // TODO check if already enabled and ready
+        guard cbManager == nil || self.state != .poweredOn else { return }
+
         XYCentral.centralQueue.sync {
             self.cbManager = CBCentralManager(
                 delegate: self,
