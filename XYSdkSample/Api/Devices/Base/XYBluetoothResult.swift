@@ -12,12 +12,17 @@ public class XYBluetoothResult {
     public private(set) var data: Data?
     public private(set) var error: XYBluetoothError?
 
-    public init(_ data: Data?) {
+    public init(data: Data?) {
         self.data = data
     }
 
     public convenience init(_ data: Data?, error: XYBluetoothError?) {
-        self.init(data)
+        self.init(data: data)
+        self.error = error
+    }
+
+    public convenience init(error: XYBluetoothError?) {
+        self.init(data: nil)
         self.error = error
     }
 

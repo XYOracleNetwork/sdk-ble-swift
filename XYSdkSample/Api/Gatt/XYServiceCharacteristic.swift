@@ -27,7 +27,7 @@ public extension XYServiceCharacteristic {
 
     func get(from device: XYBluetoothDevice) -> Promise<XYBluetoothResult> {
         return GattRequest(self).get(from: device).then { value in
-            XYBluetoothResult(value)
+            XYBluetoothResult(data: value)
         }
     }
 

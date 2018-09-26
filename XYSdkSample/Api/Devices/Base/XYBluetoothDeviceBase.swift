@@ -93,7 +93,7 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         // TODO barf
         for notify in self.notifyDelegates {
             if notify.value.serviceCharacteristic.characteristicUuid == characteristic.uuid {
-                notify.value.delegate?.update(for: notify.value.serviceCharacteristic, value: XYBluetoothResult(characteristic.value))
+                notify.value.delegate?.update(for: notify.value.serviceCharacteristic, value: XYBluetoothResult(data: characteristic.value))
             }
         }
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }

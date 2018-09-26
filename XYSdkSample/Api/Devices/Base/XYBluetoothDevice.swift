@@ -22,7 +22,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic) -> XYBluetoothResult
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) -> XYBluetoothResult
 
     func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
     func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String)
@@ -40,23 +40,26 @@ public extension XYBluetoothDevice {
         do {
             return try await(serivceCharacteristic.get(from: self))
         } catch {
-            print("Something pooped!")
+            return XYBluetoothResult(error: error as? XYBluetoothError)
         }
-
-        return XYBluetoothResult(nil)
     }
 
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) -> XYBluetoothResult  {
         do {
             try await(serivceCharacteristic.set(to: self, value: value))
+            return XYBluetoothResult(data: nil)
         } catch {
-
+            return XYBluetoothResult(error: error as? XYBluetoothError)
         }
     }
 
 }
 
 public extension XYBluetoothDevice {
+
+    func connect() -> Promise<Void> {        
+        return Promise<Void>(())
+    }
 
     func disconnect() {
         let central = XYCentral.instance

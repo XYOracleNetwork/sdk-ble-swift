@@ -93,7 +93,7 @@ class ViewController: UIViewController {
                 level = device.get(BatteryService.level)
                 revision = device.get(DeviceInformationService.firmwareRevisionString)
                 model = device.get(DeviceInformationService.modelNumberString)
-                device.set(PrimaryService.buzzer, value: XYBluetoothResult(Data([UInt8(0x0b), 0x03])))
+                _ = device.set(PrimaryService.buzzer, value: XYBluetoothResult(data: Data([UInt8(0x0b), 0x03])))
             }
 
             if device.family == .xy3 {
@@ -263,7 +263,7 @@ extension ViewController: XYCentralDelegate {
 
     func located(peripheral: XYPeripheral) {
         if self.selectedDevice?.attachPeripheral(peripheral) ?? false {
-            central.stop()
+            central.stopScan()
             central.connect(to: self.selectedDevice!)
             DispatchQueue.main.async {
                 self.deviceStatus.text = "Connecting..."

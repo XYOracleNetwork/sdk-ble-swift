@@ -70,11 +70,9 @@ public class XYCentral: NSObject {
         super.init()
     }
 
-    fileprivate let timeoutQueue = DispatchQueue(label: "com.xyfindables.sdk.XYLocateTimeoutQueue")
-    fileprivate var timeoutTimer: DispatchSourceTimer?
     fileprivate var isConnecting: Bool = false
 
-    deinit {
+     deinit {
         self.cbManager?.delegate = nil
     }
 
@@ -123,14 +121,9 @@ public class XYCentral: NSObject {
         self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
     }
 
-    public func stop() {
+    // Cancel a scan request from scan() above
+    public func stopScan() {
         self.cbManager?.stopScan()
-    }
-
-    // Connect to device
-    public func connect(to device: XYBluetoothDevice) {
-        guard let peripheral = device.peripheral else { return }
-        self.cbManager?.connect(peripheral)
     }
 
     public func setDelegate(_ delegate: XYCentralDelegate, key: String) {
@@ -140,19 +133,7 @@ public class XYCentral: NSObject {
     public func removeDelegate(for key: String) {
         self.delegates.removeValue(forKey: key)
     }
-    
-    func decodePeripheralState(peripheralState: CBPeripheralState) {
-        switch peripheralState {
-        case .disconnected:
-            print("Peripheral state: disconnected")
-        case .connected:
-            print("Peripheral state: connected")
-        case .connecting:
-            print("Peripheral state: connecting")
-        case .disconnecting:
-            print("Peripheral state: disconnecting")
-        }
-    }
+
 }
 
 extension XYCentral: CBCentralManagerDelegate {
