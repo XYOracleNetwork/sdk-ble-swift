@@ -51,6 +51,7 @@ class DeviceDetailViewController: UIViewController {
         if self.isMovingFromParentViewController {
             self.delegate = nil
             self.currentPanelView?.removeFromSuperview()
+            self.rangedDevicesManager.disconnect()
         }
     }
 
