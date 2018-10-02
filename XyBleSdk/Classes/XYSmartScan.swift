@@ -99,8 +99,6 @@ extension XYSmartScan: XYLocationDelegate {
             self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)}
         }
 
-        // TODO Detected crap
-
         self.delegates.forEach { $1?.smartScan(detected: beacons, family: family) }
     }
 

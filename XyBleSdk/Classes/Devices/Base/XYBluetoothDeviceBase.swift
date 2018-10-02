@@ -11,8 +11,9 @@ import CoreBluetooth
 // A concrete base class to base any BLE device off of
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
-    public var firstPulseTime : Date?
-    public var lastPulseTime : Date?
+    fileprivate var firstPulseTime: Date?
+    fileprivate var lastPulseTime: Date?
+    public fileprivate(set) var totalPulseCount = 0
 
     public var
     rssi: Int,
@@ -82,6 +83,16 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         return true
     }
 
+    public func detected(_ signalStrength: Int) {
+        self.totalPulseCount += 1
+
+        if self.firstPulseTime == nil {
+            self.firstPulseTime = Date()
+        }
+
+        self.lastPulseTime = Date()
+    }
+
 }
 
 // MARK: CBPeripheralDelegate, passes these on to delegate subscribers for this peripheral
@@ -110,5 +121,9 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
+    }
+
+    public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        print("asdfasd")
     }
 }

@@ -13,4 +13,5 @@ public protocol XYBluetoothBase {
     var rssi: Int { get }
     var name: String { get }
     var id: String { get }
+    var totalPulseCount: Int { get }
 }

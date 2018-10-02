@@ -17,7 +17,8 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     @IBOutlet weak var rangedDevicesTableView: UITableView!
-    
+    @IBOutlet weak var deviceCountLabel: UILabel!
+
     fileprivate let rangedDevicesManager = RangedDevicesManager.instance
 
     override func viewDidLoad() {
@@ -69,6 +70,7 @@ extension ViewController: RangedDevicesManagerDelegate {
 
     func reloadTableView() {
         self.rangedDevicesTableView.reloadData()
+        self.deviceCountLabel.text = "\(rangedDevicesManager.rangedDevices.count)"
     }
 }
 

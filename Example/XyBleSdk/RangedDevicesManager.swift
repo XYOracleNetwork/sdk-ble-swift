@@ -77,11 +77,11 @@ extension RangedDevicesManager: UITableViewDataSource {
         let directive = RangedDeviceCellDirective(
             name:  device.family.familyName,
             major: device.iBeacon?.major ?? 0,
-            rssi: 0,
+            rssi: device.rssi,
             uuid: device.uuid,
             connected: false,
             minor: device.iBeacon?.minor ?? 0,
-            pulses: 0)
+            pulses: device.totalPulseCount)
 
         cell.populate(from: directive)
         cell.accessoryType = device.powerLevel == UInt(8) ? .checkmark : .none
@@ -100,21 +100,13 @@ extension RangedDevicesManager: XYCentralDelegate {
         }
     }
 
-    func connected(peripheral: XYPeripheral) {
+    func connected(peripheral: XYPeripheral) {}
 
-    }
+    func timeout() {}
 
-    func timeout() {
+    func couldNotConnect(peripheral: XYPeripheral) {}
 
-    }
-
-    func couldNotConnect(peripheral: XYPeripheral) {
-
-    }
-
-    func disconnected(periperhal: XYPeripheral) {
-
-    }
+    func disconnected(periperhal: XYPeripheral) {}
 
     func stateChanged(newState: CBManagerState) {
         if newState == .poweredOn {
@@ -126,13 +118,9 @@ extension RangedDevicesManager: XYCentralDelegate {
 }
 
 extension RangedDevicesManager: XYSmartScanDelegate {
-    func smartScan(location: XYLocationCoordinate2D) {
+    func smartScan(location: XYLocationCoordinate2D) {}
 
-    }
-
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {
-
-    }
+    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
 
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily) {
         DispatchQueue.main.async {
@@ -150,11 +138,7 @@ extension RangedDevicesManager: XYSmartScanDelegate {
         }
     }
 
-    func smartScan(entered device: XYFinderDevice) {
+    func smartScan(entered device: XYFinderDevice) {}
 
-    }
-
-    func smartScan(exited device: XYFinderDevice) {
-
-    }
+    func smartScan(exited device: XYFinderDevice) {}
 }
