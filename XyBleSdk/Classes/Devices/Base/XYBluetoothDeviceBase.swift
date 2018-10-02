@@ -83,7 +83,7 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         return true
     }
 
-    public func detected(_ signalStrength: Int) {
+    public func detected() {
         self.totalPulseCount += 1
 
         if self.firstPulseTime == nil {

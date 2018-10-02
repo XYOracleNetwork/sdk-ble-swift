@@ -34,7 +34,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
 
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
 
-    func detected(_ signalStrength: Int)
+    func detected()
 }
 
 // MARK: Methods to get or set a characteristic using the Promises-based connection work block method below

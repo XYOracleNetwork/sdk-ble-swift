@@ -34,6 +34,28 @@ public struct XYIBeaconDefinition {
         }
     }
 
+//    public func xyId2(from family: XYFinderDeviceFamily) -> String {
+//        var mainMinor : UInt16
+//        var xyId : String
+//
+//        if (minor != nil) {
+//            if family == .xy4 || family == .xy3 || family == .xy2 || family == .xygps {
+//                mainMinor = (minor! & 0xfff0) | 0x0004
+//            } else if (family == .xy1){
+//                mainMinor = minor!
+//            } else {
+//                mainMinor = minor!
+//            }
+//            xyId = String(format:"%@:%@.%ld.%ld", family.prefix, uuid.uuidString, major!, mainMinor).lowercased()
+//        } else if (major != nil){
+//            xyId = String(format:"%@:%@.%ld", family.prefix, uuid.uuidString, major!).lowercased()
+//        } else {
+//            xyId = String(format:"%@:%@", family.prefix, uuid.uuidString).lowercased()
+//        }
+//
+//        return xyId
+//    }
+
     public func xyId(from family: XYFinderDeviceFamily) -> String {
         var xyid = [family.prefix, family.uuid.uuidString.lowercased()].joined(separator: ":")
         if let minor = mainMinor(for: family), let major = self.major {

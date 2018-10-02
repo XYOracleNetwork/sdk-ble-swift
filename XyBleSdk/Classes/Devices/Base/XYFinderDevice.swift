@@ -26,6 +26,8 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     @discardableResult func fallAsleep() -> Promise<Void>?
     @discardableResult func lock() -> Promise<Void>?
     @discardableResult func unlock() -> Promise<Void>?
+
+    func update(_ rssi: Int, powerLevel: UInt8)
 }
 
 // MARK: Default implementations of protocol methods and variables
@@ -43,13 +45,13 @@ extension XYFinderDevice {
         return self.family.prefix
     }
 
-    public var powerLevel: UInt8 {
-        guard
-            let beacon = self.iBeacon,
-            let minor = beacon.minor
-            else { return UInt8(4) }
-        return UInt8(minor & 0xf)
-    }
+//    public var powerLevel: UInt8 {
+//        guard
+//            let beacon = self.iBeacon,
+//            let minor = beacon.minor
+//            else { return UInt8(4) }
+//        return UInt8(minor & 0xf)
+//    }
 
     // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
     func beaconRegion(_ uuid: UUID, id: String, slot: UInt16? = nil) -> CLBeaconRegion {

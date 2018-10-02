@@ -14,6 +14,9 @@ public class XY3BluetoothDevice: XYBluetoothDeviceBase {
     public let
     iBeacon: XYIBeaconDefinition?
 
+    public fileprivate(set) var
+    powerLevel: UInt8 = 4
+
     public let family: XYFinderDeviceFamily = .xy3
 
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
@@ -49,6 +52,12 @@ public class XY3BluetoothDevice: XYBluetoothDeviceBase {
 }
 
 extension XY3BluetoothDevice: XYFinderDevice {
+    public func update(_ rssi: Int, powerLevel: UInt8) {
+        super.detected()
+        self.powerLevel = powerLevel
+        self.rssi = rssi
+    }
+
     @discardableResult public func find() -> Promise<Void>? {
         guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil }
         let song = Data(XYFinderSong.findIt.values(for: self.family))

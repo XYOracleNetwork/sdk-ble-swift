@@ -13,18 +13,30 @@ public class XYFinderDeviceFactory {
 
     class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) -> XYFinderDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }
-        switch family {
-        case .xygps:
-            return XYGPSBluetoothDevice(iBeacon, rssi: rssi)
-        case .xy4:
-            return XY4BluetoothDevice(iBeacon, rssi: rssi)
-        case .xy3:
-            return XY3BluetoothDevice(iBeacon, rssi: rssi)
-        case .xy2:
-            return XY2BluetoothDevice(iBeacon, rssi: rssi)
-        default:
-            return nil
+
+        var device: XYFinderDevice?
+        if let foundDevice = XYDeviceCache.devices[iBeacon.xyId(from: family)] {
+            device = XYDeviceCache.update(foundDevice, rssi: rssi, powerLevel: 4)
+        } else {
+            switch family {
+            case .xygps:
+                device = XYGPSBluetoothDevice(iBeacon, rssi: rssi)
+            case .xy4:
+                device = XY4BluetoothDevice(iBeacon, rssi: rssi)
+            case .xy3:
+                device = XY3BluetoothDevice(iBeacon, rssi: rssi)
+            case .xy2:
+                device = XY2BluetoothDevice(iBeacon, rssi: rssi)
+            default:
+                device = nil
+            }
+
+            if let device = device {
+                XYDeviceCache.add(device)
+            }
         }
+
+        return device
     }
 
     class func build(from family: XYFinderDeviceFamily) -> XYFinderDevice? {
