@@ -16,7 +16,8 @@ public class XYFinderDeviceFactory {
 
         var device: XYFinderDevice?
         if let foundDevice = XYDeviceCache.devices[iBeacon.xyId(from: family)] {
-            device = XYDeviceCache.update(foundDevice, rssi: rssi, powerLevel: 4)
+            XYDeviceCache.update(foundDevice, rssi: rssi, powerLevel: iBeacon.powerLevel)
+            device = foundDevice
         } else {
             switch family {
             case .xygps:

@@ -185,8 +185,20 @@
                                 <color key="textColor" white="1" alpha="0.5" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Devices:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jn8-6W-FPg">
-                                <rect key="frame" x="79" y="72" width="55.5" height="17"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pulses:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pI5-Ou-nSv">
+                                <rect key="frame" x="16" y="97" width="47" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" white="1" alpha="0.5" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="n/a" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jn8-6W-FPg">
+                                <rect key="frame" x="79" y="72" width="108" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="n/a" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oFV-i4-Ppl">
+                                <rect key="frame" x="71" y="97" width="116" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -197,18 +209,23 @@
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="YVc-fD-5Vy" secondAttribute="bottom" id="BZI-xM-HW8"/>
                             <constraint firstItem="aug-yQ-o9X" firstAttribute="trailing" secondItem="kh9-bI-dsS" secondAttribute="trailingMargin" id="CFd-cZ-drE"/>
                             <constraint firstItem="YVc-fD-5Vy" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="64" id="Ii5-NV-p5J"/>
+                            <constraint firstItem="pI5-Ou-nSv" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="JPI-aK-p5F"/>
                             <constraint firstItem="YVc-fD-5Vy" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="V0v-Rk-7o0"/>
                             <constraint firstItem="Jn8-6W-FPg" firstAttribute="leading" secondItem="gQ4-m5-5jp" secondAttribute="trailing" constant="7.5" id="WrW-wt-G8e"/>
                             <constraint firstItem="aug-yQ-o9X" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="14" id="ezu-nK-xwP"/>
+                            <constraint firstItem="oFV-i4-Ppl" firstAttribute="leading" secondItem="pI5-Ou-nSv" secondAttribute="trailing" constant="8" id="hV2-25-i56"/>
+                            <constraint firstItem="oFV-i4-Ppl" firstAttribute="top" secondItem="Jn8-6W-FPg" secondAttribute="bottom" constant="8" id="i7U-TQ-ZUo"/>
                             <constraint firstItem="gQ4-m5-5jp" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="j0J-DX-3bA"/>
                             <constraint firstItem="Jn8-6W-FPg" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="8" id="p59-RO-RqS"/>
                             <constraint firstItem="gQ4-m5-5jp" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="8" id="vqZ-Ii-Ik9"/>
+                            <constraint firstItem="pI5-Ou-nSv" firstAttribute="top" secondItem="gQ4-m5-5jp" secondAttribute="bottom" constant="8" id="wFo-yu-YM4"/>
                             <constraint firstAttribute="trailing" secondItem="YVc-fD-5Vy" secondAttribute="trailing" id="zV5-NK-NRL"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Select Device" id="jmC-pt-jvg"/>
                     <connections>
                         <outlet property="deviceCountLabel" destination="Jn8-6W-FPg" id="cqF-db-OdK"/>
+                        <outlet property="pulseCount" destination="oFV-i4-Ppl" id="0Uj-Tk-dCV"/>
                         <outlet property="rangedDevicesTableView" destination="YVc-fD-5Vy" id="Pv3-Pg-x1J"/>
                         <outlet property="spinner" destination="aug-yQ-o9X" id="CEe-pg-U7D"/>
                     </connections>

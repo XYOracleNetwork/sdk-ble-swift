@@ -18,6 +18,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     @IBOutlet weak var rangedDevicesTableView: UITableView!
     @IBOutlet weak var deviceCountLabel: UILabel!
+    @IBOutlet weak var pulseCount: UILabel!
 
     fileprivate let rangedDevicesManager = RangedDevicesManager.instance
 
@@ -71,6 +72,7 @@ extension ViewController: RangedDevicesManagerDelegate {
     func reloadTableView() {
         self.rangedDevicesTableView.reloadData()
         self.deviceCountLabel.text = "\(rangedDevicesManager.rangedDevices.count)"
+        self.pulseCount.text = "\(rangedDevicesManager.rangedDevices.reduce(0, { $0 + $1.totalPulseCount }))"
     }
 }
 
