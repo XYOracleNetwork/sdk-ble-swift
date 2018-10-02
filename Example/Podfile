@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'XyBleSdk_Example' do
+  pod 'XyBleSdk', :path => '../'
+
+  target 'XyBleSdk_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
