@@ -69,7 +69,7 @@ final class GattRequest: NSObject {
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
-        // request object is properly cleaned up by ARC
+        // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
         self.getLock()
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.read(device)
@@ -99,7 +99,7 @@ final class GattRequest: NSObject {
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
-        // request object is properly cleaned up by ARC
+        // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
         self.getLock()
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
@@ -129,7 +129,6 @@ fileprivate extension GattRequest {
 
 }
 
-
 // MARK: Get service and characteristic
 internal extension GattRequest {
 
@@ -151,7 +150,7 @@ internal extension GattRequest {
     }
 }
 
-// MARK: Internal getters
+// MARK: Internal getters + setters
 private extension GattRequest {
 
     func read(_ device: XYBluetoothDevice) -> Promise<Data?> {
@@ -172,11 +171,6 @@ private extension GattRequest {
 
         return self.readPromise
     }
-
-}
-
-// MARK: Internal setters
-private extension GattRequest {
 
     func write(_ device: XYBluetoothDevice, data: XYBluetoothResult, withResponse: Bool) -> Promise<Void> {
         guard

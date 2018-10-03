@@ -110,12 +110,10 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        // TODO barf
-        for notify in self.notifyDelegates {
-            if notify.value.serviceCharacteristic.characteristicUuid == characteristic.uuid {
-                notify.value.delegate?.update(for: notify.value.serviceCharacteristic, value: XYBluetoothResult(data: characteristic.value))
-            }
-        }
+        self.notifyDelegates
+            .filter { $0.value.serviceCharacteristic.characteristicUuid == characteristic.uuid }
+            .forEach { $0.value.delegate?.update(for: $0.value.serviceCharacteristic, value: XYBluetoothResult(data: characteristic.value))}
+
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }
     }
 
@@ -128,6 +126,6 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
-        print("asdfasd")
+        self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }
     }
 }

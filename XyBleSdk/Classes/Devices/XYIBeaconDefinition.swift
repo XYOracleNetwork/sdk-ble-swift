@@ -24,6 +24,7 @@ public struct XYIBeaconDefinition {
         return minor != nil && minor! > 0
     }
 
+    // Filters out the power level to generate a consistent minor value
     public func mainMinor(for family: XYFinderDeviceFamily, slot: UInt16? = nil) -> UInt16? {
         guard let minor = self.minor else { return nil }
         switch family {
@@ -34,6 +35,7 @@ public struct XYIBeaconDefinition {
         }
     }
 
+    // Builds the beacon definition based on the uuid, major and minor
     public func xyId(from family: XYFinderDeviceFamily) -> String {
         var xyid = [family.prefix, family.uuid.uuidString.lowercased()].joined(separator: ":")
         if let minor = mainMinor(for: family), let major = self.major {
@@ -45,6 +47,7 @@ public struct XYIBeaconDefinition {
         return xyid
     }
 
+    // Determines the power value from the minor, changed when a user presses the button on the finder
     public var powerLevel: UInt8 {
         guard
             let minor = self.minor
