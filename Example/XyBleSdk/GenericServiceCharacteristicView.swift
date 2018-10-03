@@ -54,6 +54,8 @@ class GenericServiceCharacteristicView: UIView {
             }
         }.always {
             self.parent?.showRefreshControl()
+        }.catch { error in
+            print(error)
         }
     }
 

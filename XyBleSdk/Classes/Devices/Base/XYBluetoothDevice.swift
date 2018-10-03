@@ -59,6 +59,34 @@ public extension XYBluetoothDevice {
 
 }
 
+class XYConnectionAgent: XYCentralDelegate {
+    private let central = XYCentral.instance
+    private let delegateKey: String
+
+    init(for device: XYBluetoothDevice) {
+        self.delegateKey = "XYConnectionAgent:\(device.id)"
+        central.setDelegate(self, key: self.delegateKey)
+    }
+
+    deinit {
+        central.removeDelegate(for: self.delegateKey)
+    }
+
+    func connect() -> Promise<Void> {
+        print(delegateKey)
+        return Promise(())
+    }
+
+    func connected(peripheral: XYPeripheral) {}
+    func couldNotConnect(peripheral: XYPeripheral) {}
+
+    // Unused in this single connection case
+    func timeout() {}
+    func disconnected(periperhal: XYPeripheral) {}
+    func located(peripheral: XYPeripheral) {}
+    func stateChanged(newState: CBManagerState) {}
+}
+
 // MARK: Connecting to a device in order to complete a block of operations defined above, as well as disconnect from the peripheral
 public extension XYBluetoothDevice {
 
@@ -66,7 +94,10 @@ public extension XYBluetoothDevice {
         guard
             XYCentral.instance.state == .poweredOn,
             self.peripheral?.state == .connected
-            else { return Promise(()) }
+            else {
+                XYConnectionAgent(for: self).connect()
+                return Promise<Void>(XYBluetoothError.notConnected)
+            }
 
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, operations)
     }

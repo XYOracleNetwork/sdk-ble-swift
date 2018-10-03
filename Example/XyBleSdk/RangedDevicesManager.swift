@@ -37,7 +37,7 @@ class RangedDevicesManager: NSObject {
 
     func startRanging() {
         if central.state != .poweredOn {
-            central.setDelegate(self, key: "ViewController")
+            central.setDelegate(self, key: "RangedDevicesManager")
             central.enable()
         } else {
             scanner.start(for: [.xy2, .xy3, .xy4, .xygps])
@@ -98,7 +98,6 @@ extension RangedDevicesManager: XYCentralDelegate {
     func located(peripheral: XYPeripheral) {
         if self.selectedDevice?.attachPeripheral(peripheral) ?? false {
             central.stopScan()
-            central.connect(to: self.selectedDevice!)
             DispatchQueue.main.async {
                 self.delegate?.showDetails()
             }

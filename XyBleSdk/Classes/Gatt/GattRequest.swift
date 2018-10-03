@@ -55,8 +55,11 @@ final class GattRequest: NSObject {
     }
 
     func get(from device: XYBluetoothDevice) -> Promise<Data?> {
-        guard let peripheral = device.peripheral else { return Promise(XYBluetoothError.notConnected) }
         var operationPromise = Promise<Data?>.pending()
+        guard let peripheral = device.peripheral else {
+            operationPromise.reject(XYBluetoothError.notConnected)
+            return operationPromise
+        }
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
