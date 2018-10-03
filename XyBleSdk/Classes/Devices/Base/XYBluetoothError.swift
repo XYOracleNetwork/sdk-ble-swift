@@ -36,9 +36,9 @@ public enum XYBluetoothError: Error {
         case .timedOut:
             return "Timed Out"
         case .peripheralDisconected(let state):
-            return "Peripheral Disconnected: \(state.debugDescription)"
+            return "Peripheral Disconnected:\n\(state.debugDescription)"
         case .cbPeripheralDelegateError(let error):
-            return "Peripheral Delegate Error: \(error)"
+            return "Peripheral Delegate Error:\n\(error.localizedDescription)"
         case .actionNotSupported:
             return "Requested Action Not Supported"
         }

@@ -27,27 +27,6 @@ public class XYGPSBluetoothDevice: XYBluetoothDeviceBase {
         self.init(iBeacon.xyId(from: .xygps), iBeacon: iBeacon, rssi: rssi)
     }
 
-    public var connectableServices: [CBUUID] {
-        guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
-
-        func getServiceUuid(_ connectablePowerLevel: UInt8) -> CBUUID {
-            let uuidSource = family.connectableSourceUuid
-            let uuidBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: 16)
-            uuidSource?.getBytes(uuidBytes)
-            for i in (0...11) {
-                uuidBytes[i] = uuidBytes[i + 4];
-            }
-            uuidBytes[13] = UInt8(major & 0x00ff)
-            uuidBytes[12] = UInt8((major & 0xff00) >> 8)
-            uuidBytes[15] = UInt8(minor & 0x00f0) | 0x04
-            uuidBytes[14] = UInt8((minor & 0xff00) >> 8)
-
-            return CBUUID(data: Data(bytes:uuidBytes, count:16))
-        }
-
-        return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { getServiceUuid($0) }
-    }
-
 }
 
 extension XYGPSBluetoothDevice: XYFinderDevice {
@@ -61,21 +40,5 @@ extension XYGPSBluetoothDevice: XYFinderDevice {
         guard let peripheral = self.peripheral, peripheral.state == .connected else { return Promise<Void>(XYBluetoothError.notConnected) }
         let song = Data(XYFinderSong.findIt.values(for: self.family))
         return ControlService.buzzerSelect.set(to: self, value: XYBluetoothResult(data: song))
-    }
-
-    @discardableResult public func stayAwake() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult public func fallAsleep() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult public func lock() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult public func unlock() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
     }
 }

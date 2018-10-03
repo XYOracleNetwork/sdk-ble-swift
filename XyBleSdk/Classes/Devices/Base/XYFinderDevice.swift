@@ -31,18 +31,39 @@ public protocol XYFinderDevice: XYBluetoothDevice {
 }
 
 // MARK: Default implementations of protocol methods and variables
-extension XYFinderDevice {
+public extension XYFinderDevice {
 
-    public var uuid: UUID {
+    var uuid: UUID {
         return self.family.uuid
     }
 
-    public var name: String {
+    var name: String {
         return self.family.familyName
     }
 
-    public var prefix: String {
+    var prefix: String {
         return self.family.prefix
+    }
+
+    public var connectableServices: [CBUUID] {
+        guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
+
+        func getServiceUuid() -> CBUUID {
+            let uuidSource = family.connectableSourceUuid
+            let uuidBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: 16)
+            uuidSource?.getBytes(uuidBytes)
+            for i in (0...11) {
+                uuidBytes[i] = uuidBytes[i + 4];
+            }
+            uuidBytes[13] = UInt8(major & 0x00ff)
+            uuidBytes[12] = UInt8((major & 0xff00) >> 8)
+            uuidBytes[15] = UInt8(minor & 0x00f0) | 0x04
+            uuidBytes[14] = UInt8((minor & 0xff00) >> 8)
+
+            return CBUUID(data: Data(bytes:uuidBytes, count:16))
+        }
+
+        return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { _ in getServiceUuid() }
     }
 
     // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
@@ -67,5 +88,24 @@ extension XYFinderDevice {
             proximityUUID: uuid,
             identifier: String(format:"%@:4", id))
     }
-    
+
+    @discardableResult func find() -> Promise<Void>? {
+        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult func stayAwake() -> Promise<Void>? {
+        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult func fallAsleep() -> Promise<Void>? {
+        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult func lock() -> Promise<Void>? {
+        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult func unlock() -> Promise<Void>? {
+        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    }
 }

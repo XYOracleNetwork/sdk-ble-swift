@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XyBleSdk
 
 final class InfoServicePanelView: UIView {
     @IBOutlet var contentView: InfoServicePanelView!
@@ -62,7 +63,10 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.find()?.then { _ in
+        device.find()?.catch { error in
+            guard let error = error as? XYBluetoothError else { return }
+            self.parent?.showErrorAlert(for: error)
+        }.always {
             self.parent?.showRefreshControl()
         }
     }
@@ -72,7 +76,10 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.stayAwake()?.then { _ in
+        device.stayAwake()?.catch { error in
+            guard let error = error as? XYBluetoothError else { return }
+            self.parent?.showErrorAlert(for: error)
+        }.always {
             self.parent?.showRefreshControl()
         }
     }
@@ -82,7 +89,10 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.fallAsleep()?.then { _ in
+        device.fallAsleep()?.catch { error in
+            guard let error = error as? XYBluetoothError else { return }
+            self.parent?.showErrorAlert(for: error)
+        }.always {
             self.parent?.showRefreshControl()
         }
     }
@@ -92,7 +102,10 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.lock()?.then { _ in
+        device.lock()?.catch { error in
+            guard let error = error as? XYBluetoothError else { return }
+            self.parent?.showErrorAlert(for: error)
+        }.always {
             self.parent?.showRefreshControl()
         }
     }
@@ -102,7 +115,10 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.unlock()?.then { _ in
+        device.unlock()?.catch { error in
+            guard let error = error as? XYBluetoothError else { return }
+            self.parent?.showErrorAlert(for: error)
+        }.always {
             self.parent?.showRefreshControl()
         }
     }

@@ -71,6 +71,12 @@ extension DeviceDetailViewController {
     func showRefreshControl() {
         self.navigationItem.rightBarButtonItem = self.refreshButton
     }
+
+    func showErrorAlert(for error: XYBluetoothError) {
+        let alert = UIAlertController(title: "Error", message: error.toString, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        self.present(alert, animated: true)
+    }
 }
 
 extension DeviceDetailViewController: UIPickerViewDataSource, UIPickerViewDelegate {

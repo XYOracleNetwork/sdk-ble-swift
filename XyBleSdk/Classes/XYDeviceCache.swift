@@ -7,6 +7,7 @@
 
 import CoreBluetooth
 
+// TODO cleanup with subscript
 class XYDeviceCache {
 
     public fileprivate(set) static var devices = [String: XYFinderDevice]()
