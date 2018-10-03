@@ -18,6 +18,7 @@ final class InfoServicePanelView: UIView {
     @IBOutlet weak var majorLabel: UILabel!
     @IBOutlet weak var minorLabel: UILabel!
     @IBOutlet weak var pulsesLabel: UILabel!
+    @IBOutlet weak var rssiLabel: UILabel!
 
     fileprivate weak var parent: DeviceDetailViewController?
 
@@ -47,7 +48,8 @@ final class InfoServicePanelView: UIView {
         self.familyLabel.text = device.family.familyName
         self.majorLabel.text = String(format:"0x%02X", device.iBeacon?.major ?? 0)
         self.minorLabel.text = String(format:"0x%02X", device.iBeacon?.minor ?? 0)
-        self.pulsesLabel.text = String(0)
+        self.pulsesLabel.text = String(device.totalPulseCount)
+        self.rssiLabel.text = String(device.rssi)
     }
 
     @IBAction func disconnectTapped(_ sender: Any) {
