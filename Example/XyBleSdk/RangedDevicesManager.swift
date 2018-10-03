@@ -44,6 +44,11 @@ class RangedDevicesManager: NSObject {
         }
     }
 
+    func stopRanging() {
+        guard central.state == .poweredOn else { return }
+        scanner.stop()
+    }
+
     func scan(for deviceIndex: NSInteger) {
         guard
             central.state == .poweredOn,

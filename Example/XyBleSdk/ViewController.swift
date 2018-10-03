@@ -22,6 +22,9 @@ class ViewController: UIViewController {
 
     fileprivate let rangedDevicesManager = RangedDevicesManager.instance
 
+    fileprivate var pauseButton: UIBarButtonItem?
+    fileprivate var playButton: UIBarButtonItem?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTable()
@@ -30,12 +33,28 @@ class ViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         rangedDevicesManager.setDelegate(self)
+        self.navigationItem.rightBarButtonItem = self.pauseButton
         rangedDevicesManager.startRanging()
     }
 
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         return identifier != ViewController.detailSegueIdentifier
     }
+
+}
+
+private extension ViewController {
+
+    @objc func pauseTapped() {
+        self.rangedDevicesManager.stopRanging()
+        self.navigationItem.rightBarButtonItem = self.playButton
+    }
+
+    @objc func playTapped() {
+        self.rangedDevicesManager.startRanging()
+        self.navigationItem.rightBarButtonItem = self.pauseButton
+    }
+
 }
 
 private extension ViewController {
@@ -60,6 +79,9 @@ private extension ViewController {
         imageView.image = image
         logoContainer.addSubview(imageView)
         navigationItem.titleView = logoContainer
+
+        self.pauseButton = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(pauseTapped))
+        self.playButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(playTapped))
     }
 }
 
