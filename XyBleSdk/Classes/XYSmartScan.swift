@@ -44,7 +44,6 @@ public class XYSmartScan {
 
     public func stop() {
         location.clearRanging()
-        // TODO clear tracked devices
     }
 
     public func setDelegate(_ delegate: XYSmartScanDelegate, key: String) {

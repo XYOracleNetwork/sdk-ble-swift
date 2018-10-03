@@ -11,13 +11,16 @@ import CoreBluetooth
 // A concrete base class to base any BLE device off of
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
-    fileprivate var firstPulseTime: Date?
-    fileprivate var lastPulseTime: Date?
+    fileprivate var
+    firstPulseTime: Date?,
+    lastPulseTime: Date?
+
     public fileprivate(set) var totalPulseCount = 0
 
-    public var
-    rssi: Int,
-    name: String = "",
+    public var rssi: Int
+
+    public let
+    name: String,
     id: String
 
     public internal(set) var peripheral: CBPeripheral?
@@ -30,6 +33,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.id = id
         self.rssi = rssi
+        self.name = ""
         super.init()
     }
 }
@@ -72,9 +76,9 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
             else { return false }
 
-        // TODO barf
         guard
             let connectableServices = (self as? XYFinderDevice)?.connectableServices,
+            connectableServices.count == 2,
             services.contains(connectableServices[0]) || services.contains(connectableServices[1])
             else { return false }
 

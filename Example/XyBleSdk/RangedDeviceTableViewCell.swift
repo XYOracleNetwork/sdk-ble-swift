@@ -38,8 +38,8 @@ class RangedDeviceTableViewCell: UITableViewCell {
     func populate(from directive: RangedDeviceCellDirective) {
         self.nameLabel.text = directive.name
         self.connectedLabel.text = directive.connected ? "Yes" : "No"
-        self.majorLabel.text = "\(directive.major)" //  String(format:"0x%02X", directive.major)
-        self.minorLabel.text = "\(directive.minor)" // String(format:"0x%02X", directive.minor)
+        self.majorLabel.text = String(format:"0x%02X", directive.major)
+        self.minorLabel.text = String(format:"0x%02X", directive.minor)
         self.rssiLabel.text = String(directive.rssi)
         self.pulsesLabel.text = String(directive.pulses)
     }

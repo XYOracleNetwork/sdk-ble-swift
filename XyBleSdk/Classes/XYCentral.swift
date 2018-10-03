@@ -53,7 +53,6 @@ public protocol XYCentralDelegate: class {
 // Singleton wrapper around CBCentral.
 public class XYCentral: NSObject {
 
-    // TODO weak refs
     fileprivate var delegates = [String: XYCentralDelegate?]()
     
     public static let instance = XYCentral()

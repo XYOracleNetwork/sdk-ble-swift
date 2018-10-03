@@ -129,4 +129,5 @@ extension XYLocation: CLLocationManagerDelegate {
     public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {
         return false
     }
+
 }
