@@ -20,6 +20,8 @@ public enum XYBluetoothError: Error {
     case peripheralDisconected(state: CBPeripheralState?)
     case cbPeripheralDelegateError(Error)
     case actionNotSupported
+    case couldNotConnect
+    case centralNotPoweredOn
 
     public var toString: String {
         switch self {
@@ -41,6 +43,10 @@ public enum XYBluetoothError: Error {
             return "Peripheral Delegate Error:\n\(error.localizedDescription)"
         case .actionNotSupported:
             return "Requested Action Not Supported"
+        case .couldNotConnect:
+            return "Could Not Connect"
+        case .centralNotPoweredOn:
+            return "Bluetooth is Off"
         }
     }
 }

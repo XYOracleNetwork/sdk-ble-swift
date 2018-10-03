@@ -59,26 +59,36 @@ public extension XYBluetoothDevice {
 
 }
 
-class XYConnectionAgent: XYCentralDelegate {
-    private let central = XYCentral.instance
-    private let delegateKey: String
+// A helper to allow for adding connecting to a peripheral to a connection() operation closure
+fileprivate final class XYConnectionAgent: XYCentralDelegate {
+    private let
+    central = XYCentral.instance,
+    delegateKey: String,
+    device: XYBluetoothDevice
+
+    private lazy var promise = Promise<Void>.pending()
 
     init(for device: XYBluetoothDevice) {
+        self.device = device
         self.delegateKey = "XYConnectionAgent:\(device.id)"
-        central.setDelegate(self, key: self.delegateKey)
-    }
-
-    deinit {
-        central.removeDelegate(for: self.delegateKey)
     }
 
     func connect() -> Promise<Void> {
-        print(delegateKey)
-        return Promise(())
+        guard self.device.peripheral?.state != .connected else { return Promise(()) }
+        central.setDelegate(self, key: self.delegateKey)
+        self.central.connect(to: device)
+        return promise
     }
 
-    func connected(peripheral: XYPeripheral) {}
-    func couldNotConnect(peripheral: XYPeripheral) {}
+    func connected(peripheral: XYPeripheral) {
+        central.removeDelegate(for: self.delegateKey)
+        promise.fulfill(())
+    }
+
+    func couldNotConnect(peripheral: XYPeripheral) {
+        central.removeDelegate(for: self.delegateKey)
+        promise.reject(XYBluetoothError.notConnected)
+    }
 
     // Unused in this single connection case
     func timeout() {}
@@ -91,15 +101,18 @@ class XYConnectionAgent: XYCentralDelegate {
 public extension XYBluetoothDevice {
 
     func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
-        guard
-            XYCentral.instance.state == .poweredOn,
-            self.peripheral?.state == .connected
-            else {
-                XYConnectionAgent(for: self).connect()
-                return Promise<Void>(XYBluetoothError.notConnected)
-            }
+        // Must have BTLE on to attempt a connection
+        guard XYCentral.instance.state == .poweredOn else {
+            return Promise<Void>(XYBluetoothError.centralNotPoweredOn)
+        }
 
-        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, operations)
+        // Process the queue, adding the connections agent if needed
+        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
+            if self.peripheral?.state != .connected {
+                try await(XYConnectionAgent(for: self).connect())
+            }
+            try operations()
+        })
     }
 
     func disconnect() {
