@@ -133,7 +133,7 @@ extension RangedDevicesManager: XYSmartScanDelegate {
                 }
             }
 
-            self.rangedDevices = rangedWithoutCurrent.sorted(by: { ($0.powerLevel, $0.family.rawValue, $0.id) > ($1.powerLevel, $1.family.rawValue, $1.id) } )
+            self.rangedDevices = rangedWithoutCurrent.sorted(by: { ($0.powerLevel, $0.rssi, $0.id) > ($1.powerLevel, $1.rssi, $1.id) } )
             self.delegate?.reloadTableView()
         }
     }
