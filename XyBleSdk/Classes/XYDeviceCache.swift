@@ -7,28 +7,37 @@
 
 import CoreBluetooth
 
-// TODO cleanup with subscript
+// Holds a cache for devices that have been found via the XYLocation manager. Use the .barrier flag
+// for best performance on writing/updating + reading
 class XYDeviceCache {
 
-    public fileprivate(set) static var devices = [String: XYFinderDevice]()
+    private var devices = [String: XYFinderDevice]()
+    private let accessQueue = DispatchQueue(label:"com.xyfindables.sdk.XYDeviceCacheQueue", attributes: .concurrent)
 
-    private static let lock = DispatchQueue(label:"com.xyfindables.sdk.XYDeviceCacheQueue")
-
-    class func add(_ device: XYFinderDevice) {
-        lock.sync {
-            guard self.devices[device.id] == nil else { return }
-            self.devices[device.id] = device
+    func remove(at index: String) {
+        self.accessQueue.async(flags: .barrier) {
+            self.devices.removeValue(forKey: index)
         }
     }
 
-    class func add(_ devices: [XYFinderDevice]) {
-        devices.forEach { self.add($0) }
+    var count: Int {
+        var count = 0
+        self.accessQueue.sync { count = self.devices.count }
+        return count
     }
 
-    class func update(_ device: XYFinderDevice, rssi: Int, powerLevel: UInt8) {
-        lock.sync {
-            self.devices[device.id]?.update(rssi, powerLevel: powerLevel)
+    subscript(index: String) -> XYFinderDevice? {
+        set {
+            self.accessQueue.async(flags: .barrier) {
+                self.devices[index] = newValue
+            }
+        }
+        get {
+            var device: XYFinderDevice?
+            self.accessQueue.sync {
+                device = self.devices[index]
+            }
+            return device
         }
     }
-
 }

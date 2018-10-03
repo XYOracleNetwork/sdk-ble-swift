@@ -11,12 +11,14 @@ import Foundation
 // Factory to build a flavored XYFinderDevice based on the inputs
 public class XYFinderDeviceFactory {
 
+    private static let deviceCache = XYDeviceCache()
+
     class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) -> XYFinderDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }
 
         var device: XYFinderDevice?
-        if let foundDevice = XYDeviceCache.devices[iBeacon.xyId(from: family)] {
-            XYDeviceCache.update(foundDevice, rssi: rssi, powerLevel: iBeacon.powerLevel)
+        if let foundDevice = deviceCache[iBeacon.xyId(from: family)] {
+            foundDevice.update(rssi, powerLevel: iBeacon.powerLevel)
             device = foundDevice
         } else {
             switch family {
@@ -33,7 +35,7 @@ public class XYFinderDeviceFactory {
             }
 
             if let device = device {
-                XYDeviceCache.add(device)
+                deviceCache[device.id] = device
             }
         }
 
