@@ -138,7 +138,8 @@ internal extension GattRequest {
             let peripheral = device.peripheral,
             peripheral.state == .connected
             else {
-                return Promise(XYBluetoothError.notConnected)
+                self.characteristicPromise.reject(XYBluetoothError.notConnected)
+                return self.characteristicPromise
             }
         
         self.device = device
@@ -179,8 +180,8 @@ private extension GattRequest {
             peripheral.state == .connected,
             let data = data.data
             else {
-                print("Gatt(set): write ERROR")
-                return Promise(XYBluetoothError.notConnected)
+                self.writePromise.reject(XYBluetoothError.notConnected)
+                return self.writePromise
             }
 
         print("Gatt(set): write")
@@ -194,20 +195,27 @@ private extension GattRequest {
 
 extension GattRequest: CBPeripheralDelegate {
 
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+    // Handles all service and characteristic common validation for delegate callbacks
+    private func serviceCharacteristicDelegateValidation(_ peripheral: CBPeripheral, error: Error?) -> Bool {
+        guard self.status != .disconnected || self.status != .timedOut else { return false }
 
         guard error == nil else {
             self.characteristicPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
-            return
+            return false
         }
 
         guard
             self.device?.peripheral == peripheral
             else {
                 self.characteristicPromise.reject(XYBluetoothError.mismatchedPeripheral)
-                return
-            }
+                return false
+        }
+
+        return true
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard serviceCharacteristicDelegateValidation(peripheral, error: error) else { return }
 
         guard
             let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.serviceUuid }).first
@@ -221,19 +229,7 @@ extension GattRequest: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
-
-        guard error == nil else {
-            self.characteristicPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
-            return
-        }
-
-        guard
-            self.device?.peripheral == peripheral
-            else {
-                self.characteristicPromise.reject(XYBluetoothError.mismatchedPeripheral)
-                return
-            }
+        guard serviceCharacteristicDelegateValidation(peripheral, error: error) else { return }
 
         guard
             let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristicUuid }).first
