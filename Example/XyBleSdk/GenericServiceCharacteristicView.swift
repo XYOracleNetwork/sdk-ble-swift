@@ -74,9 +74,11 @@ extension XYBluetoothResult {
         case .string:
             return self.asString
         case .integer:
-            return self.asInteger == nil ? "n/a" : "\(self.asInteger!)"
-        default:
-            return "n/a"
+            guard let intVal = self.asInteger else { return "n/a" }
+            return "\(intVal)"
+        case .byte:
+            guard let byteVal = self.asByteArray else { return "n/a" }
+            return byteVal.hexa
         }
     }
 }

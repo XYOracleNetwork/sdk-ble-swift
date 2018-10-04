@@ -45,6 +45,13 @@ extension Data {
     }
 }
 
+// Display a hex number from Data
+extension Collection where Iterator.Element == UInt8 {
+    public var hexa: String {
+        return map{ String(format: "%02X", $0) }.joined()
+    }
+}
+
 public extension XYBluetoothResult {
 
     var asString: String? {
@@ -55,6 +62,11 @@ public extension XYBluetoothResult {
     var asInteger: Int? {
         guard let data = self.data else { return nil }
         return data.to(type: Int.self)
+    }
+
+    var asByteArray: [UInt8]? {
+        guard let data = self.data else { return nil }
+        return Array(data)
     }
 
 }
