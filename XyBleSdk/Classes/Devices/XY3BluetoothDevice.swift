@@ -38,28 +38,33 @@ extension XY3BluetoothDevice: XYFinderDevice {
     }
 
     @discardableResult public func find() -> Promise<Void>? {
-        guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil }
         let song = Data(XYFinderSong.findIt.values(for: self.family))
-        return ControlService.buzzerSelect.set(to: self, value: XYBluetoothResult(data: song))
+        return self.connection {
+            _ = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
+        }
     }
 
     @discardableResult public func stayAwake() -> Promise<Void>? {
-        guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil  }
-        return ExtendedConfigService.registration.set(to: self, value: XYBluetoothResult(data: Data([0x01])))
+        return self.connection {
+            _ = self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x01])))
+        }
     }
 
     @discardableResult public func fallAsleep() -> Promise<Void>? {
-        guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil  }
-        return ExtendedConfigService.registration.set(to: self, value: XYBluetoothResult(data: Data([0x00])))
+        return self.connection {
+            _ = self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x00])))
+        }
     }
 
     @discardableResult public func lock() -> Promise<Void>? {
-        guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil  }
-        return BasicConfigService.lock.set(to: self, value: XYBluetoothResult(data: self.family.lockCode))
+        return self.connection {
+            _ = self.set(BasicConfigService.lock, value: XYBluetoothResult(data: self.family.lockCode))
+        }
     }
 
     @discardableResult public func unlock() -> Promise<Void>? {
-        guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil  }
-        return BasicConfigService.unlock.set(to: self, value: XYBluetoothResult(data: self.family.lockCode))
+        return self.connection {
+            _ = self.set(BasicConfigService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
+        }
     }
 }

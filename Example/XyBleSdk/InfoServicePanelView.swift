@@ -51,11 +51,7 @@ final class InfoServicePanelView: UIView {
         self.pulsesLabel.text = String(device.totalPulseCount)
         self.rssiLabel.text = String(device.rssi)
     }
-
-    @IBAction func disconnectTapped(_ sender: Any) {
-        self.rangedDevicesManager.disconnect()
-    }
-
+    
 }
 
 extension InfoServicePanelView {

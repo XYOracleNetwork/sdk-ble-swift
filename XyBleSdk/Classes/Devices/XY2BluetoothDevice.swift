@@ -38,9 +38,10 @@ extension XY2BluetoothDevice: XYFinderDevice {
     }
 
     @discardableResult public func find() -> Promise<Void>? {
-        guard let peripheral = self.peripheral, peripheral.state == .connected else { return nil }
         let song = Data(XYFinderSong.findIt.values(for: self.family))
-        return ControlService.buzzerSelect.set(to: self, value: XYBluetoothResult(data: song))
+        return self.connection {
+            _ = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
+        }
     }
 
 }
