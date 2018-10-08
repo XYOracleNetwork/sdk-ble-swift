@@ -26,7 +26,6 @@ public class XY2BluetoothDevice: XYBluetoothDeviceBase {
     public convenience init(_ iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.init(iBeacon.xyId(from: .xy2), iBeacon: iBeacon, rssi: rssi)
     }
-
 }
 
 extension XY2BluetoothDevice: XYFinderDevice {

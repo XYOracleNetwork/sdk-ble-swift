@@ -21,7 +21,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     var inRange: Bool { get }
 
     func disconnect()
-    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
+    @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult
     func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval?) -> XYBluetoothResult
@@ -100,7 +100,7 @@ fileprivate final class XYConnectionAgent: XYCentralDelegate {
 // MARK: Connecting to a device in order to complete a block of operations defined above, as well as disconnect from the peripheral
 public extension XYBluetoothDevice {
 
-    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
+    @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         // Must have BTLE on to attempt a connection
         guard XYCentral.instance.state == .poweredOn else {
             return Promise<Void>(XYBluetoothError.centralNotPoweredOn)

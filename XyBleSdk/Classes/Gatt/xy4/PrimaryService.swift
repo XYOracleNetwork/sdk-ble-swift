@@ -41,7 +41,14 @@ public enum PrimaryService: String, XYServiceCharacteristic {
         return PrimaryService.uuids[self]!
     }
 
-    public var characteristicType: XYServiceCharacteristicType { return .string }
+    public var characteristicType: XYServiceCharacteristicType {
+        switch self {
+        case .stayAwake, .major, .minor, .buttonState, .buzzer, .lastError, .uptime, .reset, .selfTest, .debug, .leftBehind:
+            return .integer
+        case .unlock, .lock, .uuid, .buzzerConfig, .adConfig, .buttonConfig, .eddystoneUID, .eddystoneURL, .eddystoneEID, .color, .hardwareCreateDate:
+            return .byte
+        }
+    }
 
     public var displayName: String {
         switch self {

@@ -8,6 +8,7 @@
 
 import UIKit
 import XyBleSdk
+import Promises
 
 final class InfoServicePanelView: UIView {
     @IBOutlet var contentView: InfoServicePanelView!
@@ -21,6 +22,9 @@ final class InfoServicePanelView: UIView {
     @IBOutlet weak var rssiLabel: UILabel!
 
     fileprivate weak var parent: DeviceDetailViewController?
+
+    @IBOutlet weak var stayAwakeButton: CommonButton!
+    @IBOutlet weak var fallAsleepButton: CommonButton!
 
     convenience init(frame: CGRect, parent: DeviceDetailViewController) {
         self.init(frame: frame)
@@ -50,22 +54,56 @@ final class InfoServicePanelView: UIView {
         self.minorLabel.text = String(format:"0x%02X", device.iBeacon?.minor ?? 0)
         self.pulsesLabel.text = String(device.totalPulseCount)
         self.rssiLabel.text = String(device.rssi)
+        updateStayAwakeButtonStates()
+    }
+
+    private func updateStayAwakeButtonStates() {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+
+        self.parent?.showRefreshing()
+
+        self.stayAwakeButton.isEnabled = false
+        self.fallAsleepButton.isEnabled = false
+
+        device.connection {
+            guard let value = device.get(PrimaryService.stayAwake).asInteger else { return }
+            DispatchQueue.main.async {
+                print("here!")
+                if value == 1 {
+                    self.stayAwakeButton.isEnabled = false
+                    self.fallAsleepButton.isEnabled = true
+                } else {
+                    self.stayAwakeButton.isEnabled = true
+                    self.fallAsleepButton.isEnabled = false
+                }
+            }
+        }.always {
+            self.parent?.showRefreshControl()
+        }
     }
     
 }
 
 extension InfoServicePanelView {
 
-    @IBAction func findTapped(_ sender: Any) {
-        guard
-            let device = self.rangedDevicesManager.selectedDevice
-            else { return }
+    private func wrapper(_ operation: () -> Promise<XYBluetoothResult>) {
         self.parent?.showRefreshing()
-        device.find().catch { error in
+        operation().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
             self.parent?.showRefreshControl()
+        }
+    }
+
+    @IBAction func findTapped(_ sender: Any) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+        wrapper {
+            device.find()
         }
     }
 
@@ -73,12 +111,8 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.stayAwake().catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper {
+            device.stayAwake()
         }
     }
 
@@ -86,12 +120,8 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.fallAsleep().catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper {
+            device.fallAsleep()
         }
     }
 
@@ -99,12 +129,8 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.lock().catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper {
+            device.lock()
         }
     }
 
@@ -112,12 +138,8 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.unlock().catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper {
+            device.unlock()
         }
     }
 
