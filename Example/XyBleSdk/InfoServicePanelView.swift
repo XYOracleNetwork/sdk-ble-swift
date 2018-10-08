@@ -29,6 +29,7 @@ final class InfoServicePanelView: UIView {
     convenience init(frame: CGRect, parent: DeviceDetailViewController) {
         self.init(frame: frame)
         self.parent = parent
+        self.parent?.showRefreshing()
     }
 
     override init(frame: CGRect) {
@@ -62,15 +63,12 @@ final class InfoServicePanelView: UIView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
 
-        self.parent?.showRefreshing()
-
         self.stayAwakeButton.isEnabled = false
         self.fallAsleepButton.isEnabled = false
 
         device.connection {
             guard let value = device.get(PrimaryService.stayAwake).asInteger else { return }
             DispatchQueue.main.async {
-                print("here!")
                 if value == 1 {
                     self.stayAwakeButton.isEnabled = false
                     self.fallAsleepButton.isEnabled = true
@@ -83,70 +81,76 @@ final class InfoServicePanelView: UIView {
             self.parent?.showRefreshControl()
         }
     }
-    
+
 }
 
 extension InfoServicePanelView {
 
-    private func wrapper(_ operation: () -> Promise<XYBluetoothResult>) {
+    private func wrapper(_ button: CommonButton, _ operation: () -> Promise<XYBluetoothResult>) {
         self.parent?.showRefreshing()
+        button.isEnabled = false
         operation().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
+            button.isEnabled = true
             self.parent?.showRefreshControl()
         }
     }
 
-    @IBAction func findTapped(_ sender: Any) {
+    @IBAction func findTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper {
+        wrapper(sender) {
             device.find()
         }
     }
 
-    @IBAction func stayAwakeTapped(_ sender: Any) {
+    @IBAction func stayAwakeTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper {
+        wrapper(sender)  {
             device.stayAwake()
         }
+
+        self.updateStayAwakeButtonStates()
     }
 
-    @IBAction func fallAsleep(_ sender: Any) {
+    @IBAction func fallAsleep(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper {
+        wrapper(sender)  {
             device.fallAsleep()
         }
+
+        self.updateStayAwakeButtonStates()
     }
 
-    @IBAction func lockTapped(_ sender: Any) {
+    @IBAction func lockTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper {
+        wrapper(sender)  {
             device.lock()
         }
     }
 
-    @IBAction func unlockTapped(_ sender: Any) {
+    @IBAction func unlockTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper {
+        wrapper(sender)  {
             device.unlock()
         }
     }
 
-    @IBAction func enableNotifyTapped(_ sender: Any) {
+    @IBAction func enableNotifyTapped(_ sender: CommonButton) {
     }
 
-    @IBAction func disableNotifyTapped(_ sender: Any) {
+    @IBAction func disableNotifyTapped(_ sender: CommonButton) {
     }
 
 }

@@ -39,7 +39,7 @@
                                 </userDefinedRuntimeAttribute>
                             </userDefinedRuntimeAttributes>
                             <connections>
-                                <action selector="findTapped:" destination="-1" eventType="touchUpInside" id="I8B-Bp-PMz"/>
+                                <action selector="findTapped:" destination="-1" eventType="touchUpInside" id="6H0-eQ-CJt"/>
                             </connections>
                         </button>
                         <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="c5a-NV-AQg">
