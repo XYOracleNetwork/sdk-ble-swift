@@ -61,7 +61,7 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.find()?.catch { error in
+        device.find().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
@@ -74,7 +74,7 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.stayAwake()?.catch { error in
+        device.stayAwake().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
@@ -87,7 +87,7 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.fallAsleep()?.catch { error in
+        device.fallAsleep().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
@@ -100,7 +100,7 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.lock()?.catch { error in
+        device.lock().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
@@ -113,7 +113,7 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         self.parent?.showRefreshing()
-        device.unlock()?.catch { error in
+        device.unlock().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {

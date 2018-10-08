@@ -37,34 +37,104 @@ extension XY3BluetoothDevice: XYFinderDevice {
         self.rssi = rssi
     }
 
-    @discardableResult public func find() -> Promise<Void>? {
+    @discardableResult public func find() -> Promise<XYBluetoothResult> {
         let song = Data(XYFinderSong.findIt.values(for: self.family))
-        return self.connection {
-            _ = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
+        let resultPromise = Promise<XYBluetoothResult>.pending()
+        var resultValue: XYBluetoothResult?
+        self.connection {
+            resultValue = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
+            }.then {
+                if let result = resultValue {
+                    if let error = result.error {
+                        resultPromise.reject(error)
+                    } else {
+                        resultPromise.fulfill(result)
+                    }
+                } else {
+                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                }
         }
+
+        return resultPromise
     }
 
-    @discardableResult public func stayAwake() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x01])))
+    @discardableResult public func stayAwake() -> Promise<XYBluetoothResult> {
+        let resultPromise = Promise<XYBluetoothResult>.pending()
+        var resultValue: XYBluetoothResult?
+        self.connection {
+            resultValue = self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x01])))
+            }.then {
+                if let result = resultValue {
+                    if let error = result.error {
+                        resultPromise.reject(error)
+                    } else {
+                        resultPromise.fulfill(result)
+                    }
+                } else {
+                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                }
         }
+
+        return resultPromise
     }
 
-    @discardableResult public func fallAsleep() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x00])))
+    @discardableResult public func fallAsleep() -> Promise<XYBluetoothResult> {
+        let resultPromise = Promise<XYBluetoothResult>.pending()
+        var resultValue: XYBluetoothResult?
+        self.connection {
+            resultValue = self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x00])))
+            }.then {
+                if let result = resultValue {
+                    if let error = result.error {
+                        resultPromise.reject(error)
+                    } else {
+                        resultPromise.fulfill(result)
+                    }
+                } else {
+                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                }
         }
+
+        return resultPromise
     }
 
-    @discardableResult public func lock() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(BasicConfigService.lock, value: XYBluetoothResult(data: self.family.lockCode))
+    @discardableResult public func lock() -> Promise<XYBluetoothResult> {
+        let resultPromise = Promise<XYBluetoothResult>.pending()
+        var resultValue: XYBluetoothResult?
+        self.connection {
+            resultValue = self.set(BasicConfigService.lock, value: XYBluetoothResult(data: self.family.lockCode))
+            }.then {
+                if let result = resultValue {
+                    if let error = result.error {
+                        resultPromise.reject(error)
+                    } else {
+                        resultPromise.fulfill(result)
+                    }
+                } else {
+                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                }
         }
+
+        return resultPromise
     }
 
-    @discardableResult public func unlock() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(BasicConfigService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
+    @discardableResult public func unlock() -> Promise<XYBluetoothResult> {
+        let resultPromise = Promise<XYBluetoothResult>.pending()
+        var resultValue: XYBluetoothResult?
+        self.connection {
+            resultValue = self.set(BasicConfigService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
+            }.then {
+                if let result = resultValue {
+                    if let error = result.error {
+                        resultPromise.reject(error)
+                    } else {
+                        resultPromise.fulfill(result)
+                    }
+                } else {
+                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                }
         }
+
+        return resultPromise
     }
 }

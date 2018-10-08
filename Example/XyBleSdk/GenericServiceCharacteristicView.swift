@@ -55,7 +55,8 @@ class GenericServiceCharacteristicView: UIView {
         }.always {
             self.parent?.showRefreshControl()
         }.catch { error in
-            print(error)
+            guard let error = error as? XYBluetoothError else { return }
+            self.parent?.showErrorAlert(for: error)
         }
     }
 
