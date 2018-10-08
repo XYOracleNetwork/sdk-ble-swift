@@ -11,7 +11,7 @@ import CoreBluetooth
 // for best performance on writing/updating + reading
 class XYDeviceCache {
 
-    private var devices = [String: XYFinderDevice]()
+    internal private(set) var devices = [String: XYFinderDevice]()
     private let accessQueue = DispatchQueue(label:"com.xyfindables.sdk.XYDeviceCacheQueue", attributes: .concurrent)
 
     func remove(at index: String) {

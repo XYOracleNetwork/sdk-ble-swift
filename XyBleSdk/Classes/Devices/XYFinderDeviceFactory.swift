@@ -13,6 +13,10 @@ public class XYFinderDeviceFactory {
 
     private static let deviceCache = XYDeviceCache()
 
+    public static var devices: [XYFinderDevice] {
+        return deviceCache.devices.map { $1 }
+    }
+
     // Create a device from an iBeacon definition, or update a cached device with the latest iBeacon/rssi data
     class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) -> XYFinderDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }
