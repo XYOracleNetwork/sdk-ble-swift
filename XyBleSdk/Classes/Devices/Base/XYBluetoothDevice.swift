@@ -12,7 +12,10 @@ import Promises
 // Use for notifying when a property that the client has subscribed to has changed
 public protocol XYBluetoothDeviceNotifyDelegate {
     func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
-    // Add for detected
+}
+
+public protocol XYBluetoothDeviceDelegate {
+    func detected(device: XYBluetoothDevice)
 }
 
 // A generic BLE device
@@ -29,12 +32,15 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
     func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String)
 
+    func getUpdates(_ delegate: XYBluetoothDeviceDelegate, for key: String)
+    func stopUpdates(for key: String)
+
     func subscribe(_ delegate: CBPeripheralDelegate, key: String)
     func unsubscribe(for key: String)
 
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
 
-    func detected()
+    func detected(_ signalStrength: Int)
 }
 
 // MARK: Methods to get or set a characteristic using the Promises-based connection work block method below

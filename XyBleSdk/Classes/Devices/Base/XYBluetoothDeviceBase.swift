@@ -25,8 +25,9 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public internal(set) var peripheral: CBPeripheral?
 
-    fileprivate var delegates = [String: CBPeripheralDelegate?]()
-    fileprivate var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
+    fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
+    fileprivate lazy var deviceDelegates = [String: XYBluetoothDeviceDelegate?]()
+    fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
     internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
 
@@ -40,6 +41,14 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
 // MARK: XYBluetoothDevice protocol base implementations
 extension XYBluetoothDeviceBase: XYBluetoothDevice {
+
+    public func getUpdates(_ delegate: XYBluetoothDeviceDelegate, for key: String) {
+        self.deviceDelegates[key] = delegate
+    }
+
+    public func stopUpdates(for key: String) {
+        self.deviceDelegates.removeValue(forKey: key)
+    }
 
     public var inRange: Bool {
         let strength = XYDeviceProximity.fromSignalStrength(self.rssi)
@@ -87,7 +96,8 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         return true
     }
 
-    public func detected() {
+    public func detected(_ newRssi: Int) {
+        self.rssi = newRssi
         self.totalPulseCount += 1
 
         if self.firstPulseTime == nil {
@@ -95,6 +105,8 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         }
 
         self.lastPulseTime = Date()
+
+        self.deviceDelegates.forEach { $1?.detected(device: self) }
     }
 
 }
@@ -126,6 +138,7 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        self.detected(Int(truncating: RSSI))
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }
     }
 }

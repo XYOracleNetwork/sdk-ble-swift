@@ -44,6 +44,8 @@ public class XYFinderDeviceFactory {
             }
         }
 
+        device?.detected(rssi)
+
         return device
     }
 

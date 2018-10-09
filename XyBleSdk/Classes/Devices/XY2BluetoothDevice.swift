@@ -31,9 +31,8 @@ public class XY2BluetoothDevice: XYBluetoothDeviceBase {
 extension XY2BluetoothDevice: XYFinderDevice {
 
     public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.detected()
+        super.detected(rssi)
         self.powerLevel = powerLevel
-        self.rssi = rssi
     }
 
     @discardableResult public func find() -> Promise<XYBluetoothResult> {
@@ -42,16 +41,16 @@ extension XY2BluetoothDevice: XYFinderDevice {
         var resultValue: XYBluetoothResult?
         self.connection {
             resultValue = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
-            }.then {
-                if let result = resultValue {
-                    if let error = result.error {
-                        resultPromise.reject(error)
-                    } else {
-                        resultPromise.fulfill(result)
-                    }
+        }.then {
+            if let result = resultValue {
+                if let error = result.error {
+                    resultPromise.reject(error)
                 } else {
-                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                    resultPromise.fulfill(result)
                 }
+            } else {
+                resultPromise.reject(XYBluetoothError.dataNotPresent)
+            }
         }
 
         return resultPromise

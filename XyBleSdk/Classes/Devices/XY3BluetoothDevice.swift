@@ -32,9 +32,8 @@ public class XY3BluetoothDevice: XYBluetoothDeviceBase {
 
 extension XY3BluetoothDevice: XYFinderDevice {
     public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.detected()
+        super.detected(rssi)
         self.powerLevel = powerLevel
-        self.rssi = rssi
     }
 
     @discardableResult public func find() -> Promise<XYBluetoothResult> {

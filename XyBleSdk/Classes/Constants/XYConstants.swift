@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum XYDeviceProximity : Int {
+public enum XYDeviceProximity: Int {
     case none
     case outOfRange
     case veryFar
