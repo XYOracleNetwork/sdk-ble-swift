@@ -81,25 +81,40 @@ fileprivate final class XYConnectionAgent: XYCentralDelegate {
 
     func connect() -> Promise<Void> {
         guard self.device.peripheral?.state != .connected else { return Promise(()) }
-        central.setDelegate(self, key: self.delegateKey)
-        self.central.connect(to: device)
+        self.central.setDelegate(self, key: self.delegateKey)
+
+        // TODO timeout?
+        if device.peripheral == nil {
+            self.central.scan()
+        } else {
+            self.central.connect(to: device)
+        }
+
         return promise
     }
 
     func connected(peripheral: XYPeripheral) {
-        central.removeDelegate(for: self.delegateKey)
+        self.central.removeDelegate(for: self.delegateKey)
         promise.fulfill(())
     }
 
     func couldNotConnect(peripheral: XYPeripheral) {
-        central.removeDelegate(for: self.delegateKey)
+        self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
+    }
+    
+    func located(peripheral: XYPeripheral) {
+        self.central.stopScan()
+        if self.device.attachPeripheral(peripheral) {
+            self.central.connect(to: device)
+        } else {
+            promise.reject(XYBluetoothError.couldNotConnect)
+        }
     }
 
     // Unused in this single connection case
     func timeout() {}
     func disconnected(periperhal: XYPeripheral) {}
-    func located(peripheral: XYPeripheral) {}
     func stateChanged(newState: CBManagerState) {}
 }
 
