@@ -51,10 +51,10 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     public var inRange: Bool {
+        if self.peripheral?.state == .connected { return true }
+
         let strength = XYDeviceProximity.fromSignalStrength(self.rssi)
         guard
-            let peripheral = self.peripheral,
-            peripheral.state == .connected,
             strength != .outOfRange && strength != .none
             else { return false }
 

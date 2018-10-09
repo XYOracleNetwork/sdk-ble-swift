@@ -104,11 +104,9 @@ fileprivate final class XYConnectionAgent: XYCentralDelegate {
     }
     
     func located(peripheral: XYPeripheral) {
-        self.central.stopScan()
         if self.device.attachPeripheral(peripheral) {
             self.central.connect(to: device)
-        } else {
-            promise.reject(XYBluetoothError.couldNotConnect)
+            self.central.stopScan()
         }
     }
 
