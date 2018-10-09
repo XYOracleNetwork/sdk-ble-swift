@@ -22,6 +22,7 @@ public protocol XYBluetoothDeviceDelegate {
 public protocol XYBluetoothDevice: XYBluetoothBase {
     var peripheral: CBPeripheral? { get }
     var inRange: Bool { get }
+    var connected: Bool { get }
 
     func disconnect()
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
@@ -45,6 +46,10 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
 
 // MARK: Methods to get or set a characteristic using the Promises-based connection work block method below
 public extension XYBluetoothDevice {
+
+    var connected: Bool {
+        return (self.peripheral?.state ?? .disconnected) == .connected
+    }
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
         do {

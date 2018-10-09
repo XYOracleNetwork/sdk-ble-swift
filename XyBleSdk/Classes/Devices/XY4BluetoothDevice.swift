@@ -141,16 +141,16 @@ extension XY4BluetoothDevice: XYFinderDevice {
         var resultValue: XYBluetoothResult?
         self.connection {
             resultValue = self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
-            }.then {
-                if let result = resultValue {
-                    if let error = result.error {
-                        resultPromise.reject(error)
-                    } else {
-                        resultPromise.fulfill(result)
-                    }
+        }.then {
+            if let result = resultValue {
+                if let error = result.error {
+                    resultPromise.reject(error)
                 } else {
-                    resultPromise.reject(XYBluetoothError.dataNotPresent)
+                    resultPromise.fulfill(result)
                 }
+            } else {
+                resultPromise.reject(XYBluetoothError.dataNotPresent)
+            }
         }
 
         return resultPromise
