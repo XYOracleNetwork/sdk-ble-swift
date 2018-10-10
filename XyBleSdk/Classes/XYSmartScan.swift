@@ -10,7 +10,7 @@ import Foundation
 
 public protocol XYSmartScanDelegate {
 //    func smartScan(status:cXYSmartScanStatus)
-    func smartScan(location: XYLocationCoordinate2D)
+    func smartScan(location: XYLocationCoordinate2D2)
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
     func smartScan(entered device: XYFinderDevice)
@@ -86,7 +86,7 @@ extension XYSmartScan {
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
 extension XYSmartScan: XYLocationDelegate {
 
-    public func locationsUpdated(_ locations: [XYLocationCoordinate2D]) {
+    public func locationsUpdated(_ locations: [XYLocationCoordinate2D2]) {
         locations.forEach { location in
             self.delegates.forEach { $1?.smartScan(location: location) }
         }

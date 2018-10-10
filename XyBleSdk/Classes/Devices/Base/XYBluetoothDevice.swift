@@ -24,7 +24,9 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     var inRange: Bool { get }
     var connected: Bool { get }
 
+    func connect()
     func disconnect()
+
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult
@@ -137,6 +139,10 @@ public extension XYBluetoothDevice {
             }
             try operations()
         })
+    }
+
+    func connect() {
+
     }
 
     func disconnect() {
