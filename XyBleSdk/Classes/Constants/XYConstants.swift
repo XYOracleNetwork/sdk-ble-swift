@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum XYDeviceProximity : Int {
+public enum XYDeviceProximity: Int {
     case none
     case outOfRange
     case veryFar
@@ -34,7 +34,7 @@ public enum XYFinderSong {
     case off
     case findIt
 
-    func values(for device: XYFinderDeviceFamily) -> [UInt8] {
+    public func values(for device: XYFinderDeviceFamily) -> [UInt8] {
         switch self {
         case .off:
             switch device {

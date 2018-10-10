@@ -26,22 +26,18 @@ public class XY2BluetoothDevice: XYBluetoothDeviceBase {
     public convenience init(_ iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
         self.init(iBeacon.xyId(from: .xy2), iBeacon: iBeacon, rssi: rssi)
     }
-
 }
 
 extension XY2BluetoothDevice: XYFinderDevice {
 
     public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.detected()
+        super.detected(rssi)
         self.powerLevel = powerLevel
-        self.rssi = rssi
     }
 
-    @discardableResult public func find() -> Promise<Void>? {
-        let song = Data(XYFinderSong.findIt.values(for: self.family))
-        return self.connection {
-            _ = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
-        }
+    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+        let songData = Data(song.values(for: self.family))
+        return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
     }
 
 }

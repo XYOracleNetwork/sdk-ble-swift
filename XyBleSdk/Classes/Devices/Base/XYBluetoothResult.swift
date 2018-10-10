@@ -31,6 +31,8 @@ public class XYBluetoothResult {
 
     public func setData(_ data: Data?) { self.data = data }
     public func setError(_ error: XYBluetoothError?) { self.error = error }
+
+    public var hasError: Bool { return error != nil }
 }
 
 // Simple extenstions to help translate Data -> String/Int

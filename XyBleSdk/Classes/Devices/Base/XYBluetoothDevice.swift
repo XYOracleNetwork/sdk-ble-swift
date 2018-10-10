@@ -12,16 +12,20 @@ import Promises
 // Use for notifying when a property that the client has subscribed to has changed
 public protocol XYBluetoothDeviceNotifyDelegate {
     func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
-    // Add for detected
+}
+
+public protocol XYBluetoothDeviceDelegate {
+    func detected(device: XYBluetoothDevice)
 }
 
 // A generic BLE device
 public protocol XYBluetoothDevice: XYBluetoothBase {
     var peripheral: CBPeripheral? { get }
     var inRange: Bool { get }
+    var connected: Bool { get }
 
     func disconnect()
-    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
+    @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult
     func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval?) -> XYBluetoothResult
@@ -29,16 +33,23 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
     func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String)
 
+    func getUpdates(_ delegate: XYBluetoothDeviceDelegate, for key: String)
+    func stopUpdates(for key: String)
+
     func subscribe(_ delegate: CBPeripheralDelegate, key: String)
     func unsubscribe(for key: String)
 
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
 
-    func detected()
+    func detected(_ signalStrength: Int)
 }
 
 // MARK: Methods to get or set a characteristic using the Promises-based connection work block method below
 public extension XYBluetoothDevice {
+
+    var connected: Bool {
+        return (self.peripheral?.state ?? .disconnected) == .connected
+    }
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
         do {
@@ -75,32 +86,45 @@ fileprivate final class XYConnectionAgent: XYCentralDelegate {
 
     func connect() -> Promise<Void> {
         guard self.device.peripheral?.state != .connected else { return Promise(()) }
-        central.setDelegate(self, key: self.delegateKey)
-        self.central.connect(to: device)
+        self.central.setDelegate(self, key: self.delegateKey)
+
+        // TODO timeout?
+        if device.peripheral == nil {
+            self.central.scan()
+        } else {
+            self.central.connect(to: device)
+        }
+
         return promise
     }
 
     func connected(peripheral: XYPeripheral) {
-        central.removeDelegate(for: self.delegateKey)
+        self.central.removeDelegate(for: self.delegateKey)
         promise.fulfill(())
     }
 
     func couldNotConnect(peripheral: XYPeripheral) {
-        central.removeDelegate(for: self.delegateKey)
+        self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
+    }
+    
+    func located(peripheral: XYPeripheral) {
+        if self.device.attachPeripheral(peripheral) {
+            self.central.connect(to: device)
+            self.central.stopScan()
+        }
     }
 
     // Unused in this single connection case
     func timeout() {}
     func disconnected(periperhal: XYPeripheral) {}
-    func located(peripheral: XYPeripheral) {}
     func stateChanged(newState: CBManagerState) {}
 }
 
 // MARK: Connecting to a device in order to complete a block of operations defined above, as well as disconnect from the peripheral
 public extension XYBluetoothDevice {
 
-    func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
+    @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         // Must have BTLE on to attempt a connection
         guard XYCentral.instance.state == .poweredOn else {
             return Promise<Void>(XYBluetoothError.centralNotPoweredOn)

@@ -14,4 +14,13 @@ public protocol XYBluetoothBase {
     var name: String { get }
     var id: String { get }
     var totalPulseCount: Int { get }
+    var proximity: XYDeviceProximity { get }
+}
+
+public extension XYBluetoothBase {
+
+    var proximity: XYDeviceProximity {
+        return XYDeviceProximity.fromSignalStrength(self.rssi)
+    }
+
 }

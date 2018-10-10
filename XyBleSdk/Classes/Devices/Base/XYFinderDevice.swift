@@ -21,11 +21,11 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var powerLevel: UInt8 { get }
 
     // Convenience methods for common operations
-    @discardableResult func find() -> Promise<Void>?
-    @discardableResult func stayAwake() -> Promise<Void>?
-    @discardableResult func fallAsleep() -> Promise<Void>?
-    @discardableResult func lock() -> Promise<Void>?
-    @discardableResult func unlock() -> Promise<Void>?
+    @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
+    @discardableResult func stayAwake() -> XYBluetoothResult
+    @discardableResult func fallAsleep() -> XYBluetoothResult
+    @discardableResult func lock() -> XYBluetoothResult
+    @discardableResult func unlock() -> XYBluetoothResult
 
     func update(_ rssi: Int, powerLevel: UInt8)
 }
@@ -89,23 +89,19 @@ public extension XYFinderDevice {
             identifier: String(format:"%@:4", id))
     }
 
-    @discardableResult func find() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    @discardableResult func stayAwake() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult func stayAwake() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    @discardableResult func fallAsleep() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult func fallAsleep() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    @discardableResult func lock() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult func lock() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult func unlock() -> Promise<Void>? {
-        return Promise<Void>(XYBluetoothError.actionNotSupported)
+    @discardableResult func unlock() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 }

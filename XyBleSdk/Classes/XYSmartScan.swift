@@ -95,6 +95,10 @@ extension XYSmartScan: XYLocationDelegate {
     public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
         guard let family = family else { return }
         beacons.forEach { beacon in
+            if beacon.inRange {
+//                self.delegates.forEach { $1?.smartScan(entered: beacon)}
+            }
+
             self.delegates.forEach { $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)}
         }
 

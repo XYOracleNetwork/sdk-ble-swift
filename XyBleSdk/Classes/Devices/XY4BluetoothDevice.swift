@@ -51,39 +51,28 @@ public class XY4BluetoothDevice: XYBluetoothDeviceBase {
 
 extension XY4BluetoothDevice: XYFinderDevice {
     public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.detected()
+        super.detected(rssi)
         self.powerLevel = powerLevel
-        self.rssi = rssi
     }
 
-    @discardableResult public func find() -> Promise<Void>? {
-        let song = Data(XYFinderSong.findIt.values(for: self.family))
-        return self.connection {
-            _ = self.set(PrimaryService.buzzer, value: XYBluetoothResult(data: song))
-        }
+    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+        let songData = Data(song.values(for: self.family))
+        return self.set(PrimaryService.buzzer, value: XYBluetoothResult(data: songData))
     }
 
-    @discardableResult public func stayAwake() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x01])))
-        }
+    @discardableResult public func stayAwake() -> XYBluetoothResult {
+        return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x01])))
     }
 
-    @discardableResult public func fallAsleep() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x00])))
-        }
+    @discardableResult public func fallAsleep() -> XYBluetoothResult {
+        return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x00])))
     }
 
-    @discardableResult public func lock() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(PrimaryService.lock, value: XYBluetoothResult(data: self.family.lockCode))
-        }
+    @discardableResult public func lock() -> XYBluetoothResult {
+        return self.set(PrimaryService.lock, value: XYBluetoothResult(data: self.family.lockCode))
     }
 
-    @discardableResult public func unlock() -> Promise<Void>? {
-        return self.connection {
-            _ = self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
-        }
+    @discardableResult public func unlock() -> XYBluetoothResult {
+        return self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
     }
 }

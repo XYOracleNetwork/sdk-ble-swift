@@ -12,11 +12,13 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InfoServicePanelView" customModule="XyBleSdk_Example" customModuleProvider="target">
             <connections>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Y77-l8-gCI"/>
+                <outlet property="fallAsleepButton" destination="YCq-AZ-I9T" id="rxZ-t3-FI2"/>
                 <outlet property="familyLabel" destination="eGp-67-QGv" id="Xwg-f4-cKo"/>
                 <outlet property="majorLabel" destination="xcU-2m-kRm" id="J1G-cF-iRY"/>
                 <outlet property="minorLabel" destination="JFt-Xl-pm8" id="8FB-on-aPB"/>
                 <outlet property="pulsesLabel" destination="o8H-kR-ol8" id="Ps6-f7-McZ"/>
                 <outlet property="rssiLabel" destination="Pf5-Jw-E34" id="Ber-WD-6dM"/>
+                <outlet property="stayAwakeButton" destination="szO-my-GU4" id="G0I-0X-Vxy"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -37,7 +39,7 @@
                                 </userDefinedRuntimeAttribute>
                             </userDefinedRuntimeAttributes>
                             <connections>
-                                <action selector="findTapped:" destination="-1" eventType="touchUpInside" id="I8B-Bp-PMz"/>
+                                <action selector="findTapped:" destination="-1" eventType="touchUpInside" id="6H0-eQ-CJt"/>
                             </connections>
                         </button>
                         <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="c5a-NV-AQg">

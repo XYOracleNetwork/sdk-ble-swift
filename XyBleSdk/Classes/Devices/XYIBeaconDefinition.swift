@@ -47,6 +47,34 @@ public struct XYIBeaconDefinition {
         return xyid
     }
 
+    public static func beacon(from xyId: String) -> XYIBeaconDefinition? {
+        let parts = xyId.components(separatedBy: ":")
+
+        if parts[safe: 1] == "near" {
+            guard let uuid = UUID(uuidString: "00000000-0000-0000-0000-000000000000") else { return nil }
+            return XYIBeaconDefinition(uuid: uuid, major: 0, minor: 0)
+        }
+
+        guard
+            parts.count == 3,
+            parts[safe: 0] == "xy"
+            else { return nil }
+
+        if parts[safe: 1] == "ibeacon" || parts[safe: 1] == "gps" || parts[safe: 1] == "mobiledevice" {
+            guard
+                let ids = parts[safe: 2]?.components(separatedBy: "."),
+                let first = ids[safe: 0], let second = ids[safe: 1], let third = ids[safe: 2],
+                let uuid = UUID(uuidString: first),
+                let major = UInt16(second, radix: 10),
+                let minor = UInt16(third, radix:10)
+                else { return nil }
+
+            return XYIBeaconDefinition(uuid: uuid, major: major, minor: minor)
+        }
+
+        return nil
+    }
+
     // Determines the power value from the minor, changed when a user presses the button on the finder
     public var powerLevel: UInt8 {
         guard

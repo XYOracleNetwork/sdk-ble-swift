@@ -8,6 +8,7 @@
 
 import UIKit
 import XyBleSdk
+import Promises
 
 final class InfoServicePanelView: UIView {
     @IBOutlet var contentView: InfoServicePanelView!
@@ -22,9 +23,13 @@ final class InfoServicePanelView: UIView {
 
     fileprivate weak var parent: DeviceDetailViewController?
 
+    @IBOutlet weak var stayAwakeButton: CommonButton!
+    @IBOutlet weak var fallAsleepButton: CommonButton!
+
     convenience init(frame: CGRect, parent: DeviceDetailViewController) {
         self.init(frame: frame)
         self.parent = parent
+        self.parent?.showRefreshing()
     }
 
     override init(frame: CGRect) {
@@ -50,81 +55,102 @@ final class InfoServicePanelView: UIView {
         self.minorLabel.text = String(format:"0x%02X", device.iBeacon?.minor ?? 0)
         self.pulsesLabel.text = String(device.totalPulseCount)
         self.rssiLabel.text = String(device.rssi)
+        updateStayAwakeButtonStates()
     }
-    
+
+    private func updateStayAwakeButtonStates() {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+
+        self.stayAwakeButton.isEnabled = false
+        self.fallAsleepButton.isEnabled = false
+
+        device.connection {
+            guard let value = device.get(PrimaryService.stayAwake).asInteger else { return }
+            DispatchQueue.main.async {
+                if value == 1 {
+                    self.stayAwakeButton.isEnabled = false
+                    self.fallAsleepButton.isEnabled = true
+                } else {
+                    self.stayAwakeButton.isEnabled = true
+                    self.fallAsleepButton.isEnabled = false
+                }
+            }
+        }.always {
+            self.parent?.showRefreshControl()
+        }
+    }
+
 }
 
 extension InfoServicePanelView {
 
-    @IBAction func findTapped(_ sender: Any) {
-        guard
-            let device = self.rangedDevicesManager.selectedDevice
-            else { return }
+    private func wrapper(_ button: CommonButton, _ operation: () -> Promise<XYBluetoothResult>) {
         self.parent?.showRefreshing()
-        device.find()?.catch { error in
+        button.isEnabled = false
+        operation().catch { error in
             guard let error = error as? XYBluetoothError else { return }
             self.parent?.showErrorAlert(for: error)
         }.always {
+            button.isEnabled = true
             self.parent?.showRefreshControl()
         }
     }
 
-    @IBAction func stayAwakeTapped(_ sender: Any) {
+    @IBAction func findTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.stayAwake()?.catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper(sender) {
+            device.find()
         }
     }
 
-    @IBAction func fallAsleep(_ sender: Any) {
+    @IBAction func stayAwakeTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.fallAsleep()?.catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper(sender)  {
+            device.stayAwake()
         }
+
+        self.updateStayAwakeButtonStates()
     }
 
-    @IBAction func lockTapped(_ sender: Any) {
+    @IBAction func fallAsleep(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.lock()?.catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper(sender)  {
+            device.fallAsleep()
         }
+
+        self.updateStayAwakeButtonStates()
     }
 
-    @IBAction func unlockTapped(_ sender: Any) {
+    @IBAction func lockTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        self.parent?.showRefreshing()
-        device.unlock()?.catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
-        }.always {
-            self.parent?.showRefreshControl()
+        wrapper(sender)  {
+            device.lock()
         }
     }
 
-    @IBAction func enableNotifyTapped(_ sender: Any) {
+    @IBAction func unlockTapped(_ sender: CommonButton) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+        wrapper(sender)  {
+            device.unlock()
+        }
     }
 
-    @IBAction func disableNotifyTapped(_ sender: Any) {
+    @IBAction func enableNotifyTapped(_ sender: CommonButton) {
+    }
+
+    @IBAction func disableNotifyTapped(_ sender: CommonButton) {
     }
 
 }
