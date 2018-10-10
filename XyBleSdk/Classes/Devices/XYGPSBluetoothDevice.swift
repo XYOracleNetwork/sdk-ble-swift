@@ -35,24 +35,8 @@ extension XYGPSBluetoothDevice: XYFinderDevice {
         self.powerLevel = powerLevel
     }
 
-    @discardableResult public func find() -> Promise<XYBluetoothResult> {
-        let song = Data(XYFinderSong.findIt.values(for: self.family))
-        let resultPromise = Promise<XYBluetoothResult>.pending()
-        var resultValue: XYBluetoothResult?
-        self.connection {
-            resultValue = self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: song))
-            }.then {
-                if let result = resultValue {
-                    if let error = result.error {
-                        resultPromise.reject(error)
-                    } else {
-                        resultPromise.fulfill(result)
-                    }
-                } else {
-                    resultPromise.reject(XYBluetoothError.dataNotPresent)
-                }
-        }
-
-        return resultPromise
+    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+        let songData = Data(song.values(for: self.family))
+        return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
     }
 }

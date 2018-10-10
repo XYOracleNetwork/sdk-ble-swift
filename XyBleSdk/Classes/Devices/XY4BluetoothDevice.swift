@@ -55,104 +55,24 @@ extension XY4BluetoothDevice: XYFinderDevice {
         self.powerLevel = powerLevel
     }
 
-    @discardableResult public func find() -> Promise<XYBluetoothResult> {
-        let song = Data(XYFinderSong.findIt.values(for: self.family))
-        let resultPromise = Promise<XYBluetoothResult>.pending()
-        var resultValue: XYBluetoothResult?
-        self.connection {
-            resultValue = self.set(PrimaryService.buzzer, value: XYBluetoothResult(data: song))
-            }.then {
-                if let result = resultValue {
-                    if let error = result.error {
-                        resultPromise.reject(error)
-                    } else {
-                        resultPromise.fulfill(result)
-                    }
-                } else {
-                    resultPromise.reject(XYBluetoothError.dataNotPresent)
-                }
-        }
-
-        return resultPromise
+    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+        let songData = Data(song.values(for: self.family))
+        return self.set(PrimaryService.buzzer, value: XYBluetoothResult(data: songData))
     }
 
-    @discardableResult public func stayAwake() -> Promise<XYBluetoothResult> {
-        let resultPromise = Promise<XYBluetoothResult>.pending()
-        var resultValue: XYBluetoothResult?
-        self.connection {
-            resultValue = self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x01])))
-        }.then {
-            if let result = resultValue {
-                if let error = result.error {
-                    resultPromise.reject(error)
-                } else {
-                    resultPromise.fulfill(result)
-                }
-            } else {
-                resultPromise.reject(XYBluetoothError.dataNotPresent)
-            }
-        }
-
-        return resultPromise
+    @discardableResult public func stayAwake() -> XYBluetoothResult {
+        return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x01])))
     }
 
-    @discardableResult public func fallAsleep() -> Promise<XYBluetoothResult> {
-        let resultPromise = Promise<XYBluetoothResult>.pending()
-        var resultValue: XYBluetoothResult?
-        self.connection {
-            resultValue = self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x00])))
-            }.then {
-                if let result = resultValue {
-                    if let error = result.error {
-                        resultPromise.reject(error)
-                    } else {
-                        resultPromise.fulfill(result)
-                    }
-                } else {
-                    resultPromise.reject(XYBluetoothError.dataNotPresent)
-                }
-        }
-
-        return resultPromise
+    @discardableResult public func fallAsleep() -> XYBluetoothResult {
+        return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x00])))
     }
 
-    @discardableResult public func lock() -> Promise<XYBluetoothResult> {
-        let resultPromise = Promise<XYBluetoothResult>.pending()
-        var resultValue: XYBluetoothResult?
-        self.connection {
-            resultValue = self.set(PrimaryService.lock, value: XYBluetoothResult(data: self.family.lockCode))
-            }.then {
-                if let result = resultValue {
-                    if let error = result.error {
-                        resultPromise.reject(error)
-                    } else {
-                        resultPromise.fulfill(result)
-                    }
-                } else {
-                    resultPromise.reject(XYBluetoothError.dataNotPresent)
-                }
-        }
-
-        return resultPromise
+    @discardableResult public func lock() -> XYBluetoothResult {
+        return self.set(PrimaryService.lock, value: XYBluetoothResult(data: self.family.lockCode))
     }
 
-    @discardableResult public func unlock() -> Promise<XYBluetoothResult> {
-        let resultPromise = Promise<XYBluetoothResult>.pending()
-        var resultValue: XYBluetoothResult?
-        self.connection {
-            resultValue = self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
-        }.then {
-            if let result = resultValue {
-                if let error = result.error {
-                    resultPromise.reject(error)
-                } else {
-                    resultPromise.fulfill(result)
-                }
-            } else {
-                resultPromise.reject(XYBluetoothError.dataNotPresent)
-            }
-        }
-
-        return resultPromise
+    @discardableResult public func unlock() -> XYBluetoothResult {
+        return self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
     }
 }

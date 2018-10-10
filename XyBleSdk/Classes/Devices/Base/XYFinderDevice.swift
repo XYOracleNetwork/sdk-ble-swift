@@ -21,11 +21,11 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var powerLevel: UInt8 { get }
 
     // Convenience methods for common operations
-    @discardableResult func find() -> Promise<XYBluetoothResult>
-    @discardableResult func stayAwake() -> Promise<XYBluetoothResult>
-    @discardableResult func fallAsleep() -> Promise<XYBluetoothResult>
-    @discardableResult func lock() -> Promise<XYBluetoothResult>
-    @discardableResult func unlock() -> Promise<XYBluetoothResult>
+    @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
+    @discardableResult func stayAwake() -> XYBluetoothResult
+    @discardableResult func fallAsleep() -> XYBluetoothResult
+    @discardableResult func lock() -> XYBluetoothResult
+    @discardableResult func unlock() -> XYBluetoothResult
 
     func update(_ rssi: Int, powerLevel: UInt8)
 }
@@ -89,28 +89,19 @@ public extension XYFinderDevice {
             identifier: String(format:"%@:4", id))
     }
 
-    @discardableResult func find() -> Promise<XYBluetoothResult> {
-        let result = XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        return Promise<XYBluetoothResult>(result)
+    @discardableResult func stayAwake() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult func stayAwake() -> Promise<XYBluetoothResult> {
-        let result = XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        return Promise<XYBluetoothResult>(result)
+    @discardableResult func fallAsleep() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult func fallAsleep() -> Promise<XYBluetoothResult> {
-        let result = XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        return Promise<XYBluetoothResult>(result)
+    @discardableResult func lock() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult func lock() -> Promise<XYBluetoothResult> {
-        let result = XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        return Promise<XYBluetoothResult>(result)
-    }
-
-    @discardableResult func unlock() -> Promise<XYBluetoothResult> {
-        let result = XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        return Promise<XYBluetoothResult>(result)
+    @discardableResult func unlock() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 }
