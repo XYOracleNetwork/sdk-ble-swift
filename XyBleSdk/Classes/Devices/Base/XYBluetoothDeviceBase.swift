@@ -26,6 +26,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     public internal(set) var peripheral: CBPeripheral?
 
     fileprivate var connectionAgent: XYConnectionAgent?
+    fileprivate var stayConnected: Bool = false
 
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var deviceDelegates = [String: XYBluetoothDeviceDelegate?]()
@@ -112,7 +113,13 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     // Connects to the device if requested, and the device is both not trying to connect or already has connected
-    public func connect() {
+    public func stayConnected(_ value: Bool) {
+        self.stayConnected = value
+        self.stayConnected ? connect() : disconnect()
+    }
+
+    // TODO this seems really lame, check as to why we need this value above, must be a better way to handle this
+    private func connect() {
         XYBluetoothDeviceBase.workQueue.sync {
             guard self.connectionAgent == nil, self.peripheral == nil else { return }
             self.connectionAgent = XYConnectionAgent(for: self)
