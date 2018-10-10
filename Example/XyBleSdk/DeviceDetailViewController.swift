@@ -34,10 +34,6 @@ class DeviceDetailViewController: UIViewController {
         self.servicePicker.dataSource = self
     }
 
-    @IBAction func findTapped(_ sender: Any) {
-        _ = self.rangedDevicesManager.selectedDevice?.find()
-    }
-
     override func viewWillAppear(_ animated: Bool) {
         self.currentPanelView = InfoServicePanelView(
             frame: CGRect(x: 0, y: 0, width: panelContainerView.frame.width, height: panelContainerView.frame.height),

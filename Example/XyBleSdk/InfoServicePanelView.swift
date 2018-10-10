@@ -86,12 +86,21 @@ final class InfoServicePanelView: UIView {
 
 extension InfoServicePanelView {
 
-    private func wrapper(_ button: CommonButton, _ operation: () -> Promise<XYBluetoothResult>) {
+    private func wrapper(_ button: CommonButton, _ operation: @escaping () -> XYBluetoothResult) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+
         self.parent?.showRefreshing()
         button.isEnabled = false
-        operation().catch { error in
-            guard let error = error as? XYBluetoothError else { return }
-            self.parent?.showErrorAlert(for: error)
+
+        var result: XYBluetoothResult?
+        device.connection {
+            result = operation()
+        }.then {
+            if let error = result?.error {
+                self.parent?.showErrorAlert(for: error)
+            }
         }.always {
             button.isEnabled = true
             self.parent?.showRefreshControl()
@@ -103,7 +112,7 @@ extension InfoServicePanelView {
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
         wrapper(sender) {
-            device.find()
+            device.find(.findIt)
         }
     }
 
