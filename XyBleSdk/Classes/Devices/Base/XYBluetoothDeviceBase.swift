@@ -25,6 +25,8 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public internal(set) var peripheral: CBPeripheral?
 
+    fileprivate var connectionAgent: XYConnectionAgent?
+
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var deviceDelegates = [String: XYBluetoothDeviceDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
@@ -109,6 +111,16 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         self.deviceDelegates.forEach { $1?.detected(device: self) }
     }
 
+    // Connects to the device if requested, and the device is both not trying to connect or already has connected
+    public func connect() {
+        XYBluetoothDeviceBase.workQueue.sync {
+            guard self.connectionAgent == nil, self.peripheral == nil else { return }
+            self.connectionAgent = XYConnectionAgent(for: self)
+            self.connectionAgent?.connect().then {
+                self.connectionAgent = nil
+            }
+        }
+    }
 }
 
 // MARK: CBPeripheralDelegate, passes these on to delegate subscribers for this peripheral

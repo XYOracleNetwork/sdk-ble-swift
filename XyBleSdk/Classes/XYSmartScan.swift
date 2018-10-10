@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol XYSmartScanDelegate {
+public protocol XYSmartScan2Delegate {
 //    func smartScan(status:cXYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D2)
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
@@ -19,11 +19,11 @@ public protocol XYSmartScanDelegate {
 //    func smartScan(updated device:XYBluetoothDevice)
 }
 
-public class XYSmartScan {
+public class XYSmartScan2 {
 
-    public static let instance = XYSmartScan()
+    public static let instance = XYSmartScan2()
 
-    fileprivate var delegates = [String: XYSmartScanDelegate?]()
+    fileprivate var delegates = [String: XYSmartScan2Delegate?]()
 
     fileprivate var trackedDevices = [String: XYFinderDevice]()
 
@@ -46,7 +46,7 @@ public class XYSmartScan {
         location.clearRanging()
     }
 
-    public func setDelegate(_ delegate: XYSmartScanDelegate, key: String) {
+    public func setDelegate(_ delegate: XYSmartScan2Delegate, key: String) {
         self.delegates[key] = delegate
     }
 
@@ -56,7 +56,7 @@ public class XYSmartScan {
 }
 
 // MARK: Tracking wranglers for known devices
-extension XYSmartScan {
+extension XYSmartScan2 {
 
     func startTracking(for device: XYFinderDevice) {
         guard trackedDevices[device.id] == nil else { return }
@@ -84,7 +84,7 @@ extension XYSmartScan {
 }
 
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
-extension XYSmartScan: XYLocationDelegate {
+extension XYSmartScan2: XYLocationDelegate {
 
     public func locationsUpdated(_ locations: [XYLocationCoordinate2D2]) {
         locations.forEach { location in

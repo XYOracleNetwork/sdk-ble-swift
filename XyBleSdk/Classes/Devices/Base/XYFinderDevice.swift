@@ -45,7 +45,7 @@ public extension XYFinderDevice {
         return self.family.prefix
     }
 
-    public var connectableServices: [CBUUID] {
+    var connectableServices: [CBUUID] {
         guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
 
         func getServiceUuid() -> CBUUID {

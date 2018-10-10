@@ -73,7 +73,7 @@ public extension XYBluetoothDevice {
 }
 
 // A helper to allow for adding connecting to a peripheral to a connection() operation closure
-fileprivate final class XYConnectionAgent: XYCentralDelegate {
+internal final class XYConnectionAgent: XYCentralDelegate {
     private let
     central = XYCentral.instance,
     delegateKey: String,
@@ -86,7 +86,7 @@ fileprivate final class XYConnectionAgent: XYCentralDelegate {
         self.delegateKey = "XYConnectionAgent:\(device.id)"
     }
 
-    func connect() -> Promise<Void> {
+    @discardableResult func connect() -> Promise<Void> {
         guard self.device.peripheral?.state != .connected else { return Promise(()) }
         self.central.setDelegate(self, key: self.delegateKey)
 
@@ -141,15 +141,10 @@ public extension XYBluetoothDevice {
         })
     }
 
-    func connect() {
-
-    }
-
     func disconnect() {
         let central = XYCentral.instance
         central.disconnect(from: self)
     }
-
 }
 
 // MARK: Allows the client to subscribe to a characteristic of a service on the device and receive udpates via the delegate
