@@ -7,26 +7,26 @@
 
 import Foundation
 
-public typealias XYFinderDeviceEventNotifier = (_ event: XYFinderEvent) -> Void
+public typealias XYFinderDeviceEventNotifier = (_ event: XYFinderEventNotification) -> Void
 
 // TODO Make Threadsafe
 public class XYFinderDeviceEventManager {
 
-    fileprivate static var handlerRegistry = [Int: [(referenceKey: String, handler: XYFinderDeviceEventNotifier)]]()
+    fileprivate static var handlerRegistry = [XYFinderEvent: [(referenceKey: String, handler: XYFinderDeviceEventNotifier)]]()
 
-    public static func report(event: XYFinderEvent) {
-        handlerRegistry[event.index]?.forEach { key, handler in
-            handler(event)
+    public static func report(events: [XYFinderEventNotification]) {
+        events.forEach { event in
+            handlerRegistry[event.toEvent]?.forEach { $0.handler(event) }
         }
     }
 
     public static func subscribe(to events: [XYFinderEvent], handler: @escaping XYFinderDeviceEventNotifier) -> String {
         let referenceKey = UUID.init().uuidString
         events.forEach { event in
-            if handlerRegistry[event.index] == nil {
-                handlerRegistry[event.index] = [(referenceKey, handler)]
+            if handlerRegistry[event] == nil {
+                handlerRegistry[event] = [(referenceKey, handler)]
             } else {
-                handlerRegistry[event.index]?.append((referenceKey, handler))
+                handlerRegistry[event]?.append((referenceKey, handler))
             }
         }
 
@@ -35,8 +35,8 @@ public class XYFinderDeviceEventManager {
 
     public static func unsubscribe(to events: [XYFinderEvent], referenceKey: String) {
         events.forEach { event in
-            let updatedArray = handlerRegistry[event.index]?.filter { $0.referenceKey != referenceKey }
-            handlerRegistry[event.index] = updatedArray
+            let updatedArray = handlerRegistry[event]?.filter { $0.referenceKey != referenceKey }
+            handlerRegistry[event] = updatedArray
         }
     }
 

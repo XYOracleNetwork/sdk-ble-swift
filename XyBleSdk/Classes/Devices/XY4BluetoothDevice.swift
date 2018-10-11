@@ -50,9 +50,17 @@ public class XY4BluetoothDevice: XYBluetoothDeviceBase {
 }
 
 extension XY4BluetoothDevice: XYFinderDevice {
+
+    // TODO deal with distance and keep connected
     public func update(_ rssi: Int, powerLevel: UInt8) {
         super.detected(rssi)
         self.powerLevel = powerLevel
+        XYFinderDeviceEventManager.report(events: [
+            .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
+            .updated(device: self)])
+        if stayConnected && connected == false {
+            self.connect()
+        }
     }
 
     @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {

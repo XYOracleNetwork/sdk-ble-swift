@@ -26,7 +26,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     public internal(set) var peripheral: CBPeripheral?
 
     fileprivate var connectionAgent: XYConnectionAgent?
-    fileprivate var stayConnected: Bool = false
+    internal var stayConnected: Bool = false
 
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
@@ -108,7 +108,7 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     // TODO this seems really lame, check as to why we need this value above, must be a better way to handle this
-    private func connect() {
+    internal func connect() {
         XYBluetoothDeviceBase.workQueue.sync {
             guard self.connectionAgent == nil, self.peripheral == nil else { return }
             self.connectionAgent = XYConnectionAgent(for: self)
@@ -145,6 +145,7 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
 
+    // TODO Need to keep pinging this every 3 seconds
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
         self.detected(Int(truncating: RSSI))
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }

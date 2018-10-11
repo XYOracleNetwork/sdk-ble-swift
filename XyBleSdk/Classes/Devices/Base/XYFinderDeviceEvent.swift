@@ -7,19 +7,50 @@
 
 import Foundation
 
-public enum XYFinderEvent {
-    case connected
+public enum XYFinderEvent: Int {
+    case connected = 0
     case disconnected
-    case buttonPressed // type
-    case buttonRecentlyPressed // type
-    case detected // power signal distance
+    case buttonPressed
+    case buttonRecentlyPressed
+    case detected
     case exiting
     case exited
     case updated
 
-    internal var index: Int {
-        return XYFinderEvent.values.index(of: self)!
-    }
+//    var toString: String {
+//        switch self {
+//        case .connected: return "connected"
+//        case .disconnected: return "disconnected"
+//        case .buttonPressed: return "buttonPressed"
+//        case .buttonRecentlyPressed: return "buttonRecentlyPressed"
+//        case .detected: return "detected"
+//        case .exiting: return "exiting"
+//        case .exited: return "exited"
+//        case .updated: return "updated"
+//        }
+//    }
+}
 
-    private static let values = [connected, disconnected, buttonPressed, buttonRecentlyPressed, detected, exiting, exited, updated]
+public enum XYFinderEventNotification {
+    case connected(device: XYFinderDevice)
+    case disconnected(device: XYFinderDevice)
+    case buttonPressed(device: XYFinderDevice) // type
+    case buttonRecentlyPressed(device: XYFinderDevice) // type
+    case detected(device: XYFinderDevice, powerLevel: Int, signalStrength: Int, distance: Double)
+    case exiting(device: XYFinderDevice)
+    case exited(device: XYFinderDevice)
+    case updated(device: XYFinderDevice)
+
+    var toEvent: XYFinderEvent {
+        switch self {
+        case .connected: return .connected
+        case .disconnected: return .disconnected
+        case .buttonPressed: return .buttonPressed
+        case .buttonRecentlyPressed: return .buttonRecentlyPressed
+        case .detected: return .detected
+        case .exiting: return .exiting
+        case .exited: return .exited
+        case .updated: return .updated
+        }
+    }
 }
