@@ -11,7 +11,7 @@ import Foundation
 // Factory to build a flavored XYFinderDevice based on the inputs
 public class XYFinderDeviceFactory {
 
-    private static let deviceCache = XYDeviceCache()
+    internal static let deviceCache = XYDeviceCache()
 
     public static var devices: [XYFinderDevice] {
         return deviceCache.devices.map { $1 }

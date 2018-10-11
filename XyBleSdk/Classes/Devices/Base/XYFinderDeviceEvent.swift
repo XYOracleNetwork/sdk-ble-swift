@@ -16,4 +16,10 @@ public enum XYFinderEvent {
     case exiting
     case exited
     case updated
+
+    internal var index: Int {
+        return XYFinderEvent.values.index(of: self)!
+    }
+
+    private static let values = [connected, disconnected, buttonPressed, buttonRecentlyPressed, detected, exiting, exited, updated]
 }
