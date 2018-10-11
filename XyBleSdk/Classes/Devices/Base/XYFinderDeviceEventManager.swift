@@ -33,9 +33,10 @@ public class XYFinderDeviceEventManager {
         return referenceKey
     }
 
-    public static func unsubscribe(to events: [XYFinderEvent], referenceKey: String) {
+    public static func unsubscribe(to events: [XYFinderEvent], referenceKey: String?) {
+        guard let key = referenceKey else { return }
         events.forEach { event in
-            let updatedArray = handlerRegistry[event]?.filter { $0.referenceKey != referenceKey }
+            let updatedArray = handlerRegistry[event]?.filter { $0.referenceKey != key }
             handlerRegistry[event] = updatedArray
         }
     }
