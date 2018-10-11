@@ -18,7 +18,7 @@ protocol RangedDevicesManagerDelegate: class {
 class RangedDevicesManager: NSObject {
 
     fileprivate let central = XYCentral.instance
-    fileprivate let scanner = XYSmartScan.instance
+    fileprivate let scanner = XYSmartScan2.instance
 
     fileprivate(set) var rangedDevices = [XYFinderDevice]()
     fileprivate(set) var selectedDevice: XYFinderDevice?
@@ -121,8 +121,8 @@ extension RangedDevicesManager: XYCentralDelegate {
 
 }
 
-extension RangedDevicesManager: XYSmartScanDelegate {
-    func smartScan(location: XYLocationCoordinate2D) {}
+extension RangedDevicesManager: XYSmartScan2Delegate {
+    func smartScan(location: XYLocationCoordinate2D2) {}
 
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
 

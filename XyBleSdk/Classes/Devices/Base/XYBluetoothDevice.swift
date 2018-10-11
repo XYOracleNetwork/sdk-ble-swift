@@ -14,10 +14,6 @@ public protocol XYBluetoothDeviceNotifyDelegate {
     func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult)
 }
 
-public protocol XYBluetoothDeviceDelegate {
-    func detected(device: XYBluetoothDevice)
-}
-
 // A generic BLE device
 public protocol XYBluetoothDevice: XYBluetoothBase {
     var peripheral: CBPeripheral? { get }
@@ -34,9 +30,6 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
 
     func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
     func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String)
-
-    func getUpdates(_ delegate: XYBluetoothDeviceDelegate, for key: String)
-    func stopUpdates(for key: String)
 
     func subscribe(_ delegate: CBPeripheralDelegate, key: String)
     func unsubscribe(for key: String)

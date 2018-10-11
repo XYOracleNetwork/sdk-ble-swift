@@ -29,7 +29,6 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     fileprivate var stayConnected: Bool = false
 
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
-    fileprivate lazy var deviceDelegates = [String: XYBluetoothDeviceDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
     internal static let workQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothDevice.OperationsQueue")
@@ -44,14 +43,6 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
 // MARK: XYBluetoothDevice protocol base implementations
 extension XYBluetoothDeviceBase: XYBluetoothDevice {
-
-    public func getUpdates(_ delegate: XYBluetoothDeviceDelegate, for key: String) {
-        self.deviceDelegates[key] = delegate
-    }
-
-    public func stopUpdates(for key: String) {
-        self.deviceDelegates.removeValue(forKey: key)
-    }
 
     public var inRange: Bool {
         if self.peripheral?.state == .connected { return true }
@@ -108,8 +99,6 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         }
 
         self.lastPulseTime = Date()
-
-        self.deviceDelegates.forEach { $1?.detected(device: self) }
     }
 
     // Connects to the device if requested, and the device is both not trying to connect or already has connected
