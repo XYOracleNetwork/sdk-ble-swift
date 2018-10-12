@@ -145,9 +145,15 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
 
-    // TODO Need to keep pinging this every 3 seconds
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
         self.detected(Int(truncating: RSSI))
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }
+
+        // TOOD Not sure this is the right place for this...
+        DispatchQueue.global().asyncAfter(deadline: .now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_INTERVAL_CONNECTED_RSSI_READ)) {
+            if (peripheral.state == .connected) {
+                peripheral.readRSSI()
+            }
+        }
     }
 }

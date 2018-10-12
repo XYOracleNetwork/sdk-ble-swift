@@ -96,12 +96,11 @@ extension XYSmartScan2: XYLocationDelegate {
         guard let family = family else { return }
         beacons.forEach { beacon in
             if beacon.inRange {
-//                self.delegates.forEach { $1?.smartScan(entered: beacon)}
+                self.delegates.forEach { $1?.smartScan(entered: beacon)}
             }
 
             self.delegates.forEach {
                 $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)
-                beacon.update(beacon.rssi, powerLevel: UInt8(4))
             }
         }
 

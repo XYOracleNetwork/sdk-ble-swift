@@ -21,9 +21,9 @@ public class XYFinderDeviceFactory {
     public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) -> XYFinderDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }
 
+        // Build or update
         var device: XYFinderDevice?
         if let foundDevice = deviceCache[iBeacon.xyId(from: family)] {
-            foundDevice.update(rssi, powerLevel: iBeacon.powerLevel)
             device = foundDevice
         } else {
             switch family {
@@ -44,7 +44,8 @@ public class XYFinderDeviceFactory {
             }
         }
 
-        device?.detected(rssi)
+        // Update the device based on the read value
+        device?.update(rssi, powerLevel: iBeacon.powerLevel)
 
         return device
     }

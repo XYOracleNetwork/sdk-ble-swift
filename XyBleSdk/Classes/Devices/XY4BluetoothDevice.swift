@@ -55,9 +55,17 @@ extension XY4BluetoothDevice: XYFinderDevice {
     public func update(_ rssi: Int, powerLevel: UInt8) {
         super.detected(rssi)
         self.powerLevel = powerLevel
-        XYFinderDeviceEventManager.report(events: [
+
+        var events: [XYFinderEventNotification] = [
             .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
-            .updated(device: self)])
+            .updated(device: self)]
+
+        if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
+            events.append(.buttonPressed(device: self, type: .single))
+        }
+
+        XYFinderDeviceEventManager.report(events: events)
+
         if stayConnected && connected == false {
             self.connect()
         }
