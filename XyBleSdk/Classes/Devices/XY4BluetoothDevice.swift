@@ -10,18 +10,10 @@ import CoreBluetooth
 import Promises
 
 // The XY4-specific implementation
-public class XY4BluetoothDevice: XYBluetoothDeviceBase {
-    public let
-    iBeacon: XYIBeaconDefinition?
-
-    public fileprivate(set) var
-    powerLevel: UInt8 = 4
-
-    public let family: XYFinderDeviceFamily = .xy4
+public class XY4BluetoothDevice: XYFinderDeviceBase {
 
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
-        self.iBeacon = iBeacon
-        super.init(id, rssi: rssi)
+        super.init(.xy4, id: id, iBeacon: iBeacon, rssi: rssi)
     }
 
     public convenience init(_ iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
@@ -49,27 +41,7 @@ public class XY4BluetoothDevice: XYBluetoothDeviceBase {
 
 }
 
-extension XY4BluetoothDevice: XYFinderDevice {
-
-    // TODO deal with distance and keep connected
-    public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.detected(rssi)
-        self.powerLevel = powerLevel
-
-        var events: [XYFinderEventNotification] = [
-            .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
-            .updated(device: self)]
-
-        if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
-            events.append(.buttonPressed(device: self, type: .single))
-        }
-
-        XYFinderDeviceEventManager.report(events: events)
-
-        if stayConnected && connected == false {
-            self.connect()
-        }
-    }
+extension XY4BluetoothDevice {
 
     @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))

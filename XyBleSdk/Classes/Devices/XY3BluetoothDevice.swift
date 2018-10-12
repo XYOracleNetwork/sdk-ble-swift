@@ -10,18 +10,10 @@ import CoreBluetooth
 import Promises
 
 // The XY3-specific implementation
-public class XY3BluetoothDevice: XYBluetoothDeviceBase {
-    public let
-    iBeacon: XYIBeaconDefinition?
-
-    public fileprivate(set) var
-    powerLevel: UInt8 = 4
-
-    public let family: XYFinderDeviceFamily = .xy3
+public class XY3BluetoothDevice: XYFinderDeviceBase {
 
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
-        self.iBeacon = iBeacon
-        super.init(id, rssi: rssi)
+        super.init(.xy3, id: id, iBeacon: iBeacon, rssi: rssi)
     }
 
     public convenience init(_ iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
@@ -30,12 +22,7 @@ public class XY3BluetoothDevice: XYBluetoothDeviceBase {
 
 }
 
-extension XY3BluetoothDevice: XYFinderDevice {
-
-    public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.detected(rssi)
-        self.powerLevel = powerLevel
-    }
+extension XY3BluetoothDevice {
 
     @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))

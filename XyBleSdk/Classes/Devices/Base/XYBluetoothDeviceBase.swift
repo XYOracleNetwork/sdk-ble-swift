@@ -17,7 +17,10 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public fileprivate(set) var totalPulseCount = 0
 
-    public var rssi: Int
+    public var
+    rssi: Int,
+    powerLevel: UInt8
+
 
     public let
     name: String,
@@ -37,7 +40,24 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
         self.id = id
         self.rssi = rssi
         self.name = ""
+        self.powerLevel = 0
         super.init()
+    }
+
+    public func update(_ rssi: Int, powerLevel: UInt8) {
+        self.rssi = rssi
+        self.powerLevel = powerLevel
+        self.totalPulseCount += 1
+
+        if self.firstPulseTime == nil {
+            self.firstPulseTime = Date()
+        }
+
+        self.lastPulseTime = Date()
+
+        if stayConnected && connected == false {
+            self.connect()
+        }
     }
 }
 
@@ -90,17 +110,6 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         return true
     }
 
-    public func detected(_ newRssi: Int) {
-        self.rssi = newRssi
-        self.totalPulseCount += 1
-
-        if self.firstPulseTime == nil {
-            self.firstPulseTime = Date()
-        }
-
-        self.lastPulseTime = Date()
-    }
-
     // Connects to the device if requested, and the device is both not trying to connect or already has connected
     public func stayConnected(_ value: Bool) {
         self.stayConnected = value
@@ -146,7 +155,7 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
-        self.detected(Int(truncating: RSSI))
+        self.update(Int(truncating: RSSI), powerLevel: 0x4)
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }
 
         // TOOD Not sure this is the right place for this...

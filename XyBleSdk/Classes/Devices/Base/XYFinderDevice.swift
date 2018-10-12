@@ -18,7 +18,6 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var family: XYFinderDeviceFamily { get }
     var prefix: String { get }
     var connectableServices: [CBUUID] { get }
-    var powerLevel: UInt8 { get }
 
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
@@ -27,8 +26,34 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     @discardableResult func lock() -> XYBluetoothResult
     @discardableResult func unlock() -> XYBluetoothResult
     @discardableResult func version() -> XYBluetoothResult
+}
 
-    func update(_ rssi: Int, powerLevel: UInt8)
+// The base XYFinder class
+public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
+    public let
+    iBeacon: XYIBeaconDefinition?,
+    family: XYFinderDeviceFamily
+
+    public init(_ family: XYFinderDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
+        self.family = family
+        self.iBeacon = iBeacon
+        super.init(id, rssi: rssi)
+    }
+
+    override public func update(_ rssi: Int, powerLevel: UInt8) {
+        super.update(rssi, powerLevel: powerLevel)
+
+        var events: [XYFinderEventNotification] = [
+            .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
+            .updated(device: self)]
+
+        if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
+            events.append(.buttonPressed(device: self, type: .single))
+        }
+
+        XYFinderDeviceEventManager.report(events: events)
+    }
+
 }
 
 // MARK: Default implementations of protocol methods and variables
@@ -88,6 +113,10 @@ public extension XYFinderDevice {
         return CLBeaconRegion(
             proximityUUID: uuid,
             identifier: String(format:"%@:4", id))
+    }
+
+    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
     @discardableResult func stayAwake() -> XYBluetoothResult {

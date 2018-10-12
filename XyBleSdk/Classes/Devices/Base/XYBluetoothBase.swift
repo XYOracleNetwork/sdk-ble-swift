@@ -11,10 +11,13 @@ import Foundation
 // Basic protocol for all BLE devices 
 public protocol XYBluetoothBase {
     var rssi: Int { get set }
+    var powerLevel: UInt8 { get set }
     var name: String { get }
     var id: String { get }
     var totalPulseCount: Int { get }
     var proximity: XYDeviceProximity { get }
+
+    func update(_ rssi: Int, powerLevel: UInt8)
 }
 
 public extension XYBluetoothBase {
