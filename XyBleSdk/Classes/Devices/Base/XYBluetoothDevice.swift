@@ -93,6 +93,11 @@ internal final class XYConnectionAgent: XYCentralDelegate {
 
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
+        // TODO Barf, need to have this generic and use XYBluetoothDevice
+        if let device = self.device as? XYFinderDevice {
+            XYFinderDeviceEventManager.report(events: [.connected(device: device)])
+            device.peripheral?.readRSSI()
+        }
         promise.fulfill(())
     }
 
