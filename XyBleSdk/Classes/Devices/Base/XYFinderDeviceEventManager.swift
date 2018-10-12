@@ -39,11 +39,9 @@ public class XYFinderDeviceEventManager {
     public static func subscribe(to events: [XYFinderEvent], for device: XYFinderDevice?, handler: @escaping XYFinderDeviceEventNotifier) -> UUID {
         let directive = XYFinderDeviceEventDirective(handler: handler, device: device)
         events.forEach { event in
-            if handlerRegistry[event] == nil {
-                handlerRegistry[event] = [directive]
-            } else {
+            handlerRegistry[event] == nil ?
+                handlerRegistry[event] = [directive] :
                 handlerRegistry[event]?.append(directive)
-            }
         }
 
         return directive.referenceKey

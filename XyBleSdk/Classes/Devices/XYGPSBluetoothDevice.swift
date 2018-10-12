@@ -39,4 +39,8 @@ extension XYGPSBluetoothDevice: XYFinderDevice {
         let songData = Data(song.values(for: self.family))
         return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
     }
+
+    @discardableResult public func version() -> XYBluetoothResult {
+        return self.get(ControlService.version)
+    }
 }

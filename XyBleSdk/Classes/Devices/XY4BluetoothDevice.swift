@@ -83,4 +83,8 @@ extension XY4BluetoothDevice: XYFinderDevice {
     @discardableResult public func unlock() -> XYBluetoothResult {
         return self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
     }
+
+    @discardableResult public func version() -> XYBluetoothResult {
+        return self.get(DeviceInformationService.firmwareRevisionString)
+    }
 }

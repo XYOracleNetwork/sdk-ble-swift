@@ -30,7 +30,8 @@ public enum XYFinderEventNotification {
     case exited(device: XYFinderDevice)
     case updated(device: XYFinderDevice)
 
-    // Silly but allows for readble conditionals based on the event's reporting device
+    // Silly but allows for readble conditionals based on the event's reporting device, as well
+    // as simplified switch case statements
     public var device: XYFinderDevice {
         switch self {
         case .connected(let device): return device

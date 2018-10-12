@@ -26,6 +26,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     @discardableResult func fallAsleep() -> XYBluetoothResult
     @discardableResult func lock() -> XYBluetoothResult
     @discardableResult func unlock() -> XYBluetoothResult
+    @discardableResult func version() -> XYBluetoothResult
 
     func update(_ rssi: Int, powerLevel: UInt8)
 }
@@ -103,5 +104,16 @@ public extension XYFinderDevice {
 
     @discardableResult func unlock() -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult func version() -> XYBluetoothResult {
+        switch self.family {
+        case .xy1:
+            return XYBluetoothResult(data: "1.0".data(using: .utf8))
+        case .xy2:
+            return XYBluetoothResult(data: "2.0".data(using: .utf8))
+        default:
+            return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+        }
     }
 }
