@@ -190,5 +190,8 @@ extension XYCentral: CBCentralManagerDelegate {
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         self.knownPeripherals.removeValue(forKey: peripheral.identifier)
         self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
+        if let device = XYFinderDeviceFactory.build(from: peripheral) {
+            XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
+        }
     }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreBluetooth
 
 // Factory to build a flavored XYFinderDevice based on the inputs
 public class XYFinderDeviceFactory {
@@ -53,6 +54,10 @@ public class XYFinderDeviceFactory {
     public class func build(from xyId: String) -> XYFinderDevice? {
         guard let beacon = XYIBeaconDefinition.beacon(from: xyId) else { return nil }
         return self.build(from: beacon)
+    }
+
+    class func build(from peripheral: CBPeripheral) -> XYFinderDevice? {
+        return devices.filter { $0.peripheral == peripheral }.first
     }
 
     class func build(from family: XYFinderDeviceFamily) -> XYFinderDevice? {
