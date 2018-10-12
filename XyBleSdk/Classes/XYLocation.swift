@@ -13,6 +13,7 @@ public protocol XYLocationDelegate: class {
     func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?)
     func deviceEntered(_ device: XYFinderDevice)
     func deviceExited(_ device: XYFinderDevice)
+    func deviceExiting(_ device: XYFinderDevice)
     func locationsUpdated(_ locations: [XYLocationCoordinate2D2])
 }
 

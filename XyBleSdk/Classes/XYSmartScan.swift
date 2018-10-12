@@ -14,7 +14,7 @@ public protocol XYSmartScan2Delegate {
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
     func smartScan(entered device: XYFinderDevice)
-//    func smartScan(exiting device:XYBluetoothDevice)
+    func smartScan(exiting device:XYBluetoothDevice)
     func smartScan(exited device: XYFinderDevice)
 //    func smartScan(updated device:XYBluetoothDevice)
 }
@@ -85,6 +85,9 @@ extension XYSmartScan2 {
 
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
 extension XYSmartScan2: XYLocationDelegate {
+    public func deviceExiting(_ device: XYFinderDevice) {
+        self.delegates.forEach { $1?.smartScan(exiting: device) }
+    }
 
     public func locationsUpdated(_ locations: [XYLocationCoordinate2D2]) {
         locations.forEach { location in
@@ -109,10 +112,12 @@ extension XYSmartScan2: XYLocationDelegate {
 
     public func deviceEntered(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(entered: device) }
+        XYFinderDeviceEventManager.report(events: [.entered(device: device)])
     }
 
     public func deviceExited(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(exited: device) }
+        XYFinderDeviceEventManager.report(events: [.exited(device: device)])
     }
     
 }
