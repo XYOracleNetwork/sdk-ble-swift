@@ -30,6 +30,13 @@ public enum XYDeviceProximity: Int {
     }
 }
 
+public enum XYButtonType2 : Int {
+    case none
+    case single
+    case double
+    case long
+}
+
 public enum XYFinderSong {
     case off
     case findIt
