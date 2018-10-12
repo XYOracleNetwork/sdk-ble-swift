@@ -40,38 +40,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         super.init(id, rssi: rssi)
     }
 
-    override public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.update(rssi, powerLevel: powerLevel)
-
-        var events: [XYFinderEventNotification] = [
-            .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
-            .updated(device: self)]
-
-        if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
-            events.append(.buttonPressed(device: self, type: .single))
-        }
-
-        XYFinderDeviceEventManager.report(events: events)
-    }
-
-}
-
-// MARK: Default implementations of protocol methods and variables
-public extension XYFinderDevice {
-
-    var uuid: UUID {
-        return self.family.uuid
-    }
-
-    var name: String {
-        return self.family.familyName
-    }
-
-    var prefix: String {
-        return self.family.prefix
-    }
-
-    var connectableServices: [CBUUID] {
+    public var connectableServices: [CBUUID] {
         guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
 
         func getServiceUuid() -> CBUUID {
@@ -90,6 +59,68 @@ public extension XYFinderDevice {
         }
 
         return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { _ in getServiceUuid() }
+    }
+
+    override public func update(_ rssi: Int, powerLevel: UInt8) {
+        super.update(rssi, powerLevel: powerLevel)
+
+        var events: [XYFinderEventNotification] = [
+            .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
+            .updated(device: self)]
+
+        if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
+            events.append(.buttonPressed(device: self, type: .single))
+        }
+
+        XYFinderDeviceEventManager.report(events: events)
+    }
+
+    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult public func stayAwake() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult public func fallAsleep() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult public func lock() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult public func unlock() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+    }
+
+    @discardableResult public func version() -> XYBluetoothResult {
+        switch self.family {
+        case .xy1:
+            return XYBluetoothResult(data: "1.0".data(using: .utf8))
+        case .xy2:
+            return XYBluetoothResult(data: "2.0".data(using: .utf8))
+        default:
+            return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+        }
+    }
+
+}
+
+// MARK: Default implementations of protocol methods and variables
+public extension XYFinderDevice {
+
+    var uuid: UUID {
+        return self.family.uuid
+    }
+
+    var name: String {
+        return self.family.familyName
+    }
+
+    var prefix: String {
+        return self.family.prefix
     }
 
     // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
@@ -113,36 +144,5 @@ public extension XYFinderDevice {
         return CLBeaconRegion(
             proximityUUID: uuid,
             identifier: String(format:"%@:4", id))
-    }
-
-    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
-        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult func stayAwake() -> XYBluetoothResult {
-        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult func fallAsleep() -> XYBluetoothResult {
-        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult func lock() -> XYBluetoothResult {
-        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult func unlock() -> XYBluetoothResult {
-        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-    }
-
-    @discardableResult func version() -> XYBluetoothResult {
-        switch self.family {
-        case .xy1:
-            return XYBluetoothResult(data: "1.0".data(using: .utf8))
-        case .xy2:
-            return XYBluetoothResult(data: "2.0".data(using: .utf8))
-        default:
-            return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        }
     }
 }

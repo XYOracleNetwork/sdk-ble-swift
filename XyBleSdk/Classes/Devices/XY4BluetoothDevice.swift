@@ -20,7 +20,7 @@ public class XY4BluetoothDevice: XYFinderDeviceBase {
         self.init(iBeacon.xyId(from: .xy4), iBeacon: iBeacon, rssi: rssi)
     }
 
-    public var connectableServices: [CBUUID] {
+    public override var connectableServices: [CBUUID] {
         guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
 
         func getServiceUuid(_ connectablePowerLevel: UInt8) -> CBUUID {
@@ -39,32 +39,28 @@ public class XY4BluetoothDevice: XYFinderDeviceBase {
         return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { getServiceUuid($0) }
     }
 
-}
-
-extension XY4BluetoothDevice {
-
-    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+    @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))
         return self.set(PrimaryService.buzzer, value: XYBluetoothResult(data: songData))
     }
 
-    @discardableResult public func stayAwake() -> XYBluetoothResult {
+    @discardableResult public override func stayAwake() -> XYBluetoothResult {
         return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x01])))
     }
 
-    @discardableResult public func fallAsleep() -> XYBluetoothResult {
+    @discardableResult public override func fallAsleep() -> XYBluetoothResult {
         return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x00])))
     }
 
-    @discardableResult public func lock() -> XYBluetoothResult {
+    @discardableResult public override func lock() -> XYBluetoothResult {
         return self.set(PrimaryService.lock, value: XYBluetoothResult(data: self.family.lockCode))
     }
 
-    @discardableResult public func unlock() -> XYBluetoothResult {
+    @discardableResult public override func unlock() -> XYBluetoothResult {
         return self.set(PrimaryService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
     }
 
-    @discardableResult public func version() -> XYBluetoothResult {
+    @discardableResult public override func version() -> XYBluetoothResult {
         return self.get(DeviceInformationService.firmwareRevisionString)
     }
 }

@@ -19,16 +19,12 @@ public class XYGPSBluetoothDevice: XYFinderDeviceBase {
         self.init(iBeacon.xyId(from: .xygps), iBeacon: iBeacon, rssi: rssi)
     }
 
-}
-
-extension XYGPSBluetoothDevice {
-
-    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+    @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))
         return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
     }
 
-    @discardableResult public func version() -> XYBluetoothResult {
+    @discardableResult public override func version() -> XYBluetoothResult {
         return self.get(ControlService.version)
     }
 

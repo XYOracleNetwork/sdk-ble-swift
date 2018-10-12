@@ -67,7 +67,11 @@ final class InfoServicePanelView: UIView {
         self.fallAsleepButton.isEnabled = false
 
         device.connection {
-            guard let value = device.get(PrimaryService.stayAwake).asInteger else { return }
+            let data = device.get(PrimaryService.stayAwake)
+            var value = 1
+            if let intVal = data.asInteger {
+                value = intVal
+            }
             DispatchQueue.main.async {
                 if value == 1 {
                     self.stayAwakeButton.isEnabled = false

@@ -19,7 +19,7 @@ public class XY2BluetoothDevice: XYFinderDeviceBase {
         self.init(iBeacon.xyId(from: .xy2), iBeacon: iBeacon, rssi: rssi)
     }
 
-    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+    @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))
         return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
     }

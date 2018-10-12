@@ -62,7 +62,7 @@ public extension XYBluetoothResult {
     }
 
     var asInteger: Int? {
-        guard let data = self.data else { return nil }
+        guard let data = self.data, data.count > 0 else { return nil }
         return data.to(type: Int.self)
     }
 
