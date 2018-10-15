@@ -10,6 +10,7 @@ import Foundation
 
 internal struct XYConstants {
     static let DEVICE_TUNING_SECONDS_INTERVAL_CONNECTED_RSSI_READ = 3
+    static let DEVICE_TUNING_LOCATION_CHANGE_THRESHOLD = 10.0
 }
 
 public enum XYDeviceProximity: Int {

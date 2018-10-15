@@ -29,6 +29,7 @@ public class XYLocation: NSObject {
         super.init()
         manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         manager.allowsBackgroundLocationUpdates = true
+        manager.distanceFilter = XYConstants.DEVICE_TUNING_LOCATION_CHANGE_THRESHOLD
         manager.requestAlwaysAuthorization()
         manager.startUpdatingLocation()
         manager.delegate = self
@@ -40,7 +41,7 @@ public class XYLocation: NSObject {
 }
 
 // MARK: Passthrough methods
-extension XYLocation {
+public extension XYLocation {
 
     var locationServicesEnabled: Bool {
         return CLLocationManager.locationServicesEnabled()
@@ -92,14 +93,65 @@ extension XYLocation {
     }
 
     public func stopRanging(for device: XYFinderDevice) {
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 4))
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 7))
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, id: device.id, slot: 8))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 4))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 7))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 8))
     }
 }
 
 // MARK: Monitoring methods (used for background operation)
 extension XYLocation {
+
+    public func startMonitoring(for family: XYFinderDeviceFamily, isHighPriority: Bool) {
+        guard let device = XYFinderDeviceFactory.build(from: family) else { return }
+        self.startMonitoring(for: device, isHighPriority: isHighPriority)
+    }
+
+    public func startMonitoring(for devices: [XYFinderDevice]) {
+        // Get the existing regions that location manager is looking for
+        let monitoredDevices = manager.monitoredRegions
+            .compactMap { $0 as? CLBeaconRegion }
+            .filter { $0.minor != nil && $0.major != nil }
+            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
+
+        // Remove devices from monitored that are not on the list
+        monitoredDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach { self.stopMonitoring(for: $0) }
+
+        // Add unmonitored devices
+        devices.filter { device in !monitoredDevices.contains(where: { $0.id == device.id }) }.forEach { self.startMonitoring(for: $0, isHighPriority: false) }
+    }
+
+    func startMonitoring(for device: XYFinderDevice, isHighPriority: Bool) {
+        if isHighPriority {
+            //monitor for button presses also, aka power level 8
+            let beaconRegionLevel8 = device.beaconRegion(slot: 8)
+            beaconRegionLevel8.notifyOnExit = false
+            beaconRegionLevel8.notifyOnEntry = false
+            beaconRegionLevel8.notifyEntryStateOnDisplay = false
+            self.manager.startMonitoring(for: beaconRegionLevel8)
+        }
+
+        //always monitor power level 4
+        let beaconRegionLevel4 = device.beaconRegion(slot: 4)
+        beaconRegionLevel4.notifyOnExit = true
+        beaconRegionLevel4.notifyOnEntry = true
+        beaconRegionLevel4.notifyEntryStateOnDisplay = true
+        self.manager.startMonitoring(for: beaconRegionLevel4)
+    }
+
+
+    func stopMonitoring() {
+        self.manager.monitoredRegions.forEach { region in
+            self.manager.stopMonitoring(for: region)
+        }
+    }
+
+
+    public func stopMonitoring(for device: XYFinderDevice) {
+        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 4))
+        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 7))
+        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 8))
+    }
 
 }
 

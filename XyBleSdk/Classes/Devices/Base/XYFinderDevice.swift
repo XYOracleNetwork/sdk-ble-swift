@@ -123,8 +123,12 @@ public extension XYFinderDevice {
         return self.family.prefix
     }
 
+    func beaconRegion(slot: UInt16) -> CLBeaconRegion {
+        return beaconRegion(self.uuid, slot: slot)
+    }
+
     // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
-    func beaconRegion(_ uuid: UUID, id: String, slot: UInt16? = nil) -> CLBeaconRegion {
+    func beaconRegion(_ uuid: UUID, slot: UInt16? = nil) -> CLBeaconRegion {
         if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {
             let computedMinor = slot == nil ? minor : ((minor & 0xfff0) | slot!)
             return CLBeaconRegion(
