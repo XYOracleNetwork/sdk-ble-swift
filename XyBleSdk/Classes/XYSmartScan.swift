@@ -37,6 +37,7 @@ public class XYSmartScan2 {
 
     fileprivate let location = XYLocation.instance
 
+    public fileprivate(set) var currentLocation = XYLocationCoordinate2D2()
     public fileprivate(set) var currentStatus = XYSmartScanStatus2.none
     fileprivate var isActive: Bool = false
 

@@ -14,6 +14,8 @@ public class XYLocationCoordinate2D2 {
     public var horizontalAccuracy : Double = 0
     public var verticalAccuracy : Double = 0
 
+    public init() {}
+
     public init(_ location: CLLocation) {
         self.longitude = location.coordinate.longitude
         self.latitude = location.coordinate.latitude
