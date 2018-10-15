@@ -57,7 +57,7 @@ public class XYSmartScan2 {
     public fileprivate(set) var currentStatus = XYSmartScanStatus2.none
     fileprivate var isActive: Bool = false
 
-    fileprivate var mode: XYSmartScan2Mode = .foreground
+    fileprivate var mode: XYSmartScan2Mode = .background
 
     fileprivate static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
 

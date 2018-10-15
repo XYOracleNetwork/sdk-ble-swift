@@ -40,7 +40,7 @@ class RangedDevicesManager: NSObject {
             central.setDelegate(self, key: "RangedDevicesManager")
             central.enable()
         } else {
-            scanner.start(for: [.xy2, .xy3, .xy4, .xygps])
+            scanner.start(mode: .foreground)
         }
     }
 
@@ -114,7 +114,7 @@ extension RangedDevicesManager: XYCentralDelegate {
 
     func stateChanged(newState: CBManagerState) {
         if newState == .poweredOn {
-            self.scanner.start(for: [.xy2, .xy3, .xy4, .xygps])
+            self.scanner.start(mode: .foreground)
             self.scanner.setDelegate(self, key: "RangedDevicesManager")
         }
     }
@@ -122,6 +122,8 @@ extension RangedDevicesManager: XYCentralDelegate {
 }
 
 extension RangedDevicesManager: XYSmartScan2Delegate {
+    func smartScan(status: XYSmartScanStatus2) {}
+
     func smartScan(exiting device: XYBluetoothDevice) {}
 
     func smartScan(location: XYLocationCoordinate2D2) {}
