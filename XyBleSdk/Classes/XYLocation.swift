@@ -42,31 +42,30 @@ public class XYLocation: NSObject {
 // MARK: Ranging methods (used for foreground operations)
 extension XYLocation {
 
+    // Convenience method
     public func startRanging(for families: [XYFinderDeviceFamily]) {
         families.forEach { startRangning(for: $0) }
     }
 
+    // Start ranging for a particular type of XY device
     public func startRangning(for family: XYFinderDeviceFamily) {
         guard let device = XYFinderDeviceFactory.build(from: family) else { return }
         self.startRanging(for: device)
     }
 
-    public func stopRanging(for family: XYFinderDeviceFamily) {
-        // TODO not used in old app, should be?
-    }
+    public func startRangning(for devices: [XYFinderDevice]) {
+        // Get the existing regions that location manager is looking for
+        let rangedDevices = manager.rangedRegions
+            .compactMap { $0 as? CLBeaconRegion }
+            .filter { $0.minor != nil && $0.major != nil }
+            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
 
-//    public func startRangning(for devices: Set<XYBluetoothDevice>) {
-//        let rangedDevices = manager.rangedRegions
-//            .compactMap { $0 as? CLBeaconRegion }
-//            .filter { $0.minor != nil && $0.major != nil }
-//            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
-//
-//        // Remove devices from rangning that are not on the list
-//        Set<XYBaseBluetoothDevice>.init(rangedDevices).subtracting(devices).forEach { self.stopRanging(for: $0) }
-//
-//        // Add unranged devices
-//        Set<XYBaseBluetoothDevice>.init(devices).subtracting(rangedDevices).forEach { self.startRanging(for: $0) }
-//    }
+        // Remove devices from rangning that are not on the list
+        rangedDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach { self.stopRanging(for: $0) }
+
+        // Add unranged devices
+        devices.filter { device in !rangedDevices.contains(where: { $0.id == device.id }) }.forEach { self.startRanging(for: $0) }
+    }
 
     public func startRanging(for device: XYFinderDevice) {
         let beaconRegion = CLBeaconRegion(proximityUUID: device.uuid, identifier: device.id)

@@ -9,14 +9,22 @@
 import Foundation
 
 public protocol XYSmartScan2Delegate {
-//    func smartScan(status:cXYSmartScanStatus)
+    func smartScan(status: XYSmartScanStatus2)
     func smartScan(location: XYLocationCoordinate2D2)
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
     func smartScan(entered device: XYFinderDevice)
     func smartScan(exiting device:XYBluetoothDevice)
     func smartScan(exited device: XYFinderDevice)
-//    func smartScan(updated device:XYBluetoothDevice)
+}
+
+public enum XYSmartScanStatus2: Int {
+    case none
+    case enabled
+    case bluetoothUnavailable
+    case bluetoothDisabled
+    case backgroundLocationDisabled
+    case locationDisabled
 }
 
 public class XYSmartScan2 {
@@ -29,21 +37,31 @@ public class XYSmartScan2 {
 
     fileprivate let location = XYLocation.instance
 
+    public fileprivate(set) var currentStatus = XYSmartScanStatus2.none
+    fileprivate var isActive: Bool = false
+
+    fileprivate static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
+
     private init() {
-        location.setDelegate(self)
+        self.location.setDelegate(self)
     }
 
     public func start(for families: [XYFinderDeviceFamily]) {
         // TODO investigate threading on main
         // TODO BG vs FG mode, just FG for now
 
-        location.startRanging(for: families)
+        self.location.startRanging(for: families)
+        self.isActive = true
 
         // TODO find devices from tracked devices
     }
 
     public func stop() {
-        location.clearRanging()
+//        self.location.clearMonitoring()
+        self.location.clearRanging()
+        self.trackedDevices.map { $1 }.forEach { $0.disconnect() }
+        self.trackedDevices.removeAll()
+        self.isActive = false
     }
 
     public func setDelegate(_ delegate: XYSmartScan2Delegate, key: String) {
@@ -55,31 +73,72 @@ public class XYSmartScan2 {
     }
 }
 
-// MARK: Tracking wranglers for known devices
+// MARK: Status updates
 extension XYSmartScan2 {
 
+    public func updateStatus() {
+        guard self.isActive else { return }
+
+        var newStatus = XYSmartScanStatus2.enabled
+        let central = XYCentral.instance
+//        if (!CLLocationManager.locationServicesEnabled())
+//        {
+//            newStatus = .locationDisabled
+//        }
+//        else
+//        {
+//            let authorizationStatus = CLLocationManager.authorizationStatus();
+//            if (authorizationStatus != CLAuthorizationStatus.authorizedAlways &&
+//                authorizationStatus != CLAuthorizationStatus.notDetermined)
+//            {
+//                newStatus = .backgroundLocationDisabled
+//            }
+//        }
+
+        switch central.state {
+        case .unknown:
+            newStatus = .none;
+        case .poweredOn:
+            break
+        case .poweredOff:
+            newStatus = .bluetoothDisabled
+        case .unsupported:
+            newStatus = .bluetoothUnavailable
+        case .unauthorized:
+            newStatus = .backgroundLocationDisabled
+        case .resetting:
+            newStatus = .none
+        }
+
+        if self.currentStatus != newStatus {
+            self.currentStatus = newStatus
+            self.delegates.map { $1 }.forEach { $0?.smartScan(status: self.currentStatus)}
+        }
+    }
+
+}
+
+// MARK: Tracking wranglers for known devices
+public extension XYSmartScan2 {
+
     func startTracking(for device: XYFinderDevice) {
-        guard trackedDevices[device.id] == nil else { return }
-        trackedDevices[device.id] = device
-        updateTracking()
+        XYSmartScan2.queue.sync {
+            guard trackedDevices[device.id] == nil else { return }
+            trackedDevices[device.id] = device
+            updateTracking()
+        }
     }
 
     func stopTracking(for deviceId: String) {
-        guard trackedDevices[deviceId] != nil else { return }
-        trackedDevices.removeValue(forKey: deviceId)
-        updateTracking()
+        XYSmartScan2.queue.sync {
+            guard trackedDevices[deviceId] != nil else { return }
+            trackedDevices.removeValue(forKey: deviceId)
+            updateTracking()
+        }
     }
 
     private func updateTracking() {
-        // TODO look into reduce here...
-//        var devices = Set<XYFinderDevice>()
-//        trackedDevices.forEach { (arg) in
-//            let (_, device) = arg
-//            devices.insert(device)
-//        }
-//
-//        // TODO BG mode is monitoring
-//        location.startRangning(for: devices)
+        location.startRangning(for: self.trackedDevices.map { $1 } )
     }
 }
 

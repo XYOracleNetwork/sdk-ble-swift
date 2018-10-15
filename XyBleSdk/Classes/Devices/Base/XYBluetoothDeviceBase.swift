@@ -21,7 +21,6 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     rssi: Int,
     powerLevel: UInt8
 
-
     public let
     name: String,
     id: String
