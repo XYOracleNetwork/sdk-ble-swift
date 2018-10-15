@@ -81,19 +81,14 @@ extension XYSmartScan2 {
 
         var newStatus = XYSmartScanStatus2.enabled
         let central = XYCentral.instance
-//        if (!CLLocationManager.locationServicesEnabled())
-//        {
-//            newStatus = .locationDisabled
-//        }
-//        else
-//        {
-//            let authorizationStatus = CLLocationManager.authorizationStatus();
-//            if (authorizationStatus != CLAuthorizationStatus.authorizedAlways &&
-//                authorizationStatus != CLAuthorizationStatus.notDetermined)
-//            {
-//                newStatus = .backgroundLocationDisabled
-//            }
-//        }
+        if !XYLocation.instance.locationServicesEnabled {
+            newStatus = .locationDisabled
+        } else {
+            let authorizationStatus = XYLocation.instance.authorizationStatus
+            if authorizationStatus != .authorizedAlways && authorizationStatus != .notDetermined {
+                newStatus = .backgroundLocationDisabled
+            }
+        }
 
         switch central.state {
         case .unknown:

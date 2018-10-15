@@ -39,6 +39,19 @@ public class XYLocation: NSObject {
     }
 }
 
+// MARK: Passthrough methods
+extension XYLocation {
+
+    var locationServicesEnabled: Bool {
+        return CLLocationManager.locationServicesEnabled()
+    }
+
+    var authorizationStatus: CLAuthorizationStatus {
+        return CLLocationManager.authorizationStatus()
+    }
+
+}
+
 // MARK: Ranging methods (used for foreground operations)
 extension XYLocation {
 
