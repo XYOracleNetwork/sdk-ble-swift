@@ -100,14 +100,25 @@ extension XYLocation {
 }
 
 // MARK: Monitoring methods (used for background operation)
-extension XYLocation {
+public extension XYLocation {
 
-    public func startMonitoring(for family: XYFinderDeviceFamily, isHighPriority: Bool) {
+    public func clearMonitoring() {
+        self.manager.monitoredRegions.forEach { region in
+            self.manager.stopMonitoring(for: region)
+        }
+    }
+
+    // Convenience method
+    public func startMonitoring(for families: [XYFinderDeviceFamily]) {
+        families.forEach { startMonitoring(for: $0, isHighPriority: false) }
+    }
+
+    func startMonitoring(for family: XYFinderDeviceFamily, isHighPriority: Bool) {
         guard let device = XYFinderDeviceFactory.build(from: family) else { return }
         self.startMonitoring(for: device, isHighPriority: isHighPriority)
     }
 
-    public func startMonitoring(for devices: [XYFinderDevice]) {
+    func startMonitoring(for devices: [XYFinderDevice]) {
         // Get the existing regions that location manager is looking for
         let monitoredDevices = manager.monitoredRegions
             .compactMap { $0 as? CLBeaconRegion }
@@ -138,14 +149,6 @@ extension XYLocation {
         beaconRegionLevel4.notifyEntryStateOnDisplay = true
         self.manager.startMonitoring(for: beaconRegionLevel4)
     }
-
-
-    func stopMonitoring() {
-        self.manager.monitoredRegions.forEach { region in
-            self.manager.stopMonitoring(for: region)
-        }
-    }
-
 
     public func stopMonitoring(for device: XYFinderDevice) {
         manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 4))

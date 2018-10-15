@@ -27,6 +27,22 @@ public enum XYSmartScanStatus2: Int {
     case locationDisabled
 }
 
+public enum XYSmartScan2Mode {
+    case foreground
+    case background
+}
+
+internal extension UIApplicationState {
+    var scanMode: XYSmartScan2Mode {
+        switch self {
+        case .active:
+            return .foreground
+        default:
+            return .background
+        }
+    }
+}
+
 public class XYSmartScan2 {
 
     public static let instance = XYSmartScan2()
@@ -41,24 +57,27 @@ public class XYSmartScan2 {
     public fileprivate(set) var currentStatus = XYSmartScanStatus2.none
     fileprivate var isActive: Bool = false
 
+    fileprivate var mode: XYSmartScan2Mode = .foreground
+
     fileprivate static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
 
     private init() {
         self.location.setDelegate(self)
     }
 
-    public func start(for families: [XYFinderDeviceFamily]) {
+    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.values, mode: XYSmartScan2Mode) {
         // TODO investigate threading on main
-        // TODO BG vs FG mode, just FG for now
 
-        self.location.startRanging(for: families)
+        switch mode {
+        case .foreground: self.switchToForeground(families)
+        case .background: self.switchToBackground(families)
+        }
+
         self.isActive = true
-
-        // TODO find devices from tracked devices
     }
 
     public func stop() {
-//        self.location.clearMonitoring()
+        self.location.clearMonitoring()
         self.location.clearRanging()
         self.trackedDevices.map { $1 }.forEach { $0.disconnect() }
         self.trackedDevices.removeAll()
@@ -72,6 +91,33 @@ public class XYSmartScan2 {
     public func removeDelegate(for key: String) {
         self.delegates.removeValue(forKey: key)
     }
+}
+
+// MARK: Change monitoring state based on start/stop
+fileprivate extension XYSmartScan2 {
+
+    func switchToForeground(_ families: [XYFinderDeviceFamily]) {
+        guard self.mode == .background else { return }
+
+        self.mode = .foreground
+        self.location.clearMonitoring()
+        self.location.startRanging(for: families)
+        self.updateTracking()
+        self.updateStatus()
+//        self.poll()
+    }
+
+    func switchToBackground(_ families: [XYFinderDeviceFamily]) {
+        guard self.mode == .foreground else { return }
+
+        self.mode = .background
+        self.location.clearRanging()
+        self.location.startMonitoring(for: families)
+        self.updateTracking()
+        self.updateStatus()
+//        self.poll()
+    }
+
 }
 
 // MARK: Status updates
