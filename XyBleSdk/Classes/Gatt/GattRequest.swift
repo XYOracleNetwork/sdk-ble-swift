@@ -66,19 +66,19 @@ final class GattRequest: NSObject {
             guard let s = self else { return }
             s.timer = nil
             s.status = .timedOut
-            s.freeLock()
+            GattRequest.freeLock()
             operationPromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        self.getLock()
+        GattRequest.getLock()
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.read(device)
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
-            self.freeLock()
+            GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
         }
@@ -98,19 +98,19 @@ final class GattRequest: NSObject {
             guard let s = self else { return }
             s.timer = nil
             s.status = .timedOut
-            s.freeLock()
+            GattRequest.freeLock()
             operationPromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        self.getLock()
+        GattRequest.getLock()
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
-            self.freeLock()
+            GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
         }
@@ -120,15 +120,15 @@ final class GattRequest: NSObject {
 }
 
 // MARK: Locking methods
-fileprivate extension GattRequest {
+internal extension GattRequest {
 
-    func getLock() {
+    static func getLock() {
         if GattRequest.lock.wait(timeout: .now() + GattRequest.waitTimeout) == .timedOut {
             freeLock()
         }
     }
 
-    func freeLock() {
+    static func freeLock() {
         GattRequest.lock.signal()
     }
 

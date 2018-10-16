@@ -115,10 +115,13 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         self.stayConnected ? connect() : disconnect()
     }
 
-    // TODO this seems really lame, check as to why we need this value above, must be a better way to handle this
     internal func connect() {
-        XYBluetoothDeviceBase.workQueue.sync {
-            guard self.connectionAgent == nil, self.peripheral == nil else { return }
+        XYBluetoothDeviceBase.workQueue.async {
+            guard
+                self.connectionAgent == nil,
+                self.peripheral?.state != .connected
+                else { return }
+
             self.connectionAgent = XYConnectionAgent(for: self)
             self.connectionAgent?.connect().then {
                 self.connectionAgent = nil

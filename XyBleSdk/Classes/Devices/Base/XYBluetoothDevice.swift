@@ -85,12 +85,18 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 2. Create a connection, or fulfill the promise if the device already is connected
     @discardableResult func connect(_ timeout: DispatchTimeInterval? = nil) -> Promise<Void> {
         guard self.device.peripheral?.state != .connected else { return Promise(()) }
+
+        GattRequest.getLock()
+
+        guard self.device.peripheral?.state != .connected else { return Promise(()) }
+
         self.central.setDelegate(self, key: self.delegateKey)
 
         // Timeout on connection to the peripheral
         let callTimeout = timeout ?? XYConnectionAgent.callTimeout
         self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
             guard let strong = self else { return }
+            GattRequest.freeLock()
             strong.timer = nil
             strong.promise.reject(XYBluetoothError.timedOut)
         }
@@ -114,6 +120,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
             XYFinderDeviceEventManager.report(events: [.connected(device: device)])
             device.peripheral?.readRSSI()
         }
+        GattRequest.freeLock()
         promise.fulfill(())
     }
 
@@ -128,6 +135,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
+        GattRequest.freeLock()
     }
 
     // Unused in this single connection case
