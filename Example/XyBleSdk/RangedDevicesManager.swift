@@ -49,7 +49,7 @@ class RangedDevicesManager: NSObject {
         scanner.stop()
     }
 
-    func scan(for deviceIndex: NSInteger) {
+func scan(for deviceIndex: NSInteger) {
         guard
             central.state == .poweredOn,
             let device = self.rangedDevices[safe: deviceIndex]

@@ -153,6 +153,8 @@ extension XYCentral: CBCentralManagerDelegate {
         }
     }
 
+    // Central delegate method called when scanForPeripherals() locates a device. The peripheral will be cached if it is not already and
+    // the associated located() delegate method is called
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         var wrappedPeripheral: XYPeripheral
         if let alreadySeenPeripehral = knownPeripherals[peripheral.identifier] {

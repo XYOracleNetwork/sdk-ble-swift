@@ -32,17 +32,6 @@ public enum XYSmartScan2Mode {
     case background
 }
 
-internal extension UIApplicationState {
-    var scanMode: XYSmartScan2Mode {
-        switch self {
-        case .active:
-            return .foreground
-        default:
-            return .background
-        }
-    }
-}
-
 public class XYSmartScan2 {
 
     public static let instance = XYSmartScan2()
