@@ -71,6 +71,7 @@ public class XYSmartScan2 {
         self.trackedDevices.map { $1 }.forEach { $0.disconnect() }
         self.trackedDevices.removeAll()
         self.isActive = false
+        self.mode = .background
     }
 
     public func setDelegate(_ delegate: XYSmartScan2Delegate, key: String) {
