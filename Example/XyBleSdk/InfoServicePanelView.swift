@@ -68,7 +68,7 @@ final class InfoServicePanelView: UIView {
 
         device.connection {
             let data = device.get(PrimaryService.stayAwake)
-            var value = 1
+            var value = 0
             if let intVal = data.asInteger {
                 value = intVal
             }
