@@ -90,7 +90,7 @@ final class InfoServicePanelView: UIView {
 
 extension InfoServicePanelView {
 
-    private func wrapper(_ button: CommonButton, _ operation: @escaping () -> XYBluetoothResult) {
+    private func wrapper(_ button: CommonButton, operation: @escaping () -> XYBluetoothResult, completion: (() -> Void)? = nil) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
@@ -108,6 +108,7 @@ extension InfoServicePanelView {
         }.always {
             button.isEnabled = true
             self.parent?.showRefreshControl()
+            completion?()
         }
     }
 
@@ -115,49 +116,49 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender) {
+        wrapper(sender, operation: {
             device.find(.findIt)
-        }
+        })
     }
 
     @IBAction func stayAwakeTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender)  {
+        wrapper(sender, operation: {
             device.stayAwake()
-        }
-
-        self.updateStayAwakeButtonStates()
+        }, completion: {
+            self.updateStayAwakeButtonStates()
+        })
     }
 
     @IBAction func fallAsleep(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender)  {
+        wrapper(sender, operation: {
             device.fallAsleep()
-        }
-
-        self.updateStayAwakeButtonStates()
+        }, completion: {
+            self.updateStayAwakeButtonStates()
+        })
     }
 
     @IBAction func lockTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender)  {
+        wrapper(sender, operation: {
             device.lock()
-        }
+        })
     }
 
     @IBAction func unlockTapped(_ sender: CommonButton) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender)  {
+        wrapper(sender, operation: {
             device.unlock()
-        }
+        })
     }
 
     @IBAction func enableNotifyTapped(_ sender: CommonButton) {
