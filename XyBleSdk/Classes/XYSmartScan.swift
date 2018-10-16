@@ -187,7 +187,20 @@ extension XYSmartScan2: XYLocationDelegate {
 
     public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
         guard let family = family else { return }
-        beacons.forEach { beacon in
+
+        // Get the unique buttons that got pressed
+        let buttonPressedBeacons = beacons.filter { $0.powerLevel == 8 }.reduce([], { initial, beacon in
+            initial.contains(where: { $0.id == beacon.id }) ? initial : initial + [beacon]
+        })
+
+        // Get the unique buttons that didn't get pressed
+        let buttonNotPressedBeacons = beacons.filter { $0.powerLevel != 8 }.reduce([], { initial, beacon in
+            initial.contains(where: { $0.id == beacon.id }) ? initial : initial + [beacon]
+        })
+
+        let uniqueBeacons = buttonPressedBeacons + buttonNotPressedBeacons
+
+        uniqueBeacons.forEach { beacon in
             if beacon.inRange {
                 self.delegates.forEach { $1?.smartScan(entered: beacon)}
             }
@@ -197,7 +210,7 @@ extension XYSmartScan2: XYLocationDelegate {
             }
         }
 
-        self.delegates.forEach { $1?.smartScan(detected: beacons, family: family) }
+        self.delegates.forEach { $1?.smartScan(detected: uniqueBeacons, family: family) }
     }
 
     public func deviceEntered(_ device: XYFinderDevice) {

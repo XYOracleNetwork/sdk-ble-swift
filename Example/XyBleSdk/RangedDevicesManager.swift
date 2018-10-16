@@ -40,7 +40,7 @@ class RangedDevicesManager: NSObject {
             central.setDelegate(self, key: "RangedDevicesManager")
             central.enable()
         } else {
-            scanner.start(mode: .foreground)
+            scanner.start(for: [.xy3], mode: .foreground)
         }
     }
 
@@ -114,7 +114,7 @@ extension RangedDevicesManager: XYCentralDelegate {
 
     func stateChanged(newState: CBManagerState) {
         if newState == .poweredOn {
-            self.scanner.start(mode: .foreground)
+            self.scanner.start(for: [.xy3], mode: .foreground)
             self.scanner.setDelegate(self, key: "RangedDevicesManager")
         }
     }
@@ -136,7 +136,7 @@ extension RangedDevicesManager: XYSmartScan2Delegate {
 
             devices.forEach { device in
                 // Only show those in range
-                if device.rssi != 0 && device.rssi > -95 {
+                if device.rssi != 0 && device.rssi > -95 {                    
                     rangedWithoutCurrent.append(device)
                 }
             }

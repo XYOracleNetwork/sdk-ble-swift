@@ -44,7 +44,7 @@ public struct XYIBeaconDefinition {
             xyid.append(String(format: ".%ld", major))
         }
 
-        return xyid
+        return xyid.lowercased()
     }
 
     public static func beacon(from xyId: String) -> XYIBeaconDefinition? {
