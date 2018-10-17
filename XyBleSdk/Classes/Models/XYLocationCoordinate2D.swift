@@ -22,4 +22,8 @@ public class XYLocationCoordinate2D2 {
         self.horizontalAccuracy = location.horizontalAccuracy
         self.verticalAccuracy = location.verticalAccuracy
     }
+
+    public var isValid: Bool {
+        return self.latitude != 0 && self.longitude != 0
+    }
 }

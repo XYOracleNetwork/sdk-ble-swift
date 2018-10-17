@@ -18,6 +18,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var family: XYFinderDeviceFamily { get }
     var prefix: String { get }
     var connectableServices: [CBUUID] { get }
+    var location: XYLocationCoordinate2D2 { get }
 
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
@@ -33,6 +34,8 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     public let
     iBeacon: XYIBeaconDefinition?,
     family: XYFinderDeviceFamily
+
+    public fileprivate(set) var location: XYLocationCoordinate2D2 = XYLocationCoordinate2D2()
 
     public init(_ family: XYFinderDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
         self.family = family
