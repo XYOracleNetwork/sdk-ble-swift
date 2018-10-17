@@ -20,6 +20,10 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var connectableServices: [CBUUID] { get }
     var location: XYLocationCoordinate2D2 { get }
 
+    // Handlers for button press subscriptions
+    func subscribeToButtonPress()
+    func unsubscribeToButtonPress()
+
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
     @discardableResult func stayAwake() -> XYBluetoothResult
@@ -78,6 +82,10 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         XYFinderDeviceEventManager.report(events: events)
     }
 
+    // Handles the xy1 and xy2 cases
+    public func subscribeToButtonPress() {}
+    public func unsubscribeToButtonPress() {}
+
     @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
@@ -109,6 +117,21 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         }
     }
 
+}
+
+// MARK: Default handler to report the button press should the finder subscribe to the notification
+extension XYFinderDeviceBase: XYBluetoothDeviceNotifyDelegate {
+    public func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
+        guard
+            // Validate the proper services and the value from the notification, then report
+            serviceCharacteristic.characteristicUuid == PrimaryService.buttonState.characteristicUuid ||
+            serviceCharacteristic.characteristicUuid == ControlService.button.characteristicUuid,
+            let rawValue = value.asInteger,
+            let buttonPressed = XYButtonType2.init(rawValue: rawValue)
+            else { return }
+
+        XYFinderDeviceEventManager.report(events: [.buttonPressed(device: self, type: buttonPressed)])
+    }
 }
 
 // MARK: Default implementations of protocol methods and variables

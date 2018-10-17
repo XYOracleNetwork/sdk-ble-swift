@@ -19,6 +19,10 @@ public class XYGPSBluetoothDevice: XYFinderDeviceBase {
         self.init(iBeacon.xyId(from: .xygps), iBeacon: iBeacon, rssi: rssi)
     }
 
+    public override func subscribeToButtonPress() {
+        self.subscribe(to: ControlService.button, delegate: (self.id, self))
+    }
+
     @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))
         return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
