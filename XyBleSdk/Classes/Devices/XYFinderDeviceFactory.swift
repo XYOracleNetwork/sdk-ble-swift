@@ -60,7 +60,7 @@ public class XYFinderDeviceFactory {
         return devices.filter { $0.peripheral == peripheral }.first
     }
 
-    class func build(from family: XYFinderDeviceFamily) -> XYFinderDevice? {
+    public class func build(from family: XYFinderDeviceFamily) -> XYFinderDevice? {
         let id = [family.prefix, family.uuid.uuidString.lowercased()].joined(separator: ":")
         switch family {
         case .xygps:
