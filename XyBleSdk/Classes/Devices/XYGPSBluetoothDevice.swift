@@ -11,6 +11,8 @@ import Promises
 // The XYGPS-specific implementation
 public class XYGPSBluetoothDevice: XYFinderDeviceBase {
 
+    public var activated = false
+
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
         super.init(.xygps, id: id, iBeacon: iBeacon, rssi: rssi)
     }
