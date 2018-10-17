@@ -9,9 +9,9 @@
 
 import Foundation
 
-internal extension DispatchSource {
+public extension DispatchSource {
     // Similar to before but the scheduling queue is passed as a parameter
-    class func singleTimer(interval: DispatchTimeInterval, leeway:
+    public class func singleTimer(interval: DispatchTimeInterval, leeway:
         DispatchTimeInterval = .nanoseconds(0), queue: DispatchQueue, handler: @escaping ()
         -> Void) -> DispatchSourceTimer {
         // Use the specified queue

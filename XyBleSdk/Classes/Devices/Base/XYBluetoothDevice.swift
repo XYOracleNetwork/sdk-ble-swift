@@ -156,7 +156,7 @@ public extension XYBluetoothDevice {
         // Process the queue, adding the connections agent if needed
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
             if self.peripheral?.state != .connected {
-                try await(XYConnectionAgent(for: self).connect(.seconds(1)))
+                try await(XYConnectionAgent(for: self).connect())
             }
             try operations()
         })
