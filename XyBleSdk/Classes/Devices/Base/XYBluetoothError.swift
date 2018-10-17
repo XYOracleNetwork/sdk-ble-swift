@@ -22,6 +22,7 @@ public enum XYBluetoothError: Error {
     case actionNotSupported
     case couldNotConnect
     case centralNotPoweredOn
+    case couldNotUnlock
 
     public var toString: String {
         switch self {
@@ -47,6 +48,8 @@ public enum XYBluetoothError: Error {
             return "Could Not Connect"
         case .centralNotPoweredOn:
             return "Bluetooth is Off"
+        case .couldNotUnlock:
+            return "Could not unlock"
         }
     }
 }
