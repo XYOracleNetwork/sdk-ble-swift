@@ -18,7 +18,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var family: XYFinderDeviceFamily { get }
     var prefix: String { get }
     var connectableServices: [CBUUID] { get }
-    var location: XYLocationCoordinate2D2 { get }
+    var location: XYLocationCoordinate2D2 { get set }
 
     // Handlers for button press subscriptions
     func subscribeToButtonPress()
@@ -39,7 +39,8 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     iBeacon: XYIBeaconDefinition?,
     family: XYFinderDeviceFamily
 
-    public fileprivate(set) var location: XYLocationCoordinate2D2 = XYLocationCoordinate2D2()
+    // TODO reevaluate this
+    public var location: XYLocationCoordinate2D2 = XYLocationCoordinate2D2()
 
     public init(_ family: XYFinderDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
         self.family = family
