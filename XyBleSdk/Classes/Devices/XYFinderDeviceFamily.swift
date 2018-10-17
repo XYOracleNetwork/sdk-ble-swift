@@ -71,7 +71,7 @@ public enum XYFinderDeviceFamily: Int {
     }
 
     private static let uuids = [
-        "", // unknown
+        "00000000-0000-0000-0000-000000000000", // unknown
         "a500248c-abc2-4206-9bd7-034f4fc9ed10", // xy1
         "07775dd0-111b-11e4-9191-0800200c9a66", // xy2
         "08885dd0-111b-11e4-9191-0800200c9a66", // xy3
