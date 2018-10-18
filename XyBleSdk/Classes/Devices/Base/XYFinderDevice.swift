@@ -58,6 +58,12 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         super.init(id, rssi: rssi)
     }
 
+    // Ensures we only fire the button press once when it is detected for 30 seconds
+    // TODO find a better way to handle this
+    fileprivate static let buttonTimeout: DispatchTimeInterval = .seconds(30)
+    fileprivate static let buttonTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceButtonTimerQueue")
+    fileprivate var buttonTimer: DispatchSourceTimer?
+
     public var connectableServices: [CBUUID] {
         guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
 
@@ -79,6 +85,8 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { _ in getServiceUuid() }
     }
 
+    // Each time a device is loaded/fetched from the factory, this method will get fired, as well as
+    // each time the RSSI value is read from the peripheral callback
     override public func update(_ rssi: Int, powerLevel: UInt8) {
         super.update(rssi, powerLevel: powerLevel)
 
@@ -87,7 +95,16 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             .updated(device: self)]
 
         if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
-            events.append(.buttonPressed(device: self, type: .single))
+            if buttonTimer == nil {
+                self.buttonTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.buttonTimeout, queue: XYFinderDeviceBase.buttonTimerQueue) { [weak self] in
+                    guard let strong = self else { return }
+                    strong.buttonTimer = nil
+                }
+
+                events.append(.buttonPressed(device: self, type: .single))
+            } else {
+                events.append(.buttonRecentlyPressed(device: self, type: .single))
+            }
         }
 
         XYFinderDeviceEventManager.report(events: events)
