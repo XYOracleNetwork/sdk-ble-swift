@@ -34,4 +34,20 @@ public class XYGPSBluetoothDevice: XYFinderDeviceBase {
         return self.get(ControlService.version)
     }
 
+    @discardableResult public override func stayAwake() -> XYBluetoothResult {
+        return self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x01])))
+    }
+
+    @discardableResult public override func fallAsleep() -> XYBluetoothResult {
+        return self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x00])))
+    }
+
+    @discardableResult public override func lock() -> XYBluetoothResult {
+        return self.set(BasicConfigService.lock, value: XYBluetoothResult(data: self.family.lockCode))
+    }
+
+    @discardableResult public override func unlock() -> XYBluetoothResult {
+        return self.set(BasicConfigService.unlock, value: XYBluetoothResult(data: self.family.lockCode))
+    }
+
 }
