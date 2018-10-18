@@ -126,7 +126,7 @@ extension RangedDevicesManager: XYSmartScan2Delegate {
 
     func smartScan(exiting device: XYBluetoothDevice) {}
 
-    func smartScan(location: XYLocationCoordinate2D2) {}
+    func smartScan(location: XYLocationCoordinate2D) {}
 
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
 
