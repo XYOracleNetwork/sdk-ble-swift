@@ -10,7 +10,7 @@ import Foundation
 
 public protocol XYSmartScan2Delegate {
     func smartScan(status: XYSmartScanStatus2)
-    func smartScan(location: XYLocationCoordinate2D2)
+    func smartScan(location: XYLocationCoordinate2D)
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
     func smartScan(entered device: XYFinderDevice)
@@ -42,7 +42,7 @@ public class XYSmartScan2 {
 
     fileprivate let location = XYLocation.instance
 
-    public fileprivate(set) var currentLocation = XYLocationCoordinate2D2()
+    public fileprivate(set) var currentLocation = XYLocationCoordinate2D()
     public fileprivate(set) var currentStatus = XYSmartScanStatus2.none
     fileprivate var isActive: Bool = false
 
@@ -180,9 +180,10 @@ extension XYSmartScan2: XYLocationDelegate {
         self.delegates.forEach { $1?.smartScan(exiting: device) }
     }
 
-    public func locationsUpdated(_ locations: [XYLocationCoordinate2D2]) {
+    public func locationsUpdated(_ locations: [XYLocationCoordinate2D]) {
         locations.forEach { location in
             self.delegates.forEach { $1?.smartScan(location: location) }
+            XYFinderDeviceFactory.updateDeviceLocations(location)
         }
     }
 

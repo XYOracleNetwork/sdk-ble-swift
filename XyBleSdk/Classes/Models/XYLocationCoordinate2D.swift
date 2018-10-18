@@ -8,7 +8,7 @@
 
 import CoreLocation
 
-public class XYLocationCoordinate2D2 {
+public class XYLocationCoordinate2D {
     public var latitude : Double = 0
     public var longitude : Double = 0
     public var horizontalAccuracy : Double = 0

@@ -18,6 +18,11 @@ public class XYFinderDeviceFactory {
         return deviceCache.devices.map { $1 }
     }
 
+    // Used to update all cached, in range device locations to the current user's location
+    public static func updateDeviceLocations(_ newLocation: XYLocationCoordinate2D) {
+        devices.filter { $0.inRange }.forEach { $0.updateLocation(newLocation) }
+    }
+
     // Create a device from an iBeacon definition, or update a cached device with the latest iBeacon/rssi data
     public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) -> XYFinderDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }

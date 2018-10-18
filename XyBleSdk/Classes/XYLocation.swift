@@ -14,7 +14,7 @@ public protocol XYLocationDelegate: class {
     func deviceEntered(_ device: XYFinderDevice)
     func deviceExited(_ device: XYFinderDevice)
     func deviceExiting(_ device: XYFinderDevice)
-    func locationsUpdated(_ locations: [XYLocationCoordinate2D2])
+    func locationsUpdated(_ locations: [XYLocationCoordinate2D])
 }
 
 public class XYLocation: NSObject {
@@ -191,7 +191,7 @@ extension XYLocation: CLLocationManagerDelegate {
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.delegate?.locationsUpdated(locations.map { XYLocationCoordinate2D2($0) })
+        self.delegate?.locationsUpdated(locations.map { XYLocationCoordinate2D($0) })
     }
 
     public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {

@@ -18,11 +18,19 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var family: XYFinderDeviceFamily { get }
     var prefix: String { get }
     var connectableServices: [CBUUID] { get }
-    var location: XYLocationCoordinate2D2 { get set }
+    var location: XYLocationCoordinate2D { get }
+    var batteryLevel: Int { get }
+    var firmware: String { get }
 
     // Handlers for button press subscriptions
     func subscribeToButtonPress()
     func unsubscribeToButtonPress()
+
+    // Handle location updates
+    func updateLocation(_ newLocation: XYLocationCoordinate2D)
+
+    // Updates to battery level
+    func updateBatteryLevel(_ newLevel: Int)
 
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
@@ -39,8 +47,10 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     iBeacon: XYIBeaconDefinition?,
     family: XYFinderDeviceFamily
 
-    // TODO reevaluate this
-    public var location: XYLocationCoordinate2D2 = XYLocationCoordinate2D2()
+    public fileprivate(set) var
+    location: XYLocationCoordinate2D = XYLocationCoordinate2D(),
+    batteryLevel: Int = -1,
+    firmware: String = ""
 
     public init(_ family: XYFinderDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
         self.family = family
@@ -87,6 +97,14 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     public func subscribeToButtonPress() {}
     public func unsubscribeToButtonPress() {}
 
+    public func updateLocation(_ newLocation: XYLocationCoordinate2D) {
+        self.location = newLocation
+    }
+
+    public func updateBatteryLevel(_ newLevel: Int) {
+        self.batteryLevel = newLevel
+    }
+
     @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
@@ -110,9 +128,11 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     @discardableResult public func version() -> XYBluetoothResult {
         switch self.family {
         case .xy1:
-            return XYBluetoothResult(data: "1.0".data(using: .utf8))
+            self.firmware = "1.0"
+            fallthrough
         case .xy2:
-            return XYBluetoothResult(data: "2.0".data(using: .utf8))
+            self.firmware = "2.0"
+            return XYBluetoothResult(data: self.firmware.data(using: .utf8))
         default:
             return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
         }
