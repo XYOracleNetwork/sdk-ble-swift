@@ -12,11 +12,11 @@ import Promises
 public class XYMobileBluetoothDevice: XYFinderDeviceBase {
 
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
-        super.init(.mobile, id: id, iBeacon: iBeacon, rssi: rssi)
+        super.init(.xymobile, id: id, iBeacon: iBeacon, rssi: rssi)
     }
 
     public convenience init(_ iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
-        self.init(iBeacon.xyId(from: .mobile), iBeacon: iBeacon, rssi: rssi)
+        self.init(iBeacon.xyId(from: .xymobile), iBeacon: iBeacon, rssi: rssi)
     }
 
     public override func subscribeToButtonPress() {

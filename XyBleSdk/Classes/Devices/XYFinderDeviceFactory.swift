@@ -36,6 +36,8 @@ public class XYFinderDeviceFactory {
                 device = XY3BluetoothDevice(iBeacon, rssi: rssi)
             case .xy2:
                 device = XY2BluetoothDevice(iBeacon, rssi: rssi)
+            case .xymobile:
+                device = XYMobileBluetoothDevice(iBeacon, rssi: rssi)
             default:
                 device = nil
             }
@@ -71,6 +73,8 @@ public class XYFinderDeviceFactory {
             return XY3BluetoothDevice(id)
         case .xy2:
             return XY2BluetoothDevice(id)
+        case .xymobile:
+            return XYMobileBluetoothDevice(id)
         default:
             return nil
         }
