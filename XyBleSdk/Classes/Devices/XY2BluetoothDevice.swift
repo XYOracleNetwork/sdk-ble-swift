@@ -23,4 +23,8 @@ public class XY2BluetoothDevice: XYFinderDeviceBase {
         let songData = Data(song.values(for: self.family))
         return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))
     }
+
+    @discardableResult public override func unlock() -> XYBluetoothResult {
+        return XYBluetoothResult.init(data: nil)
+    }
 }
