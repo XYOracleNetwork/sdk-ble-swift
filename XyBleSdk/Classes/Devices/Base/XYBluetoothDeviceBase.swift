@@ -115,7 +115,7 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         self.stayConnected ? connect() : disconnect()
     }
 
-    internal func connect() {
+    public func connect() {
         XYBluetoothDeviceBase.workQueue.async {
             guard
                 self.connectionAgent == nil,

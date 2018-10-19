@@ -21,6 +21,8 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     var connected: Bool { get }
 
     func stayConnected(_ value: Bool)
+
+    func connect()
     func disconnect()
 
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
