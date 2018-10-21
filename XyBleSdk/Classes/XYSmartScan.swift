@@ -170,7 +170,9 @@ public extension XYSmartScan2 {
     }
 
     private func updateTracking() {
-        location.startRangning(for: self.trackedDevices.map { $1 } )
+        self.mode == .foreground ?
+            location.startRangning(for: self.trackedDevices.map { $1 } ) :
+            location.startMonitoring(for: self.trackedDevices.map { $1 } )
     }
 }
 

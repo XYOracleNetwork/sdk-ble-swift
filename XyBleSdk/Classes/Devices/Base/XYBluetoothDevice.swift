@@ -120,6 +120,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         // TODO Barf, need to have this generic and use XYBluetoothDevice
         if let device = self.device as? XYFinderDevice {
             XYFinderDeviceEventManager.report(events: [.connected(device: device)])
+            device.subscribeToButtonPress()
             device.peripheral?.readRSSI()
         }
         GattRequest.freeLock()
