@@ -44,4 +44,8 @@ public extension XYServiceCharacteristic {
         return GattRequest(self, timeout: timeout).set(to: device, valueObj: value, withResponse: withResponse)
     }
 
+    func notify(for device: XYBluetoothDevice, enabled: Bool, timeout: DispatchTimeInterval? = nil) -> Promise<Void> {
+        return GattRequest(self, timeout: timeout).notify(for: device, enabled: enabled)
+    }
+
 }

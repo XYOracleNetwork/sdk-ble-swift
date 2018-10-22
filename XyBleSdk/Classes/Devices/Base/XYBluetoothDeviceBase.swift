@@ -84,13 +84,17 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     public func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
-        self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
-        setNotify(serviceCharacteristic, notify: true)
+        self.connection {
+            _ = self.notify(serviceCharacteristic, enabled: true)
+            self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
+        }
     }
 
     public func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) {
-        setNotify(serviceCharacteristic, notify: false)
-        self.notifyDelegates.removeValue(forKey: key)
+        self.connection {
+            _ = self.notify(serviceCharacteristic, enabled: false)
+            self.notifyDelegates.removeValue(forKey: key)
+        }
     }
 
     public func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {

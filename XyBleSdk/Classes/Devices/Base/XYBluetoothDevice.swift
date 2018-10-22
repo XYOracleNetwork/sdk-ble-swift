@@ -39,7 +39,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
 }
 
-// MARK: Methods to get or set a characteristic using the Promises-based connection work block method below
+// MARK: Methods to get, set, or notify on a characteristic using the Promises-based connection work block method below
 public extension XYBluetoothDevice {
 
     var connected: Bool {
@@ -54,9 +54,18 @@ public extension XYBluetoothDevice {
         }
     }
 
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult  {
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
         do {
             try await(serivceCharacteristic.set(to: self, value: value, timeout: timeout))
+            return XYBluetoothResult(data: nil)
+        } catch {
+            return XYBluetoothResult(error: error as? XYBluetoothError)
+        }
+    }
+
+    func notify(_ serivceCharacteristic: XYServiceCharacteristic, enabled: Bool, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
+        do {
+            try await(serivceCharacteristic.notify(for: self, enabled: enabled, timeout: timeout))
             return XYBluetoothResult(data: nil)
         } catch {
             return XYBluetoothResult(error: error as? XYBluetoothError)
@@ -72,7 +81,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     delegateKey: String,
     device: XYBluetoothDevice
 
-    private static let callTimeout: DispatchTimeInterval = .seconds(15)
+    private static let callTimeout: DispatchTimeInterval = .seconds(30)
     private static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYConnectionAgentTimeoutQueue")
     private var timer: DispatchSourceTimer?
 
@@ -169,28 +178,4 @@ public extension XYBluetoothDevice {
         let central = XYCentral.instance
         central.disconnect(from: self)
     }
-}
-
-// MARK: Allows the client to subscribe to a characteristic of a service on the device and receive udpates via the delegate
-internal extension XYBluetoothDevice {
-
-    func setNotify(_ serviceCharacteristic: XYServiceCharacteristic, notify: Bool) {
-        guard
-            let peripheral = self.peripheral,
-            peripheral.state == .connected else { return }
-
-        if
-            let services = peripheral.services,
-            let service = services.filter({ $0.uuid == serviceCharacteristic.serviceUuid }).first,
-            let characteristic = service.characteristics?.filter({ $0.uuid == serviceCharacteristic.characteristicUuid }).first {
-
-            peripheral.setNotifyValue(notify, for: characteristic)
-        } else {
-            let client = GattRequest(serviceCharacteristic)
-            client.getCharacteristic(self).then { characteristic in
-                peripheral.setNotifyValue(true, for: characteristic)
-            }
-        }
-    }
-
 }

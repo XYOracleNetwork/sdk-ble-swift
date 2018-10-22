@@ -14,7 +14,11 @@ public enum GattRequestStatus: String {
     case disconnected
     case discoveringServices
     case discoveringCharacteristics
-    case operating
+
+    case reading
+    case writing
+    case notifying
+
     case timedOut
     case completed
 }
@@ -26,6 +30,7 @@ final class GattRequest: NSObject {
     fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
+    fileprivate lazy var notifyPromise = Promise<Void>.pending()
 
     fileprivate let serviceCharacteristic: XYServiceCharacteristic
 
@@ -48,6 +53,7 @@ final class GattRequest: NSObject {
     init(_ serviceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval? = nil) {
         self.serviceCharacteristic = serviceCharacteristic
         self.specifiedTimeout = timeout ??  GattRequest.callTimeout
+        super.init()
     }
 
     func delegateKey(deviceUuid: UUID) -> String {
@@ -61,6 +67,8 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
+        GattRequest.getLock()
+
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
@@ -73,11 +81,11 @@ final class GattRequest: NSObject {
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        GattRequest.getLock()
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.read(device)
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+            self.timer = nil
             GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
@@ -93,6 +101,8 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
+        GattRequest.getLock()
+
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
@@ -105,17 +115,51 @@ final class GattRequest: NSObject {
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        GattRequest.getLock()
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+            self.timer = nil
             GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
         }
 
         return operationPromise
+    }
+
+    func notify(for device: XYBluetoothDevice, enabled: Bool) -> Promise<Void> {
+        var operationPromise = Promise<Void>.pending()
+        guard let peripheral = device.peripheral else {
+            operationPromise.reject(XYBluetoothError.notConnected)
+            return operationPromise
+        }
+
+        GattRequest.getLock()
+
+        // Create timeout using the operation queue. Self-cleaning if we timeout
+        timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
+            guard let s = self else { return }
+            s.timer = nil
+            s.status = .timedOut
+            GattRequest.freeLock()
+            operationPromise.reject(XYBluetoothError.timedOut)
+        }
+
+        // Assign the pending operation promise to the results from getting services/characteristics and
+        // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
+        // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
+        operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
+            self.setNotify(device, enabled: enabled)
+        }.always {
+            device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
+            self.timer = nil
+            GattRequest.freeLock()
+        }.catch { error in
+            operationPromise.reject(error)
+        }
+
+        return notifyPromise
     }
 }
 
@@ -172,7 +216,7 @@ private extension GattRequest {
 
         print("Gatt(get): read")
 
-        self.status = .operating
+        self.status = .reading
         peripheral.readValue(for: characteristic)
 
         return self.readPromise
@@ -191,9 +235,29 @@ private extension GattRequest {
 
         print("Gatt(set): write")
 
+        self.status = .writing
         peripheral.writeValue(data, for: characteristic, type: withResponse ? .withResponse : .withoutResponse)
 
         return self.writePromise
+    }
+
+    func setNotify(_ device: XYBluetoothDevice, enabled: Bool) -> Promise<Void> {
+        guard
+            self.status != .timedOut,
+            let characteristic = self.characteristic,
+            let peripheral = device.peripheral,
+            peripheral.state == .connected
+            else {
+                self.readPromise.reject(XYBluetoothError.notConnected)
+                return self.notifyPromise
+            }
+
+        print("Gatt(notify): notify")
+
+        self.status = .notifying
+        peripheral.setNotifyValue(enabled, for: characteristic)
+
+        return self.notifyPromise
     }
 
 }
@@ -306,6 +370,26 @@ extension GattRequest: CBPeripheralDelegate {
         print("Gatt(set): write delegate called, done")
 
         writePromise.fulfill(())
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        guard self.status != .disconnected || self.status != .timedOut else { return }
+
+        guard error == nil else {
+            self.notifyPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
+            return
+        }
+
+        guard
+            self.device?.peripheral == peripheral
+            else {
+                self.notifyPromise.reject(XYBluetoothError.mismatchedPeripheral)
+                return
+            }
+
+        print("Gatt(notify): notify delegate called, done")
+
+        notifyPromise.fulfill(())
     }
 
 }
