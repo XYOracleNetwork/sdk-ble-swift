@@ -126,13 +126,14 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 4: Delegate from central.connect(), meaning we have connected and are ready to set/get characteristics
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
+        GattRequest.freeLock()
+
         // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
         if let device = self.device as? XYFinderDevice {
             XYFinderDeviceEventManager.report(events: [.connected(device: device)])
             device.subscribeToButtonPress()
             device.peripheral?.readRSSI() // TODO Final Check - crash here, peripheral not connected, but why?
         }
-        GattRequest.freeLock()
         promise.fulfill(())
     }
 

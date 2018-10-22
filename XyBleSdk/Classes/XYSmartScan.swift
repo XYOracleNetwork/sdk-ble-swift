@@ -94,7 +94,6 @@ fileprivate extension XYSmartScan {
         self.location.startRanging(for: families)
         self.updateTracking()
         self.updateStatus()
-//        self.poll()
     }
 
     func switchToBackground(_ families: [XYFinderDeviceFamily]) {
@@ -105,7 +104,6 @@ fileprivate extension XYSmartScan {
         self.location.startMonitoring(for: families)
         self.updateTracking()
         self.updateStatus()
-//        self.poll()
     }
 
 }
