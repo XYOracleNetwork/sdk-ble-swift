@@ -121,7 +121,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         if let device = self.device as? XYFinderDevice {
             XYFinderDeviceEventManager.report(events: [.connected(device: device)])
             device.subscribeToButtonPress()
-            device.peripheral?.readRSSI()
+            device.peripheral?.readRSSI() // TODO Final Check - crash here, peripheral not connected, but why?
         }
         GattRequest.freeLock()
         promise.fulfill(())
