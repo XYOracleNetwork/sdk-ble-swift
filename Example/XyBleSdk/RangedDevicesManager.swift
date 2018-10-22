@@ -121,8 +121,8 @@ extension RangedDevicesManager: XYCentralDelegate {
 
 }
 
-extension RangedDevicesManager: XYSmartScan2Delegate {
-    func smartScan(status: XYSmartScanStatus2) {}
+extension RangedDevicesManager: XYSmartScanDelegate {
+    func smartScan(status: XYSmartScanStatus) {}
 
     func smartScan(exiting device: XYBluetoothDevice) {}
 
