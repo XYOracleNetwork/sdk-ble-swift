@@ -32,9 +32,9 @@ public enum XYSmartScan2Mode {
     case background
 }
 
-public class XYSmartScan2 {
+public class XYSmartScan {
 
-    public static let instance = XYSmartScan2()
+    public static let instance = XYSmartScan()
 
     fileprivate var delegates = [String: XYSmartScan2Delegate?]()
 
@@ -84,7 +84,7 @@ public class XYSmartScan2 {
 }
 
 // MARK: Change monitoring state based on start/stop
-fileprivate extension XYSmartScan2 {
+fileprivate extension XYSmartScan {
 
     func switchToForeground(_ families: [XYFinderDeviceFamily]) {
         guard self.mode == .background else { return }
@@ -111,7 +111,7 @@ fileprivate extension XYSmartScan2 {
 }
 
 // MARK: Status updates
-extension XYSmartScan2 {
+extension XYSmartScan {
 
     public func updateStatus() {
         guard self.isActive else { return }
@@ -151,10 +151,10 @@ extension XYSmartScan2 {
 }
 
 // MARK: Tracking wranglers for known devices
-public extension XYSmartScan2 {
+public extension XYSmartScan {
 
     func startTracking(for device: XYFinderDevice) {
-        XYSmartScan2.queue.sync {
+        XYSmartScan.queue.sync {
             guard trackedDevices[device.id] == nil else { return }
             trackedDevices[device.id] = device
             updateTracking()
@@ -162,7 +162,7 @@ public extension XYSmartScan2 {
     }
 
     func stopTracking(for deviceId: String) {
-        XYSmartScan2.queue.sync {
+        XYSmartScan.queue.sync {
             guard trackedDevices[deviceId] != nil else { return }
             trackedDevices.removeValue(forKey: deviceId)
             updateTracking()
@@ -177,7 +177,7 @@ public extension XYSmartScan2 {
 }
 
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
-extension XYSmartScan2: XYLocationDelegate {
+extension XYSmartScan: XYLocationDelegate {
     public func deviceExiting(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(exiting: device) }
     }

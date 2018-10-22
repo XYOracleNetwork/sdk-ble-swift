@@ -126,7 +126,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 4: Delegate from central.connect(), meaning we have connected and are ready to set/get characteristics
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
-        // TODO Barf, need to have this generic and use XYBluetoothDevice
+        // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
         if let device = self.device as? XYFinderDevice {
             XYFinderDeviceEventManager.report(events: [.connected(device: device)])
             device.subscribeToButtonPress()
