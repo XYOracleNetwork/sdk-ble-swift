@@ -33,6 +33,8 @@ public enum XYDeviceProximity: Int {
         if strength >= -200 { return XYDeviceProximity.veryFar }
         return XYDeviceProximity.outOfRange
     }
+
+    public static let defaultProximity: Int = -999
 }
 
 public enum XYButtonType2 : Int {
