@@ -18,7 +18,7 @@ protocol RangedDevicesManagerDelegate: class {
 class RangedDevicesManager: NSObject {
 
     fileprivate let central = XYCentral.instance
-    fileprivate let scanner = XYSmartScan2.instance
+    fileprivate let scanner = XYSmartScan.instance
 
     fileprivate(set) var rangedDevices = [XYFinderDevice]()
     fileprivate(set) var selectedDevice: XYFinderDevice?
@@ -40,7 +40,7 @@ class RangedDevicesManager: NSObject {
             central.setDelegate(self, key: "RangedDevicesManager")
             central.enable()
         } else {
-            scanner.start(mode: .foreground) // for: [.xy3],
+            scanner.start(mode: .foreground)
         }
     }
 
@@ -114,7 +114,7 @@ extension RangedDevicesManager: XYCentralDelegate {
 
     func stateChanged(newState: CBManagerState) {
         if newState == .poweredOn {
-            self.scanner.start(mode: .foreground) // for: [.xy3], 
+            self.scanner.start(mode: .foreground)
             self.scanner.setDelegate(self, key: "RangedDevicesManager")
         }
     }

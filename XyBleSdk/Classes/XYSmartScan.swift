@@ -8,8 +8,8 @@
 
 import Foundation
 
-public protocol XYSmartScan2Delegate {
-    func smartScan(status: XYSmartScanStatus2)
+public protocol XYSmartScanDelegate {
+    func smartScan(status: XYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D)
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
@@ -18,7 +18,7 @@ public protocol XYSmartScan2Delegate {
     func smartScan(exited device: XYFinderDevice)
 }
 
-public enum XYSmartScanStatus2: Int {
+public enum XYSmartScanStatus: Int {
     case none
     case enabled
     case bluetoothUnavailable
@@ -36,14 +36,14 @@ public class XYSmartScan {
 
     public static let instance = XYSmartScan()
 
-    fileprivate var delegates = [String: XYSmartScan2Delegate?]()
+    fileprivate var delegates = [String: XYSmartScanDelegate?]()
 
     fileprivate var trackedDevices = [String: XYFinderDevice]()
 
     fileprivate let location = XYLocation.instance
 
     public fileprivate(set) var currentLocation = XYLocationCoordinate2D()
-    public fileprivate(set) var currentStatus = XYSmartScanStatus2.none
+    public fileprivate(set) var currentStatus = XYSmartScanStatus.none
     fileprivate var isActive: Bool = false
 
     fileprivate var mode: XYSmartScan2Mode = .background
@@ -74,7 +74,7 @@ public class XYSmartScan {
         self.mode = .background
     }
 
-    public func setDelegate(_ delegate: XYSmartScan2Delegate, key: String) {
+    public func setDelegate(_ delegate: XYSmartScanDelegate, key: String) {
         self.delegates[key] = delegate
     }
 
@@ -114,7 +114,7 @@ extension XYSmartScan {
     public func updateStatus() {
         guard self.isActive else { return }
 
-        var newStatus = XYSmartScanStatus2.enabled
+        var newStatus = XYSmartScanStatus.enabled
         let central = XYCentral.instance
         if !XYLocation.instance.locationServicesEnabled {
             newStatus = .locationDisabled
