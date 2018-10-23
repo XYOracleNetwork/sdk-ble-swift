@@ -81,7 +81,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
 
     // Handles the xy1 and xy2 cases
     public func subscribeToButtonPress() {}
-    public func unsubscribeToButtonPress() {}
+    public func unsubscribeToButtonPress(for referenceKey: UUID?) {}
 
     public func updateLocation(_ newLocation: XYLocationCoordinate2D) {
         self.location = newLocation

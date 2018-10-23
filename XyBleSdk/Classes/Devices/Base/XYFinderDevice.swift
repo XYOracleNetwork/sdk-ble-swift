@@ -24,7 +24,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
 
     // Handlers for button press subscriptions
     func subscribeToButtonPress()
-    func unsubscribeToButtonPress()
+    func unsubscribeToButtonPress(for referenceKey: UUID?)
 
     // Handle location updates
     func updateLocation(_ newLocation: XYLocationCoordinate2D)

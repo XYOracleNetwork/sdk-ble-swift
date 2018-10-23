@@ -162,9 +162,17 @@ extension InfoServicePanelView {
     }
 
     @IBAction func enableNotifyTapped(_ sender: CommonButton) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+        device.subscribeToButtonPress()
     }
 
     @IBAction func disableNotifyTapped(_ sender: CommonButton) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+        device.unsubscribeToButtonPress(for: self.rangedDevicesManager.subscriptionUuid)
     }
 
 }

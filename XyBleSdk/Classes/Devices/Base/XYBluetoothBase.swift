@@ -27,3 +27,7 @@ public extension XYBluetoothBase {
     }
 
 }
+
+public func ==(lhs: XYBluetoothBase, rhs: XYBluetoothBase) -> Bool {
+    return lhs.id == rhs.id
+}

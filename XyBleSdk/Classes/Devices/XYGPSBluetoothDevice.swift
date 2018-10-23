@@ -25,6 +25,11 @@ public class XYGPSBluetoothDevice: XYFinderDeviceBase {
         self.subscribe(to: ControlService.button, delegate: (self.id, self))
     }
 
+    public override func unsubscribeToButtonPress(for referenceKey: UUID?) {
+        guard let key = referenceKey?.uuidString else { return }
+        self.unsubscribe(from: ControlService.button, key: key)
+    }
+
     @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))
         return self.set(ControlService.buzzerSelect, value: XYBluetoothResult(data: songData))

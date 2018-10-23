@@ -13,6 +13,7 @@ import XyBleSdk
 protocol RangedDevicesManagerDelegate: class {
     func reloadTableView()
     func showDetails()
+    func buttonPressed(on device: XYFinderDevice)
 }
 
 class RangedDevicesManager: NSObject {
@@ -25,10 +26,21 @@ class RangedDevicesManager: NSObject {
 
     fileprivate weak var delegate: RangedDevicesManagerDelegate?
 
+    fileprivate(set) var subscriptionUuid: UUID?
+
     static let instance = RangedDevicesManager()
 
     private override init() {
         super.init()
+        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed], for: self.selectedDevice) { event in
+            guard let currentDevice = self.selectedDevice else { return }
+            switch event {
+            case .buttonPressed(let device, _) where currentDevice == device:
+                self.delegate?.buttonPressed(on: device)
+            default:
+                break
+            }
+        }
     }
 
     func setDelegate(_ delegate: RangedDevicesManagerDelegate) {

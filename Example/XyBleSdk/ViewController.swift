@@ -86,6 +86,12 @@ private extension ViewController {
 }
 
 extension ViewController: RangedDevicesManagerDelegate {
+    func buttonPressed(on device: XYFinderDevice) {
+        let alert = UIAlertController(title: "Button Pressed", message: device.id, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        self.present(alert, animated: true)
+    }
+
     func showDetails() {
         self.spinner.stopAnimating()
         self.performSegue(withIdentifier: ViewController.detailSegueIdentifier, sender: nil)
