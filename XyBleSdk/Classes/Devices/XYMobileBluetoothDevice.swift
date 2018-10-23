@@ -19,10 +19,6 @@ public class XYMobileBluetoothDevice: XYFinderDeviceBase {
         self.init(iBeacon.xyId(from: .xymobile), iBeacon: iBeacon, rssi: rssi)
     }
 
-    public override func subscribeToButtonPress() {
-        self.subscribe(to: PrimaryService.buttonState, delegate: (self.id, self))
-    }
-
     @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         let songData = Data(song.values(for: self.family))
         return self.set(PrimaryService.buzzer, value: XYBluetoothResult(data: songData))
