@@ -44,7 +44,7 @@ final class GattRequest: NSObject {
 
     // Used for handling timeouts
     fileprivate static let lock = DispatchSemaphore(value: 1)
-    fileprivate static let waitTimeout: TimeInterval = 5
+    internal static let waitTimeout: TimeInterval = 7
 
     fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")

@@ -25,6 +25,9 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func connect()
     func disconnect()
 
+    func lock()
+    func unlock()
+
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult
@@ -104,7 +107,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
             return Promise(())
         }
 
-        GattRequest.getLock()
+//        GattRequest.getLock()
 
         guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
             print("----------- ALREADY CONNECTED POST LOCK!: \(id) FAM: \(fam) -----------------------")
@@ -117,7 +120,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         let callTimeout = timeout ?? XYConnectionAgent.callTimeout
         self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
             guard let strong = self else { return }
-            GattRequest.freeLock()
+//            GattRequest.freeLock()
             strong.timer = nil
             strong.promise.reject(XYBluetoothError.timedOut)
         }
@@ -162,7 +165,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
-        GattRequest.freeLock()
+//        GattRequest.freeLock()
     }
 
     // Unused in this single connection case
@@ -180,7 +183,8 @@ public extension XYBluetoothDevice {
             return Promise<Void>(XYBluetoothError.centralNotPoweredOn)
         }
 
-        GattRequest.getLock()
+//        GattRequest.getLock()
+        lock()
 
         // Process the queue, adding the connections agent if needed
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
@@ -189,7 +193,8 @@ public extension XYBluetoothDevice {
             }
             try operations()
         }).always {
-            GattRequest.freeLock()
+//            GattRequest.freeLock()
+            self.unlock()
         }
     }
 

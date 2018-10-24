@@ -17,6 +17,8 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public fileprivate(set) var totalPulseCount = 0
 
+    fileprivate var semaphore = DispatchSemaphore(value: 1)
+
     public var
     rssi: Int,
     powerLevel: UInt8
@@ -65,6 +67,16 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
 // MARK: XYBluetoothDevice protocol base implementations
 extension XYBluetoothDeviceBase: XYBluetoothDevice {
+
+    public func lock() {
+        if self.semaphore.wait(timeout: .now() + GattRequest.waitTimeout) == .timedOut {
+            self.unlock()
+        }
+    }
+
+    public func unlock() {
+        self.semaphore.signal()
+    }
 
     public var inRange: Bool {
         if self.peripheral?.state == .connected { return true }
