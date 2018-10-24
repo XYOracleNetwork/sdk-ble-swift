@@ -25,7 +25,14 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     name: String,
     id: String
 
-    public internal(set) var peripheral: CBPeripheral?
+    public internal(set) var peripheral: CBPeripheral? {
+        didSet {
+            let id = self.id[self.id.index(self.id.endIndex, offsetBy: -10)...]
+            let fam = (self as? XYFinderDevice)?.family.familyName ?? "unknown"
+            print("************* SET: \(id) OBJ: \(self.peripheral != nil ? "\(ObjectIdentifier(self).hashValue)" : "not set") FAM: \(fam)")
+            let i = 1
+        }
+    }
 
     fileprivate var connectionAgent: XYConnectionAgent?
     internal var stayConnected: Bool = false
@@ -53,10 +60,6 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
         }
 
         self.lastPulseTime = Date()
-
-        if stayConnected && connected == false {
-            self.connect()
-        }
     }
 }
 
@@ -120,12 +123,17 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     public func connect() {
-        XYBluetoothDeviceBase.workQueue.async {
-            guard
-                self.connectionAgent == nil,
-                self.peripheral?.state != .connected
-                else { return }
+        guard
+            self.connectionAgent == nil,
+            self.peripheral?.state != .connected && self.peripheral?.state != .connecting
+            else { return }
 
+        let id = self.id[self.id.index(self.id.endIndex, offsetBy: -10)...]
+        let fam = (self as? XYFinderDevice)?.family.familyName ?? "unknown"
+        let ident = self.peripheral != nil ? "\(ObjectIdentifier(self).hashValue)" : "not set"
+
+        XYBluetoothDeviceBase.workQueue.async {
+            print("----------- CONNECTING: \(id) OBJ: \(ident) FAM: \(fam) -----------------------")
             self.connectionAgent = XYConnectionAgent(for: self)
             self.connectionAgent?.connect().then {
                 self.connectionAgent = nil

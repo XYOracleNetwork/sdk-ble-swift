@@ -210,6 +210,9 @@ extension XYSmartScan: XYLocationDelegate {
             self.delegates.forEach {
                 $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)
             }
+
+            // Handles button presses and other notifications
+            beacon.detected()
         }
 
         self.delegates.forEach { $1?.smartScan(detected: uniqueBeacons, family: family) }

@@ -95,11 +95,21 @@ internal final class XYConnectionAgent: XYCentralDelegate {
 
     // 2. Create a connection, or fulfill the promise if the device already is connected
     @discardableResult func connect(_ timeout: DispatchTimeInterval? = nil) -> Promise<Void> {
-        guard self.device.peripheral?.state != .connected else { return Promise(()) }
+
+        let id = self.device.id[self.device.id.index(self.device.id.endIndex, offsetBy: -10)...]
+        let fam = (self.device as? XYFinderDevice)?.family.familyName ?? "unknown"
+
+        guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting  else {
+            print("----------- ALREADY CONNECTED PRE LOCK!: \(id) FAM: \(fam) -----------------------")
+            return Promise(())
+        }
 
         GattRequest.getLock()
 
-        guard self.device.peripheral?.state != .connected else { return Promise(()) }
+        guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
+            print("----------- ALREADY CONNECTED POST LOCK!: \(id) FAM: \(fam) -----------------------")
+            return Promise(())
+        }
 
         self.central.setDelegate(self, key: self.delegateKey)
 
@@ -132,7 +142,11 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         if let device = self.device as? XYFinderDevice {
             XYFinderDeviceEventManager.report(events: [.connected(device: device)])
             device.subscribeToButtonPress()
-            device.peripheral?.readRSSI() // TODO Final Check - crash here, peripheral not connected, but why?
+            if device.peripheral?.state == .connected {
+                device.peripheral?.readRSSI() // TODO Final Check - crash here, peripheral not connected, but why?
+            } else {
+                print("Not sure!")
+            }
         }
         promise.fulfill(())
     }

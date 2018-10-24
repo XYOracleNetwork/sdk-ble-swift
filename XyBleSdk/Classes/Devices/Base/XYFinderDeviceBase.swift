@@ -54,26 +54,28 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { _ in getServiceUuid() }
     }
 
-    // Each time a device is loaded/fetched from the factory, this method will get fired, as well as
-    // each time the RSSI value is read from the peripheral callback
-    override public func update(_ rssi: Int, powerLevel: UInt8) {
-        super.update(rssi, powerLevel: powerLevel)
+    public func detected() {
+        var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
 
-        var events: [XYFinderEventNotification] = [
-            .detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0),
-            .updated(device: self)]
-
+        // If the button has been pressed on a compatible devices, we add the appropriate event
         if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
             if buttonTimer == nil {
                 self.buttonTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.buttonTimeout, queue: XYFinderDeviceBase.buttonTimerQueue) { [weak self] in
                     guard let strong = self else { return }
                     strong.buttonTimer = nil
                 }
-
                 events.append(.buttonPressed(device: self, type: .single))
             } else {
                 events.append(.buttonRecentlyPressed(device: self, type: .single))
             }
+        }
+
+        //        if self.registered {
+        //            reportUpdated();
+        //        }
+
+        if stayConnected && connected == false {
+            self.connect()
         }
 
         XYFinderDeviceEventManager.report(events: events)
