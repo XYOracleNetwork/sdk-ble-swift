@@ -180,13 +180,17 @@ public extension XYBluetoothDevice {
             return Promise<Void>(XYBluetoothError.centralNotPoweredOn)
         }
 
+        GattRequest.getLock()
+
         // Process the queue, adding the connections agent if needed
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
             if self.peripheral?.state != .connected {
                 try await(XYConnectionAgent(for: self).connect())
             }
             try operations()
-        })
+        }).always {
+            GattRequest.freeLock()
+        }
     }
 
     func disconnect() {

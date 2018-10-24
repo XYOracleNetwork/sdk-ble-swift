@@ -44,7 +44,7 @@ final class GattRequest: NSObject {
 
     // Used for handling timeouts
     fileprivate static let lock = DispatchSemaphore(value: 1)
-    fileprivate static let waitTimeout: TimeInterval = 30
+    fileprivate static let waitTimeout: TimeInterval = 5
 
     fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")
@@ -67,14 +67,11 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        GattRequest.getLock()
-
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
             s.timer = nil
             s.status = .timedOut
-            GattRequest.freeLock()
             operationPromise.reject(XYBluetoothError.timedOut)
         }
 
@@ -86,7 +83,6 @@ final class GattRequest: NSObject {
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-            GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
         }
@@ -101,14 +97,11 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        GattRequest.getLock()
-
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
             s.timer = nil
             s.status = .timedOut
-            GattRequest.freeLock()
             operationPromise.reject(XYBluetoothError.timedOut)
         }
 
@@ -120,7 +113,6 @@ final class GattRequest: NSObject {
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-            GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
         }
@@ -135,14 +127,11 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        GattRequest.getLock()
-
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
             s.timer = nil
             s.status = .timedOut
-            GattRequest.freeLock()
             operationPromise.reject(XYBluetoothError.timedOut)
         }
 
@@ -154,7 +143,6 @@ final class GattRequest: NSObject {
         }.always {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-            GattRequest.freeLock()
         }.catch { error in
             operationPromise.reject(error)
         }
