@@ -42,10 +42,6 @@ final class GattRequest: NSObject {
 
     public fileprivate(set) var status: GattRequestStatus = .disconnected
 
-    // Used for handling timeouts
-    fileprivate static let lock = DispatchSemaphore(value: 1)
-    internal static let waitTimeout: TimeInterval = 7
-
     fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")
     fileprivate var timer: DispatchSourceTimer?
@@ -149,21 +145,6 @@ final class GattRequest: NSObject {
 
         return notifyPromise
     }
-}
-
-// MARK: Locking methods
-internal extension GattRequest {
-
-    static func getLock() {
-        if GattRequest.lock.wait(timeout: .now() + GattRequest.waitTimeout) == .timedOut {
-            freeLock()
-        }
-    }
-
-    static func freeLock() {
-        GattRequest.lock.signal()
-    }
-
 }
 
 // MARK: Get service and characteristic

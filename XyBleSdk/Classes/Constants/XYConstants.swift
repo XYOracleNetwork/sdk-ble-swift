@@ -74,3 +74,20 @@ public enum XYFinderSong {
 
     }
 }
+
+internal struct GenericLock {
+
+    private let semaphore = DispatchSemaphore(value: 1)
+    internal static let waitTimeout: TimeInterval = 7
+
+    public func lock() {
+        if self.semaphore.wait(timeout: .now() + GenericLock.waitTimeout) == .timedOut {
+            self.unlock()
+        }
+    }
+
+    public func unlock() {
+        self.semaphore.signal()
+    }
+
+}

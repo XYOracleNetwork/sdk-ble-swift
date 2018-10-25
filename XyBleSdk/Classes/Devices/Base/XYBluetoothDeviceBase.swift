@@ -19,7 +19,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public fileprivate(set) var totalPulseCount = 0
 
-    fileprivate var semaphore = DispatchSemaphore(value: 1)
+    fileprivate var deviceLock = GenericLock()
 
     public var
     rssi: Int,
@@ -29,14 +29,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     name: String,
     id: String
 
-    public internal(set) var peripheral: CBPeripheral? {
-        didSet {
-            let id = self.id[self.id.index(self.id.endIndex, offsetBy: -10)...]
-            let fam = (self as? XYFinderDevice)?.family.familyName ?? "unknown"
-            print("************* SET: \(id) OBJ: \(self.peripheral != nil ? "\(ObjectIdentifier(self).hashValue)" : "not set") FAM: \(fam)")
-            let i = 1
-        }
-    }
+    public internal(set) var peripheral: CBPeripheral?
 
     internal var stayConnected: Bool = false
 
@@ -70,16 +63,14 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
 // MARK: XYBluetoothDevice protocol base implementations
 extension XYBluetoothDeviceBase: XYBluetoothDevice {
-
     public func lock() {
-        if self.semaphore.wait(timeout: .now() + GattRequest.waitTimeout) == .timedOut {
-            self.unlock()
-        }
+        self.deviceLock.lock()
     }
 
     public func unlock() {
-        self.semaphore.signal()
+        self.deviceLock.unlock()
     }
+
 
     public var inRange: Bool {
         if self.peripheral?.state == .connected { return true }

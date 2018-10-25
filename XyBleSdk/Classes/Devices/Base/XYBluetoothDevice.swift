@@ -88,6 +88,8 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     private static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYConnectionAgentTimeoutQueue")
     private var timer: DispatchSourceTimer?
 
+    fileprivate static let connectionLock = GenericLock()
+
     private lazy var promise = Promise<Void>.pending()
 
     // 1. Called to set the device to connect to
@@ -98,19 +100,14 @@ internal final class XYConnectionAgent: XYCentralDelegate {
 
     // 2. Create a connection, or fulfill the promise if the device already is connected
     @discardableResult func connect(_ timeout: DispatchTimeInterval? = nil) -> Promise<Void> {
-
-        let id = self.device.id[self.device.id.index(self.device.id.endIndex, offsetBy: -10)...]
-        let fam = (self.device as? XYFinderDevice)?.family.familyName ?? "unknown"
-
-        guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting  else {
-            print("----------- ALREADY CONNECTED PRE LOCK!: \(id) FAM: \(fam) -----------------------")
+        guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
             return Promise(())
         }
 
-        self.device.lock()
+        XYConnectionAgent.connectionLock.lock()
 
         guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
-            print("----------- ALREADY CONNECTED POST LOCK!: \(id) FAM: \(fam) -----------------------")
+            XYConnectionAgent.connectionLock.unlock()
             return Promise(())
         }
 
@@ -120,7 +117,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         let callTimeout = timeout ?? XYConnectionAgent.callTimeout
         self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
             guard let strong = self else { return }
-            strong.device.unlock()
+            XYConnectionAgent.connectionLock.unlock()
             strong.timer = nil
             strong.promise.reject(XYBluetoothError.timedOut)
         }
@@ -139,7 +136,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 4: Delegate from central.connect(), meaning we have connected and are ready to set/get characteristics
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
-        device.unlock()
+        XYConnectionAgent.connectionLock.unlock()
 
         // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
         if let device = self.device as? XYFinderDevice {
@@ -165,7 +162,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
-        device.unlock()
+        XYConnectionAgent.connectionLock.unlock()
     }
 
     // Unused in this single connection case
@@ -183,10 +180,14 @@ public extension XYBluetoothDevice {
             return Promise<Void>(XYBluetoothError.centralNotPoweredOn)
         }
 
-        lock()
+        // Must be in range
+        guard self.proximity != .outOfRange || self.proximity != .none else {
+            return Promise<Void>(XYBluetoothError.deviceNotInRange)
+        }
 
         // Process the queue, adding the connections agent if needed
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
+            self.lock()
             if self.peripheral?.state != .connected {
                 try await(XYConnectionAgent(for: self).connect())
             }
