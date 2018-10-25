@@ -107,7 +107,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
             return Promise(())
         }
 
-//        GattRequest.getLock()
+        self.device.lock()
 
         guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
             print("----------- ALREADY CONNECTED POST LOCK!: \(id) FAM: \(fam) -----------------------")
@@ -120,7 +120,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         let callTimeout = timeout ?? XYConnectionAgent.callTimeout
         self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
             guard let strong = self else { return }
-//            GattRequest.freeLock()
+            strong.device.unlock()
             strong.timer = nil
             strong.promise.reject(XYBluetoothError.timedOut)
         }
@@ -139,7 +139,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 4: Delegate from central.connect(), meaning we have connected and are ready to set/get characteristics
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
-        GattRequest.freeLock()
+        device.unlock()
 
         // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
         if let device = self.device as? XYFinderDevice {
@@ -165,7 +165,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
-//        GattRequest.freeLock()
+        device.unlock()
     }
 
     // Unused in this single connection case
@@ -183,7 +183,6 @@ public extension XYBluetoothDevice {
             return Promise<Void>(XYBluetoothError.centralNotPoweredOn)
         }
 
-//        GattRequest.getLock()
         lock()
 
         // Process the queue, adding the connections agent if needed
@@ -193,7 +192,6 @@ public extension XYBluetoothDevice {
             }
             try operations()
         }).always {
-//            GattRequest.freeLock()
             self.unlock()
         }
     }

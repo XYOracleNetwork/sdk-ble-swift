@@ -53,7 +53,9 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     }
 
     public func update(_ rssi: Int, powerLevel: UInt8) {
-        self.rssi = rssi
+        if rssi != XYDeviceProximity.defaultProximity {
+            self.rssi = rssi
+        }
         self.powerLevel = powerLevel
         self.totalPulseCount += 1
 
@@ -180,9 +182,11 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
 
+    // We "recursively" call this method, updating the latest rssi value, and also calling detected if it is an XYFinder device
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
         self.update(Int(truncating: RSSI), powerLevel: 0x4)
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }
+        (self as? XYFinderDevice)?.detected()
 
         // TOOD Not sure this is the right place for this...
         DispatchQueue.global().asyncAfter(deadline: .now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_INTERVAL_CONNECTED_RSSI_READ)) {
