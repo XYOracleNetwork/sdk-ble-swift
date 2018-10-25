@@ -11,6 +11,8 @@ import CoreBluetooth
 // A concrete base class to base any BLE device off of
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
+    fileprivate static let connectedDevices = XYFinderDeviceManager()
+
     fileprivate var
     firstPulseTime: Date?,
     lastPulseTime: Date?
@@ -36,7 +38,6 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
         }
     }
 
-    fileprivate var connectionAgent: XYConnectionAgent?
     internal var stayConnected: Bool = false
 
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
@@ -137,23 +138,9 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     public func connect() {
-        guard
-            self.connectionAgent == nil,
-            self.peripheral?.state != .connected && self.peripheral?.state != .connecting
-            else { return }
-
-        let id = self.id[self.id.index(self.id.endIndex, offsetBy: -10)...]
-        let fam = (self as? XYFinderDevice)?.family.familyName ?? "unknown"
-        let ident = self.peripheral != nil ? "\(ObjectIdentifier(self).hashValue)" : "not set"
-
-        XYBluetoothDeviceBase.workQueue.async {
-            print("----------- CONNECTING: \(id) OBJ: \(ident) FAM: \(fam) -----------------------")
-            self.connectionAgent = XYConnectionAgent(for: self)
-            self.connectionAgent?.connect().then {
-                self.connectionAgent = nil
-            }
-        }
+        XYBluetoothDeviceBase.connectedDevices.add(device: self)
     }
+
 }
 
 // MARK: CBPeripheralDelegate, passes these on to delegate subscribers for this peripheral

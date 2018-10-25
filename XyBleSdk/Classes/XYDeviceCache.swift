@@ -7,8 +7,7 @@
 
 import CoreBluetooth
 
-// Holds a cache for devices that have been found via the XYLocation manager. Use the .barrier flag
-// for best performance on writing/updating + reading
+// Holds a cache for devices that have been found via the XYLocation manager
 class XYDeviceCache {
 
     internal private(set) var devices = [String: XYFinderDevice]()
