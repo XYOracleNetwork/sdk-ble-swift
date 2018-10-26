@@ -94,8 +94,9 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
 
     public func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
         self.connection {
-            _ = self.notify(serviceCharacteristic, enabled: true)
-            self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
+            if !self.notify(serviceCharacteristic, enabled: true).hasError {
+                self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
+            }
         }
     }
 

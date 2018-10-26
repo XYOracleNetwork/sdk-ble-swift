@@ -76,10 +76,10 @@ final class GattRequest: NSObject {
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.read(device)
-        }.always {
+        }.always(on: XYCentral.centralQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-        }.catch { error in
+        }.catch(on: XYCentral.centralQueue) { error in
             operationPromise.reject(error)
         }
 
@@ -106,10 +106,10 @@ final class GattRequest: NSObject {
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
-        }.always {
+        }.always(on: XYCentral.centralQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-        }.catch { error in
+        }.catch(on: XYCentral.centralQueue) { error in
             operationPromise.reject(error)
         }
 
@@ -136,10 +136,10 @@ final class GattRequest: NSObject {
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
         operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
             self.setNotify(device, enabled: enabled)
-        }.always {
+        }.always(on: XYCentral.centralQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-        }.catch { error in
+        }.catch(on: XYCentral.centralQueue) { error in
             operationPromise.reject(error)
         }
 

@@ -18,7 +18,10 @@ class XYFinderDeviceManager {
     func add(device: XYBluetoothDevice) {
         guard self.devices[device.id] == nil else { return }
         self.managerQueue.async(flags: .barrier) {
+            guard self.devices[device.id] == nil else { return }
             self.devices[device.id] = device
+            print(" **************** added \(device.id) ****************")
+
             self.connect(for: device)
         }
     }
@@ -28,9 +31,9 @@ class XYFinderDeviceManager {
         self.connectionLock.lock()
         XYConnectionAgent(for: device).connect().then(on: XYCentral.centralQueue) {
             self.connectionLock.unlock()
+            print(" **************** DONE \(device.id) ****************")
         }
     }
-
 
 //    func remove(at index: String) {
 //        self.accessQueue.async(flags: .barrier) {

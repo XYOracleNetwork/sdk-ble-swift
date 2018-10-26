@@ -136,7 +136,6 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 4: Delegate from central.connect(), meaning we have connected and are ready to set/get characteristics
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
-        XYConnectionAgent.connectionLock.unlock()
 
         // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
         if let device = self.device as? XYFinderDevice {
@@ -148,7 +147,9 @@ internal final class XYConnectionAgent: XYCentralDelegate {
                 print("Not sure!")
             }
         }
+
         promise.fulfill(())
+        XYConnectionAgent.connectionLock.unlock()
     }
 
     // 3a. Delegate called from scan(), we found the device and now will connect
@@ -181,7 +182,7 @@ public extension XYBluetoothDevice {
         }
 
         // Must be in range
-        guard self.proximity != .outOfRange || self.proximity != .none else {
+        guard self.proximity != .outOfRange && self.proximity != .none else {
             return Promise<Void>(XYBluetoothError.deviceNotInRange)
         }
 
@@ -192,7 +193,7 @@ public extension XYBluetoothDevice {
                 try await(XYConnectionAgent(for: self).connect())
             }
             try operations()
-        }).always {
+        }).always(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
         }
     }
