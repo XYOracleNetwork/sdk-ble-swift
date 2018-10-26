@@ -20,8 +20,6 @@ class XYFinderDeviceManager {
         self.managerQueue.async(flags: .barrier) {
             guard self.devices[device.id] == nil else { return }
             self.devices[device.id] = device
-            print(" **************** added \(device.id) ****************")
-
             self.connect(for: device)
         }
     }
@@ -31,7 +29,13 @@ class XYFinderDeviceManager {
         self.connectionLock.lock()
         XYConnectionAgent(for: device).connect().then(on: XYCentral.centralQueue) {
             self.connectionLock.unlock()
-            print(" **************** DONE \(device.id) ****************")
+
+            // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
+            if let xyDevice = device as? XYFinderDevice {
+                XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
+                xyDevice.subscribeToButtonPress()
+                xyDevice.peripheral?.readRSSI()
+            }
         }
     }
 
