@@ -34,7 +34,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval?) -> XYBluetoothResult
 
     func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
-    func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String)
+    func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) -> XYBluetoothResult
 
     func subscribe(_ delegate: CBPeripheralDelegate, key: String)
     func unsubscribe(for key: String)

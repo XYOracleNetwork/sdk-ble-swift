@@ -43,8 +43,8 @@ public class XY4BluetoothDevice: XYFinderDeviceBase {
         self.subscribe(to: PrimaryService.buttonState, delegate: (self.id, self))
     }
 
-    public override func unsubscribeToButtonPress(for referenceKey: UUID? = nil) {
-        self.unsubscribe(from: PrimaryService.buttonState, key: referenceKey?.uuidString ?? self.id)
+    public override func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {
+        return self.unsubscribe(from: PrimaryService.buttonState, key: referenceKey?.uuidString ?? self.id)
     }
 
     @discardableResult public override func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {

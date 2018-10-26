@@ -29,6 +29,8 @@ public class XYBluetoothResult {
         self.error = error
     }
 
+    public static var empty: XYBluetoothResult { return XYBluetoothResult(data: nil) }
+
     public func setData(_ data: Data?) { self.data = data }
     public func setError(_ error: XYBluetoothError?) { self.error = error }
 
