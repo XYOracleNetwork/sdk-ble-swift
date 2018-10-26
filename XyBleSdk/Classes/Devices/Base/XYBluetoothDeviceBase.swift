@@ -11,8 +11,6 @@ import CoreBluetooth
 // A concrete base class to base any BLE device off of
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
-    fileprivate static let connectedDevices = XYFinderDeviceManager()
-
     fileprivate var
     firstPulseTime: Date?,
     lastPulseTime: Date?
@@ -70,7 +68,6 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     public func unlock() {
         self.deviceLock.unlock()
     }
-
 
     public var inRange: Bool {
         if self.peripheral?.state == .connected { return true }
@@ -130,7 +127,11 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     public func connect() {
-        XYBluetoothDeviceBase.connectedDevices.add(device: self)
+        XYDeviceConnectionManager.instance.add(device: self)
+    }
+
+    public func disconnect() {
+        XYDeviceConnectionManager.instance.remove(for: self.id)
     }
 
 }

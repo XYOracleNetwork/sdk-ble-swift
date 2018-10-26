@@ -185,9 +185,4 @@ public extension XYBluetoothDevice {
             self.unlock()
         }
     }
-
-    func disconnect() {
-        let central = XYCentral.instance
-        central.disconnect(from: self)
-    }
 }

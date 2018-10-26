@@ -7,10 +7,14 @@
 
 import CoreBluetooth
 
-class XYFinderDeviceManager {
+final class XYDeviceConnectionManager {
+
+    static let instance = XYDeviceConnectionManager()
+
+    private init() {}
 
     fileprivate var devices = [String: XYBluetoothDevice]()
-    private let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
+    fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
     fileprivate let connectionLock = GenericLock()
 
     // Add a tracked device and connect to it, ensuring we do not add the same device twice as this method
@@ -24,8 +28,21 @@ class XYFinderDeviceManager {
         }
     }
 
+    // Remove the devices from the dictionary of tracked, connected devices, and let central know to disconnect
+    func remove(for id: String) {
+        guard self.devices[id] != nil else { return }
+        self.managerQueue.async(flags: .barrier) {
+            guard let device = self.devices[id] else { return }
+            self.devices.removeValue(forKey: device.id)
+            self.disconnect(from: device)
+        }
+    }
+}
+
+private extension XYDeviceConnectionManager {
+
     // Connect to the device using the connection agent, ensuring work is done on a BG queue
-    private func connect(for device: XYBluetoothDevice) {
+    func connect(for device: XYBluetoothDevice) {
         self.connectionLock.lock()
         XYConnectionAgent(for: device).connect().then(on: XYCentral.centralQueue) {
             self.connectionLock.unlock()
@@ -39,22 +56,8 @@ class XYFinderDeviceManager {
         }
     }
 
-//    func remove(at index: String) {
-//        self.accessQueue.async(flags: .barrier) {
-//            self.devices.removeValue(forKey: index)
-//        }
-//    }
-
-
-    // Threadsafe lookup for a tracked device
-    subscript(index: String) -> XYBluetoothDevice? {
-        get {
-            var device: XYBluetoothDevice?
-            self.managerQueue.sync {
-                device = self.devices[index]
-            }
-            return device
-        }
+    func disconnect(from device: XYBluetoothDevice) {
+        XYCentral.instance.disconnect(from: device)
     }
 
 }
