@@ -93,6 +93,45 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         XYFinderDeviceEventManager.report(events: events)
     }
 
+    public override func verifyExit(_ callback:((_ exited: Bool) -> Void)? = nil) {
+        // If we're connected poke the device
+        guard self.peripheral?.state != .connected else {
+            peripheral?.readRSSI()
+            return
+        }
+
+        let lastPulse = self.lastPulseTime
+        if self.verifyCounter == 0 {
+            self.verifyCounter = XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXIT_WINDOW_COUNT
+        }
+
+        XYLocation.instance.startRanging(for: self)
+        DispatchQueue.global().asyncAfter(deadline: .now() + XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXIT_WINDOW_SIZE) {
+            XYLocation.instance.stopRanging(for: self)
+            self.verifyCounter -= 1
+            if (self.lastPulseTime == lastPulse)
+            {
+                if (self.verifyCounter != 0)
+                {
+                    DispatchQueue.global().asyncAfter(deadline: .now() + XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXIT_GAP_SIZE) {
+                        self.verifyExit(callback)
+                    }
+                }
+                else
+                {
+                    XYFinderDeviceEventManager.report(events: [.exited(device: self)])
+                    callback?(true)
+                }
+            }
+            else
+            {
+                self.verifyCounter = 0
+                callback?(false)
+            }
+        }
+
+    }
+
     // Handles the xy1 and xy2 cases
     public func subscribeToButtonPress() {}
     public func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {

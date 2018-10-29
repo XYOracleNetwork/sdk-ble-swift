@@ -28,6 +28,8 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func lock()
     func unlock()
 
+    func verifyExit(_ callback:((_ exited: Bool) -> Void)?)
+
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult

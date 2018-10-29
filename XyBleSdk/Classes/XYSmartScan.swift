@@ -186,10 +186,9 @@ public extension XYSmartScan {
                     else { continue }
 
                 XYFinderDeviceEventManager.report(events: [.exited(device: xyDevice)])
-
-//                device.lastPulseTime = nil
-//                device.verifyExit()
+                device.verifyExit(nil)
             }
+
             self.checkExits()
         }
     }
@@ -224,7 +223,7 @@ extension XYSmartScan: XYLocationDelegate {
         let uniqueBeacons = buttonPressedBeacons + buttonNotPressedBeacons
 
         uniqueBeacons.forEach { beacon in
-            if beacon.inRange {
+            if !beacon.inRange {
                 self.delegates.forEach { $1?.smartScan(entered: beacon)}
                 XYFinderDeviceEventManager.report(events: [.entered(device: beacon)])
             }

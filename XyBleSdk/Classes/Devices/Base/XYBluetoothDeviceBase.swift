@@ -19,6 +19,8 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     fileprivate var deviceLock = GenericLock()
 
+    internal var verifyCounter = 0
+
     public var
     rssi: Int,
     powerLevel: UInt8
@@ -57,6 +59,8 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
         self.lastPulseTime = Date()
     }
+
+    public func verifyExit(_ callback:((_ exited: Bool) -> Void)?) {}
 }
 
 // MARK: XYBluetoothDevice protocol base implementations
