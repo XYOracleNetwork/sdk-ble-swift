@@ -21,6 +21,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     var location: XYLocationCoordinate2D { get }
     var batteryLevel: Int { get }
     var firmware: String { get }
+    var isRegistered: Bool { get }
 
     // Handlers for button press subscriptions
     func subscribeToButtonPress()
@@ -34,6 +35,10 @@ public protocol XYFinderDevice: XYBluetoothDevice {
 
     // Handles when detected from the location manager
     func detected()
+
+    // Updates the state of the device's isRegistered flag
+    // I'm unsure as to what this is used for
+    func getRegistrationFlag()
 
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult

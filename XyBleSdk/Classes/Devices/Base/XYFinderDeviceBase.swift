@@ -18,6 +18,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
 
     public fileprivate(set) var
     location: XYLocationCoordinate2D = XYLocationCoordinate2D(),
+    isRegistered: Bool = false,
     batteryLevel: Int = -1,
     firmware: String = ""
 
@@ -54,6 +55,17 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { _ in getServiceUuid() }
     }
 
+    public func getRegistrationFlag() {
+        self.connection {
+            if !self.unlock().hasError {
+                let result = self.isAwake()
+                if !result.hasError, let value = result.asByteArray, value.count > 0 {
+                    self.isRegistered = value[0] != 0x00
+                }
+            }
+        }
+    }
+
     public func detected() {
         var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
 
@@ -70,9 +82,9 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             }
         }
 
-        //        if self.registered {
-        //            reportUpdated();
-        //        }
+        if self.isRegistered {
+            XYFinderDeviceEventManager.report(events: [.updated(device: self)])
+        }
 
         if stayConnected && connected == false {
             self.connect()

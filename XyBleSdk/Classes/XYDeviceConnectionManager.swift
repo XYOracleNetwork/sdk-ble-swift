@@ -51,7 +51,9 @@ private extension XYDeviceConnectionManager {
             if let xyDevice = device as? XYFinderDevice {
                 XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
                 xyDevice.subscribeToButtonPress()
-                xyDevice.peripheral?.readRSSI()
+                if xyDevice.peripheral?.state == .connected {
+                    xyDevice.peripheral?.readRSSI()
+                }
             }
         }
     }
