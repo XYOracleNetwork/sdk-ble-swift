@@ -17,6 +17,10 @@ final class XYDeviceConnectionManager {
     fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
     fileprivate let connectionLock = GenericLock()
 
+    public var connectedDevices: [XYBluetoothDevice] {
+        return self.devices.map { $1 }
+    }
+
     // Add a tracked device and connect to it, ensuring we do not add the same device twice as this method
     // will be called multiple times over the course of a session from the location and peripheral delegates
     func add(device: XYBluetoothDevice) {

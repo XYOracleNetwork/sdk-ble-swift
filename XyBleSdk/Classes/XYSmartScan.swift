@@ -52,6 +52,7 @@ public class XYSmartScan {
 
     private init() {
         self.location.setDelegate(self)
+        self.checkExits()
     }
 
     public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.values, mode: XYSmartScan2Mode) {
@@ -172,6 +173,26 @@ public extension XYSmartScan {
             location.startRangning(for: self.trackedDevices.map { $1 } ) :
             location.startMonitoring(for: self.trackedDevices.map { $1 } )
     }
+
+    // Another recursive method for checking exits of devices so we can alter the user
+    private func checkExits() {
+        XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
+
+            for device in XYDeviceConnectionManager.instance.connectedDevices {
+                guard
+                    let xyDevice = device as? XYFinderDevice,
+                    let lastPulseTime = xyDevice.lastPulseTime,
+                    fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
+                    else { continue }
+
+                XYFinderDeviceEventManager.report(events: [.exited(device: xyDevice)])
+
+//                device.lastPulseTime = nil
+//                device.verifyExit()
+            }
+            self.checkExits()
+        }
+    }
 }
 
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
@@ -205,6 +226,7 @@ extension XYSmartScan: XYLocationDelegate {
         uniqueBeacons.forEach { beacon in
             if beacon.inRange {
                 self.delegates.forEach { $1?.smartScan(entered: beacon)}
+                XYFinderDeviceEventManager.report(events: [.entered(device: beacon)])
             }
 
             self.delegates.forEach {
