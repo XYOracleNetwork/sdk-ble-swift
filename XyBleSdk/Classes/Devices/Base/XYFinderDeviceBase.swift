@@ -103,6 +103,15 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
+    @discardableResult public func isAwake() -> XYBluetoothResult {
+        switch self.family {
+        case .xy1, .xy2:
+            return XYBluetoothResult(data: Data([0x01]))
+        default:
+            return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
+        }
+    }
+
     @discardableResult public func fallAsleep() -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }

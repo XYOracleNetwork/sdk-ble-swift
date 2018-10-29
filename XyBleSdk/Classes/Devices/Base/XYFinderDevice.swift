@@ -38,6 +38,7 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
     @discardableResult func stayAwake() -> XYBluetoothResult
+    @discardableResult func isAwake() -> XYBluetoothResult
     @discardableResult func fallAsleep() -> XYBluetoothResult
     @discardableResult func lock() -> XYBluetoothResult
     @discardableResult func unlock() -> XYBluetoothResult

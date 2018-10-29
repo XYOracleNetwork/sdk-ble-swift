@@ -56,6 +56,10 @@ public class XY4BluetoothDevice: XYFinderDeviceBase {
         return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x01])))
     }
 
+    @discardableResult public override func isAwake() -> XYBluetoothResult {
+        return self.get(PrimaryService.stayAwake)
+    }
+
     @discardableResult public override func fallAsleep() -> XYBluetoothResult {
         return self.set(PrimaryService.stayAwake, value: XYBluetoothResult(data: Data([0x00])))
     }

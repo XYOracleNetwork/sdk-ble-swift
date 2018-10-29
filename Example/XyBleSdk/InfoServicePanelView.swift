@@ -26,6 +26,9 @@ final class InfoServicePanelView: UIView {
     @IBOutlet weak var stayAwakeButton: CommonButton!
     @IBOutlet weak var fallAsleepButton: CommonButton!
 
+    @IBOutlet weak var connectionButton: CommonButton!
+    @IBOutlet weak var disconnectionButton: CommonButton!
+
     convenience init(frame: CGRect, parent: DeviceDetailViewController) {
         self.init(frame: frame)
         self.parent = parent
@@ -55,19 +58,21 @@ final class InfoServicePanelView: UIView {
         self.minorLabel.text = String(format:"0x%02X", device.iBeacon?.minor ?? 0)
         self.pulsesLabel.text = String(device.totalPulseCount)
         self.rssiLabel.text = String(device.rssi)
-        updateStayAwakeButtonStates()
+        updateStayAwakeAndConnectionButtonStates()
     }
 
-    private func updateStayAwakeButtonStates() {
+    private func updateStayAwakeAndConnectionButtonStates() {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
 
+        self.connectionButton.isEnabled = false
+        self.disconnectionButton.isEnabled = false
         self.stayAwakeButton.isEnabled = false
         self.fallAsleepButton.isEnabled = false
 
         device.connection {
-            let data = device.get(PrimaryService.stayAwake)
+            let data = device.isAwake()
             var value = 0
             if let intVal = data.asInteger {
                 value = intVal
@@ -76,9 +81,13 @@ final class InfoServicePanelView: UIView {
                 if value == 1 {
                     self.stayAwakeButton.isEnabled = false
                     self.fallAsleepButton.isEnabled = true
+                    self.connectionButton.isEnabled = false
+                    self.disconnectionButton.isEnabled = true
                 } else {
                     self.stayAwakeButton.isEnabled = true
                     self.fallAsleepButton.isEnabled = false
+                    self.connectionButton.isEnabled = true
+                    self.disconnectionButton.isEnabled = false
                 }
             }
         }.always {
@@ -104,6 +113,8 @@ extension InfoServicePanelView {
         }.then {
             if let error = result?.error {
                 self.parent?.showErrorAlert(for: error)
+            } else {
+                self.parent?.showAlert(title: "Operation Successful", message: "No error")
             }
         }.always {
             button.isEnabled = true
@@ -128,7 +139,7 @@ extension InfoServicePanelView {
         wrapper(sender, operation: {
             device.stayAwake()
         }, completion: {
-            self.updateStayAwakeButtonStates()
+            self.updateStayAwakeAndConnectionButtonStates()
         })
     }
 
@@ -139,7 +150,7 @@ extension InfoServicePanelView {
         wrapper(sender, operation: {
             device.fallAsleep()
         }, completion: {
-            self.updateStayAwakeButtonStates()
+            self.updateStayAwakeAndConnectionButtonStates()
         })
     }
 
@@ -165,14 +176,70 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
+
+
         device.subscribeToButtonPress()
     }
 
-    @IBAction func disableNotifyTapped(_ sender: CommonButton) {
+    @IBAction func disableNotifyTapped(_ sender: Any) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        device.unsubscribeToButtonPress(for: self.rangedDevicesManager.subscriptionUuid)
+
+        device.connection {
+            _ = device.unsubscribeToButtonPress(for: nil)
+        }
+    }
+
+    @IBAction func emulateConnectTapped(_ sender: Any) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+
+        device.connection {
+            let unlock = device.unlock()
+            let stayAwake = device.stayAwake()
+
+            if unlock.hasError {
+                self.parent?.showErrorAlert(for: unlock.error!)
+            }
+
+            if stayAwake.hasError {
+                self.parent?.showErrorAlert(for: stayAwake.error!)
+            }
+
+            if (unlock.hasError && stayAwake.hasError) == false {
+                self.parent?.showAlert(title: "Operation Successful", message: "No error")
+            }
+        }.always {
+            self.updateStayAwakeAndConnectionButtonStates()
+        }
+    }
+
+    @IBAction func emulateDisconnectTapped(_ sender: Any) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+
+        device.connection {
+            let unlock = device.unlock()
+            let fallAsleep = device.fallAsleep()
+
+            if unlock.hasError {
+                self.parent?.showErrorAlert(for: unlock.error!)
+            }
+
+            if fallAsleep.hasError {
+                self.parent?.showErrorAlert(for: fallAsleep.error!)
+            }
+
+            if (unlock.hasError && fallAsleep.hasError) == false {
+                self.parent?.showAlert(title: "Operation Successful", message: "No error")
+            }
+
+        }.always {
+            self.updateStayAwakeAndConnectionButtonStates()
+        }
     }
 
 }

@@ -11,7 +11,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InfoServicePanelView" customModule="XyBleSdk_Example" customModuleProvider="target">
             <connections>
+                <outlet property="connectionButton" destination="sIA-AM-bnI" id="a0v-ia-7vf"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Y77-l8-gCI"/>
+                <outlet property="disconnectionButton" destination="3cy-vg-dwb" id="N7Z-5H-Biu"/>
                 <outlet property="fallAsleepButton" destination="YCq-AZ-I9T" id="rxZ-t3-FI2"/>
                 <outlet property="familyLabel" destination="eGp-67-QGv" id="Xwg-f4-cKo"/>
                 <outlet property="majorLabel" destination="xcU-2m-kRm" id="J1G-cF-iRY"/>
@@ -27,7 +29,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" distribution="equalCentering" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="lUA-kJ-2ih">
-                    <rect key="frame" x="16" y="168" width="232" height="160"/>
+                    <rect key="frame" x="16" y="168" width="232" height="242"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="13z-Jf-3TS" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
@@ -115,7 +117,7 @@
                                         <action selector="enableNotifyTapped:" destination="-1" eventType="touchUpInside" id="Yfn-BI-E3A"/>
                                     </connections>
                                 </button>
-                                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sIA-AM-bnI" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
+                                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WXL-85-Hj3" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
                                     <rect key="frame" x="120" y="0.0" width="112" height="34"/>
                                     <state key="normal" title="Disable Notify"/>
                                     <userDefinedRuntimeAttributes>
@@ -124,11 +126,35 @@
                                         </userDefinedRuntimeAttribute>
                                     </userDefinedRuntimeAttributes>
                                     <connections>
-                                        <action selector="disableNotifyTapped:" destination="-1" eventType="touchUpInside" id="i7v-c7-V4U"/>
+                                        <action selector="disableNotifyTapped:" destination="-1" eventType="touchUpInside" id="uDR-ch-q5Y"/>
                                     </connections>
                                 </button>
                             </subviews>
                         </stackView>
+                        <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sIA-AM-bnI" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="170" width="138" height="30"/>
+                            <state key="normal" title="Emulate Connection"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="10"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="emulateConnectTapped:" destination="-1" eventType="touchUpInside" id="Ai6-Yg-fI2"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3cy-vg-dwb" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="212" width="158" height="30"/>
+                            <state key="normal" title="Emulate Disconnection"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="10"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="emulateDisconnectTapped:" destination="-1" eventType="touchUpInside" id="kMl-Dn-cPT"/>
+                            </connections>
+                        </button>
                     </subviews>
                 </stackView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Family:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WgW-6m-oPh">

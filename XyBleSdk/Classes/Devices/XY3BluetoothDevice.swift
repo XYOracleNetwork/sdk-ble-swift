@@ -37,6 +37,10 @@ public class XY3BluetoothDevice: XYFinderDeviceBase {
         return self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x01])))
     }
 
+    @discardableResult public override func isAwake() -> XYBluetoothResult {
+        return self.get(ExtendedConfigService.registration)
+    }
+
     @discardableResult public override func fallAsleep() -> XYBluetoothResult {
         return self.set(ExtendedConfigService.registration, value: XYBluetoothResult(data: Data([0x00])))
     }
