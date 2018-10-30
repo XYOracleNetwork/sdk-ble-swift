@@ -32,11 +32,13 @@ class RangedDevicesManager: NSObject {
 
     private override init() {
         super.init()
-        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed], for: self.selectedDevice) { event in
-            guard let currentDevice = self.selectedDevice else { return }
+        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected]) { event in
             switch event {
-            case .buttonPressed(let device, _) where currentDevice == device:
+            case .buttonPressed(let device, _):
+                guard let currentDevice = self.selectedDevice, currentDevice == device else { return }
                 self.delegate?.buttonPressed(on: device)
+            case .connected(let device):
+                print("----- Connected to \(device.id)")
             default:
                 break
             }
@@ -68,7 +70,8 @@ func scan(for deviceIndex: NSInteger) {
             else { return }
 
         self.selectedDevice = device
-        central.scan()
+        print(self.selectedDevice?.id)
+//        central.scan()
     }
 
     func disconnect() {
@@ -104,6 +107,21 @@ extension RangedDevicesManager: UITableViewDataSource {
         cell.accessoryType = device.powerLevel == UInt(8) ? .checkmark : .none
         return cell
     }
+}
+
+extension RangedDevicesManager {
+
+    func multiTest() {
+        print("Starting MultiTest")
+
+        // Build two devices from ids
+        let blue = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+        let black = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.80.59060")
+
+        blue?.connect()
+//        black?.connect()
+    }
+
 }
 
 extension RangedDevicesManager: XYCentralDelegate {

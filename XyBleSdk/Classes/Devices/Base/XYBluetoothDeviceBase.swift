@@ -17,7 +17,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public fileprivate(set) var totalPulseCount = 0
 
-    fileprivate var deviceLock = GenericLock()
+    fileprivate var deviceLock = GenericLock(3)
 
     internal var verifyCounter = 0
 
@@ -111,6 +111,9 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
             else { return false }
 
+//        dump((self as? XYFinderDevice)?.connectableServices.map { $0.uuidString })
+//        dump(services.map { $0.uuidString })
+
         guard
             let connectableServices = (self as? XYFinderDevice)?.connectableServices,
             connectableServices.count == 2,
@@ -165,6 +168,7 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
     }
 
     // We "recursively" call this method, updating the latest rssi value, and also calling detected if it is an XYFinder device
+    // This is the driver for the distance meters in the primary application
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
         self.update(Int(truncating: RSSI), powerLevel: 0x4)
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }

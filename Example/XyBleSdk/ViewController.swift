@@ -55,6 +55,10 @@ private extension ViewController {
         self.navigationItem.rightBarButtonItem = self.pauseButton
     }
 
+    @objc func multiTestTapped() {
+        self.rangedDevicesManager.multiTest()
+    }
+
 }
 
 private extension ViewController {
@@ -82,6 +86,9 @@ private extension ViewController {
 
         self.pauseButton = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(pauseTapped))
         self.playButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(playTapped))
+
+        let multiTest = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(multiTestTapped))
+        self.navigationItem.leftBarButtonItem = multiTest
     }
 }
 

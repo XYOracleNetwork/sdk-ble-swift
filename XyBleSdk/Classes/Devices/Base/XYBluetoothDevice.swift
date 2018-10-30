@@ -42,6 +42,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func unsubscribe(for key: String)
 
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
+    var state: CBPeripheralState { get }
 }
 
 // MARK: Methods to get, set, or notify on a characteristic using the Promises-based connection work block method below
@@ -49,6 +50,10 @@ public extension XYBluetoothDevice {
 
     var connected: Bool {
         return (self.peripheral?.state ?? .disconnected) == .connected
+    }
+
+    var state: CBPeripheralState {
+        return self.peripheral?.state ?? .disconnected
     }
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
@@ -80,6 +85,8 @@ public extension XYBluetoothDevice {
 }
 
 // A helper to allow for adding connecting to a peripheral to a connection() operation closure
+// NOTE: The agent is not thread-safe, and should be used in conjunction with other locking mechanisms
+// such as those in the XYDeviceConnectionManager or the call to connection below
 internal final class XYConnectionAgent: XYCentralDelegate {
     private let
     central = XYCentral.instance,
@@ -89,8 +96,6 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     private static let callTimeout: DispatchTimeInterval = .seconds(30)
     private static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYConnectionAgentTimeoutQueue")
     private var timer: DispatchSourceTimer?
-
-    fileprivate static let connectionLock = GenericLock()
 
     private lazy var promise = Promise<Void>.pending()
 
@@ -106,20 +111,13 @@ internal final class XYConnectionAgent: XYCentralDelegate {
             return Promise(())
         }
 
-        XYConnectionAgent.connectionLock.lock("XYConnectionAgent: id \(self.device.id)")
-
-        guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
-            XYConnectionAgent.connectionLock.unlock()
-            return Promise(())
-        }
-
         self.central.setDelegate(self, key: self.delegateKey)
 
         // Timeout on connection to the peripheral
         let callTimeout = timeout ?? XYConnectionAgent.callTimeout
         self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
             guard let strong = self else { return }
-            XYConnectionAgent.connectionLock.unlock()
+            strong.central.stopScan()
             strong.timer = nil
             strong.promise.reject(XYBluetoothError.timedOut)
         }
@@ -139,7 +137,6 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     func connected(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
         promise.fulfill(())
-        XYConnectionAgent.connectionLock.unlock()
     }
 
     // 3a. Delegate called from scan(), we found the device and now will connect
@@ -153,7 +150,6 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     func couldNotConnect(peripheral: XYPeripheral) {
         self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
-        XYConnectionAgent.connectionLock.unlock()
     }
 
     // Unused in this single connection case

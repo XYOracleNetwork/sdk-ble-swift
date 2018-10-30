@@ -29,7 +29,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" distribution="equalCentering" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="lUA-kJ-2ih">
-                    <rect key="frame" x="16" y="168" width="232" height="242"/>
+                    <rect key="frame" x="16" y="168" width="232" height="244"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="13z-Jf-3TS" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
@@ -132,7 +132,7 @@
                             </subviews>
                         </stackView>
                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sIA-AM-bnI" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="170" width="138" height="30"/>
+                            <rect key="frame" x="0.0" y="168" width="154" height="34"/>
                             <state key="normal" title="Emulate Connection"/>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -144,7 +144,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3cy-vg-dwb" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="212" width="158" height="30"/>
+                            <rect key="frame" x="0.0" y="210" width="174" height="34"/>
                             <state key="normal" title="Emulate Disconnection"/>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">

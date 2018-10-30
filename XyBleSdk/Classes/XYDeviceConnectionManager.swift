@@ -15,8 +15,8 @@ final class XYDeviceConnectionManager {
 
     fileprivate var devices = [String: XYBluetoothDevice]()
     fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
-    fileprivate let connectionLock = GenericLock()
-    fileprivate var building = false
+
+    fileprivate let connectionLock = GenericLock(0)
 
     public var connectedDevices: [XYBluetoothDevice] {
         return self.devices.map { $1 }
@@ -42,39 +42,32 @@ final class XYDeviceConnectionManager {
             self.disconnect(from: device)
         }
     }
-
-    func buildDaemon() {
-        self.managerQueue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
-            guard self.devices.filter({ $1.peripheral?.state == .connected }).count > 0, self.building == false else { self.buildDaemon(); return }
-            if let toBuild = self.devices.filter({ $1.peripheral?.state == .disconected }).first {
-                self.building = true
-                self.connect(for: toBuild)
-            }
-        }
-    }
 }
 
+// MARK: Connect and disconnection
 private extension XYDeviceConnectionManager {
 
-    // Connect to the device using the connection agent, ensuring work is done on a BG queue
+    // Connect to the device using the connection agent, then subscribe to the button press and
+    // start the readRSSI recursive loop. Use a 0-based sempahore to ensure only once device
+    // can be in the connection state at one time
     func connect(for device: XYBluetoothDevice) {
-        self.connectionLock.lock("XYDeviceConnectionManager: id \(device.id)")
         XYConnectionAgent(for: device).connect().then(on: XYCentral.centralQueue) {
-            self.connectionLock.unlock()
-
             // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
             if let xyDevice = device as? XYFinderDevice {
                 XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
-                xyDevice.subscribeToButtonPress()
                 if xyDevice.peripheral?.state == .connected {
+                    xyDevice.subscribeToButtonPress()
                     xyDevice.peripheral?.readRSSI()
                 }
             }
+        }.always {
+            self.connectionLock.unlock()
         }
+
+        self.connectionLock.lock()
     }
 
     func disconnect(from device: XYBluetoothDevice) {
         XYCentral.instance.disconnect(from: device)
     }
-
 }

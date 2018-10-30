@@ -87,15 +87,24 @@ internal class GenericLock {
     private var currentCounter = 0
     private var name: String?
 
-    private let semaphore = DispatchSemaphore(value: 1)
-    internal static let waitTimeout: TimeInterval = 7
+//    private let semaphore = DispatchSemaphore(value: 1)
+//    internal static let waitTimeout: TimeInterval = 15
+
+    private let
+    semaphore: DispatchSemaphore,
+    waitTimeout: TimeInterval
+
+    init(_ value: Int = 1, timeout: TimeInterval = 15) {
+        self.semaphore = DispatchSemaphore(value: value)
+        self.waitTimeout = timeout
+    }
 
     public func lock(_ name: String? = nil) {
         currentCounter = GenericLock.counter
         self.name = name
         GenericLock.counter += 1
         print(" ------------ LOCKING: \(currentCounter) : \(name ?? "unnamed") ------------ ")
-        if self.semaphore.wait(timeout: .now() + GenericLock.waitTimeout) == .timedOut {
+        if self.semaphore.wait(timeout: .now() + self.waitTimeout) == .timedOut {
             self.unlock()
         }
     }
