@@ -23,7 +23,7 @@ public class XYLocation: NSObject {
 
     fileprivate let manager = CLLocationManager()
 
-    fileprivate weak var delegate: XYLocationDelegate?
+    fileprivate lazy var delegates = [String: XYLocationDelegate?]()
 
     private override init() {
         super.init()
@@ -35,8 +35,8 @@ public class XYLocation: NSObject {
         manager.delegate = self
     }
 
-    public func setDelegate(_ delegate: XYLocationDelegate) {
-        self.delegate = delegate
+    public func setDelegate(_ delegate: XYLocationDelegate, key: String) {
+        self.delegates[key] = delegate
     }
 }
 
@@ -162,10 +162,10 @@ public extension XYLocation {
 extension XYLocation: CLLocationManagerDelegate {
 
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
-        self.delegate?.didRangeBeacons(
+        self.delegates.forEach { $1?.didRangeBeacons(
             beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi) },
             for: region.family
-        )
+        )}
     }
 
     public func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
@@ -174,7 +174,7 @@ extension XYLocation: CLLocationManagerDelegate {
             let device = XYFinderDeviceFactory.build(from: beaconRegion.xyiBeaconDefinition)
             else { return }
 
-        self.delegate?.deviceEntered(device)
+        self.delegates.forEach { $1?.deviceEntered(device) }
     }
 
     public func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
@@ -183,7 +183,7 @@ extension XYLocation: CLLocationManagerDelegate {
             let device = XYFinderDeviceFactory.build(from: beaconRegion.xyiBeaconDefinition)
             else { return }
 
-        self.delegate?.deviceExited(device)
+        self.delegates.forEach { $1?.deviceExited(device) }
     }
 
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
@@ -191,7 +191,7 @@ extension XYLocation: CLLocationManagerDelegate {
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.delegate?.locationsUpdated(locations.map { XYLocationCoordinate2D($0) })
+        self.delegates.forEach { $1?.locationsUpdated(locations.map { XYLocationCoordinate2D($0) }) }
     }
 
     public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {

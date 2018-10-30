@@ -111,9 +111,6 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
             else { return false }
 
-//        dump((self as? XYFinderDevice)?.connectableServices.map { $0.uuidString })
-//        dump(services.map { $0.uuidString })
-
         guard
             let connectableServices = (self as? XYFinderDevice)?.connectableServices,
             connectableServices.count == 2,
