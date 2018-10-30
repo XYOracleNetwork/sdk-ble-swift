@@ -33,6 +33,8 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     internal var stayConnected: Bool = false
 
+    public fileprivate(set) lazy var supportedServices = [CBUUID]()
+
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
@@ -117,8 +119,13 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
             services.contains(connectableServices[0]) || services.contains(connectableServices[1])
             else { return false }
 
+        // Set the peripheral and delegate to self
         self.peripheral = peripheral.peripheral
         self.peripheral?.delegate = self
+
+        // Save off the services this device was found with for BG monitoring
+        self.supportedServices = services
+
         return true
     }
 
@@ -135,7 +142,6 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     public func disconnect() {
         XYDeviceConnectionManager.instance.remove(for: self.id)
     }
-
 }
 
 // MARK: CBPeripheralDelegate, passes these on to delegate subscribers for this peripheral

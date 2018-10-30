@@ -6,7 +6,7 @@
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
 
-import Foundation
+import CoreBluetooth
 
 // Basic protocol for all BLE devices 
 public protocol XYBluetoothBase {
@@ -19,6 +19,8 @@ public protocol XYBluetoothBase {
     var proximity: XYDeviceProximity { get }
 
     func update(_ rssi: Int, powerLevel: UInt8)
+
+    var supportedServices: [CBUUID] { get }
 }
 
 public extension XYBluetoothBase {

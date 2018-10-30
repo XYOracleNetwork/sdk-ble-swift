@@ -59,9 +59,6 @@ public class XYCentral: NSObject {
     public static let instance = XYCentral()
 
     fileprivate var cbManager: CBCentralManager?
-    fileprivate let scanOptions = [CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true]
-
-    fileprivate let defaultScanTimeout = 10
 
     fileprivate var knownPeripherals = [UUID: XYPeripheral]()
 
@@ -70,12 +67,6 @@ public class XYCentral: NSObject {
 
     private override init() {
         super.init()
-    }
-
-    fileprivate var isConnecting: Bool = false
-
-     deinit {
-        self.cbManager?.delegate = nil
     }
 
     public var state: CBManagerState {
