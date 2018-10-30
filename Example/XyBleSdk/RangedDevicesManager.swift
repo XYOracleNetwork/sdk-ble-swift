@@ -70,8 +70,7 @@ func scan(for deviceIndex: NSInteger) {
             else { return }
 
         self.selectedDevice = device
-        print(self.selectedDevice?.id)
-//        central.scan()
+        central.scan()
     }
 
     func disconnect() {
@@ -107,21 +106,6 @@ extension RangedDevicesManager: UITableViewDataSource {
         cell.accessoryType = device.powerLevel == UInt(8) ? .checkmark : .none
         return cell
     }
-}
-
-extension RangedDevicesManager {
-
-    func multiTest() {
-        print("Starting MultiTest")
-
-        // Build two devices from ids
-        let blue = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
-        let black = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.80.59060")
-
-        blue?.connect()
-//        black?.connect()
-    }
-
 }
 
 extension RangedDevicesManager: XYCentralDelegate {
