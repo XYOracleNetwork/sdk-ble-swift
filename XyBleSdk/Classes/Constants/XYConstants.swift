@@ -83,13 +83,6 @@ public enum XYFinderSong {
 
 internal class GenericLock {
 
-    private static var counter = 0
-    private var currentCounter = 0
-    private var name: String?
-
-//    private let semaphore = DispatchSemaphore(value: 1)
-//    internal static let waitTimeout: TimeInterval = 15
-
     private let
     semaphore: DispatchSemaphore,
     waitTimeout: TimeInterval
@@ -99,18 +92,13 @@ internal class GenericLock {
         self.waitTimeout = timeout
     }
 
-    public func lock(_ name: String? = nil) {
-        currentCounter = GenericLock.counter
-        self.name = name
-        GenericLock.counter += 1
-        print(" ------------ LOCKING: \(currentCounter) : \(name ?? "unnamed") ------------ ")
+    public func lock() {
         if self.semaphore.wait(timeout: .now() + self.waitTimeout) == .timedOut {
             self.unlock()
         }
     }
 
     public func unlock() {
-        print(" +++++++++++++ UNLOCKING \(currentCounter) : \(name ?? "unnamed") +++++++++++++ ")
         self.semaphore.signal()
     }
 
