@@ -106,7 +106,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
             return Promise(())
         }
 
-        XYConnectionAgent.connectionLock.lock()
+        XYConnectionAgent.connectionLock.lock("XYConnectionAgent: id \(self.device.id)")
 
         guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
             XYConnectionAgent.connectionLock.unlock()

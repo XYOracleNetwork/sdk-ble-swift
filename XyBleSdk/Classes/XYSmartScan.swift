@@ -176,21 +176,21 @@ public extension XYSmartScan {
 
     // Another recursive method for checking exits of devices so we can alter the user
     private func checkExits() {
-        XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
-
-            for device in XYDeviceConnectionManager.instance.connectedDevices {
-                guard
-                    let xyDevice = device as? XYFinderDevice,
-                    let lastPulseTime = xyDevice.lastPulseTime,
-                    fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
-                    else { continue }
-
-                XYFinderDeviceEventManager.report(events: [.exited(device: xyDevice)])
-                device.verifyExit(nil)
-            }
-
-            self.checkExits()
-        }
+//        XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
+//
+//            for device in XYDeviceConnectionManager.instance.connectedDevices {
+//                guard
+//                    let xyDevice = device as? XYFinderDevice,
+//                    let lastPulseTime = xyDevice.lastPulseTime,
+//                    fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
+//                    else { continue }
+//
+//                XYFinderDeviceEventManager.report(events: [.exited(device: xyDevice)])
+//                device.verifyExit(nil)
+//            }
+//
+//            self.checkExits()
+//        }
     }
 }
 

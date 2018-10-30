@@ -66,7 +66,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 // MARK: XYBluetoothDevice protocol base implementations
 extension XYBluetoothDeviceBase: XYBluetoothDevice {
     public func lock() {
-        self.deviceLock.lock()
+        self.deviceLock.lock("XYBluetoothDeviceBase: id \(self.id)")
     }
 
     public func unlock() {
