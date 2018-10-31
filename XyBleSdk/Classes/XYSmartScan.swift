@@ -68,6 +68,13 @@ public class XYSmartScan {
         self.isActive = true
     }
 
+    public func start(for device: XYFinderDevice, mode: XYSmartScan2Mode) {
+        self.location.start()
+        self.mode = mode
+        self.startTracking(for: device)
+        self.isActive = true
+    }
+
     public func stop() {
         self.location.stop()
 

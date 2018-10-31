@@ -84,6 +84,8 @@ private extension XYDeviceConnectionManager {
             }
         }.always {
             self.connectionLock.unlock()
+        }.catch { error in
+            print(error.localizedDescription)
         }
 
         self.connectionLock.lock()

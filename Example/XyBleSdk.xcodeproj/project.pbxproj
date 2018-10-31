@@ -16,6 +16,7 @@
 		316409DF215E8F3C006DFAA2 /* CommonButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409DE215E8F3C006DFAA2 /* CommonButton.swift */; };
 		316409E3215EC534006DFAA2 /* GenericServiceCharacteristicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409E2215EC534006DFAA2 /* GenericServiceCharacteristicView.swift */; };
 		316409E5215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409E4215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift */; };
+		31BAAFEA218A5BD20051E2DB /* BackgroundDeviceTestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BAAFE9218A5BD20051E2DB /* BackgroundDeviceTestManager.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -48,6 +49,7 @@
 		316409DE215E8F3C006DFAA2 /* CommonButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButton.swift; sourceTree = "<group>"; };
 		316409E2215EC534006DFAA2 /* GenericServiceCharacteristicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericServiceCharacteristicView.swift; sourceTree = "<group>"; };
 		316409E4215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericServiceCharacteristicRegistry.swift; sourceTree = "<group>"; };
+		31BAAFE9218A5BD20051E2DB /* BackgroundDeviceTestManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDeviceTestManager.swift; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* XyBleSdk_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XyBleSdk_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				316409CE215D7092006DFAA2 /* RangedDevicesManager.swift */,
+				31BAAFE9218A5BD20051E2DB /* BackgroundDeviceTestManager.swift */,
 			);
 			name = Manager;
 			sourceTree = "<group>";
@@ -428,6 +431,7 @@
 				316409DF215E8F3C006DFAA2 /* CommonButton.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				31BAAFEA218A5BD20051E2DB /* BackgroundDeviceTestManager.swift in Sources */,
 				316409E5215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift in Sources */,
 				316409E3215EC534006DFAA2 /* GenericServiceCharacteristicView.swift in Sources */,
 				314BAD7A21628AC6002B6058 /* CommonLabel.swift in Sources */,

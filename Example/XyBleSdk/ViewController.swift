@@ -21,6 +21,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var pulseCount: UILabel!
 
     fileprivate let rangedDevicesManager = RangedDevicesManager.instance
+    fileprivate let bgTestManager = BackgroundDeviceTestManager()
 
     fileprivate var pauseButton: UIBarButtonItem?
     fileprivate var playButton: UIBarButtonItem?
@@ -34,7 +35,8 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         rangedDevicesManager.setDelegate(self)
         self.navigationItem.rightBarButtonItem = self.pauseButton
-        rangedDevicesManager.startRanging()
+//        rangedDevicesManager.startRanging()
+        bgTestManager.prep()
     }
 
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
