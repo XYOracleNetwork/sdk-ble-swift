@@ -25,9 +25,27 @@ final class XYDeviceConnectionManager {
     // Add a tracked device and connect to it, ensuring we do not add the same device twice as this method
     // will be called multiple times over the course of a session from the location and peripheral delegates
     func add(device: XYBluetoothDevice) {
-        guard self.devices[device.id] == nil else { return }
+        guard self.devices[device.id] == nil else {
+            if let xyFound = self.devices[device.id] as? XYFinderDevice {
+                if xyFound.state != .connected {
+                    self.connect(for: xyFound)
+                } else {
+                    XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyFound)])
+                }
+            }
+            return
+        }
         self.managerQueue.async(flags: .barrier) {
-            guard self.devices[device.id] == nil else { return }
+            guard self.devices[device.id] == nil else {
+                if let xyFound = self.devices[device.id] as? XYFinderDevice {
+                    if xyFound.state != .connected {
+                        self.connect(for: xyFound)
+                    } else {
+                        XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyFound)])
+                    }
+                }
+                return
+            }
             self.devices[device.id] = device
             self.connect(for: device)
         }
@@ -46,6 +64,10 @@ final class XYDeviceConnectionManager {
 
 // MARK: Connect and disconnection
 private extension XYDeviceConnectionManager {
+
+    func handleAlreadyConnected() {
+
+    }
 
     // Connect to the device using the connection agent, then subscribe to the button press and
     // start the readRSSI recursive loop. Use a 0-based sempahore to ensure only once device

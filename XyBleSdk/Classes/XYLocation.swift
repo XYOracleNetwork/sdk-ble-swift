@@ -31,12 +31,23 @@ public class XYLocation: NSObject {
         manager.allowsBackgroundLocationUpdates = true
         manager.distanceFilter = XYConstants.DEVICE_TUNING_LOCATION_CHANGE_THRESHOLD
         manager.requestAlwaysAuthorization()
-        manager.startUpdatingLocation()
         manager.delegate = self
     }
 
     public func setDelegate(_ delegate: XYLocationDelegate, key: String) {
         self.delegates[key] = delegate
+    }
+}
+
+// MARK: Start and stop
+public extension XYLocation {
+
+    func start() {
+        self.manager.startUpdatingLocation()
+    }
+
+    func stop() {
+        self.manager.stopUpdatingLocation()
     }
 }
 

@@ -34,6 +34,8 @@ public enum XYSmartScan2Mode {
 
 public class XYSmartScan {
 
+    fileprivate static var detectedCounter = 0
+
     public static let instance = XYSmartScan()
 
     fileprivate var delegates = [String: XYSmartScanDelegate?]()
@@ -55,8 +57,8 @@ public class XYSmartScan {
         self.checkExits()
     }
 
-    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.values, mode: XYSmartScan2Mode) {
-        // TODO investigate threading on main
+    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScan2Mode) {
+        self.location.start()
 
         switch mode {
         case .foreground: self.switchToForeground(families)
@@ -67,6 +69,8 @@ public class XYSmartScan {
     }
 
     public func stop() {
+        self.location.stop()
+
         self.location.clearMonitoring()
         self.location.clearRanging()
         self.trackedDevices.map { $1 }.forEach { $0.disconnect() }
@@ -209,6 +213,9 @@ extension XYSmartScan: XYLocationDelegate {
 
     public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
         guard let family = family else { return }
+
+        XYSmartScan.detectedCounter += 1
+        print("Hello, I am called! \(XYSmartScan.detectedCounter)")
 
         // Get the unique buttons that got pressed
         let buttonPressedBeacons = beacons.filter { $0.powerLevel == 8 }.reduce([], { initial, beacon in

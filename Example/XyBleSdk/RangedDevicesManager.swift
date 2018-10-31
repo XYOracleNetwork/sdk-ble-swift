@@ -32,13 +32,15 @@ class RangedDevicesManager: NSObject {
 
     private override init() {
         super.init()
-        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected]) { event in
+        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected, .alreadyConnected]) { event in
             switch event {
             case .buttonPressed(let device, _):
                 guard let currentDevice = self.selectedDevice, currentDevice == device else { return }
                 self.delegate?.buttonPressed(on: device)
-            case .connected(let device):
-                print("----- Connected to \(device.id)")
+            case .connected, .alreadyConnected:
+                DispatchQueue.main.async {
+                    self.delegate?.showDetails()
+                }
             default:
                 break
             }
@@ -63,19 +65,18 @@ class RangedDevicesManager: NSObject {
         scanner.stop()
     }
 
-func scan(for deviceIndex: NSInteger) {
+    func scan(for deviceIndex: NSInteger) {
         guard
-            central.state == .poweredOn,
             let device = self.rangedDevices[safe: deviceIndex]
             else { return }
 
         self.selectedDevice = device
-        central.scan()
+        self.selectedDevice?.connect()
     }
 
     func disconnect() {
         guard let device = selectedDevice else { return }
-        self.central.disconnect(from: device)
+        device.disconnect()
     }
 }
 
@@ -109,21 +110,10 @@ extension RangedDevicesManager: UITableViewDataSource {
 }
 
 extension RangedDevicesManager: XYCentralDelegate {
-    func located(peripheral: XYPeripheral) {
-        if self.selectedDevice?.attachPeripheral(peripheral) ?? false {
-            central.stopScan()
-            DispatchQueue.main.async {
-                self.delegate?.showDetails()
-            }
-        }
-    }
-
+    func located(peripheral: XYPeripheral) {}
     func connected(peripheral: XYPeripheral) {}
-
     func timeout() {}
-
     func couldNotConnect(peripheral: XYPeripheral) {}
-
     func disconnected(periperhal: XYPeripheral) {}
 
     func stateChanged(newState: CBManagerState) {
@@ -132,17 +122,9 @@ extension RangedDevicesManager: XYCentralDelegate {
             self.scanner.setDelegate(self, key: "RangedDevicesManager")
         }
     }
-
 }
 
 extension RangedDevicesManager: XYSmartScanDelegate {
-    func smartScan(status: XYSmartScanStatus) {}
-
-    func smartScan(exiting device: XYBluetoothDevice) {}
-
-    func smartScan(location: XYLocationCoordinate2D) {}
-
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
 
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily) {
         DispatchQueue.main.async {
@@ -161,6 +143,9 @@ extension RangedDevicesManager: XYSmartScanDelegate {
     }
 
     func smartScan(entered device: XYFinderDevice) {}
-
+    func smartScan(status: XYSmartScanStatus) {}
+    func smartScan(exiting device: XYBluetoothDevice) {}
+    func smartScan(location: XYLocationCoordinate2D) {}
+    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
     func smartScan(exited device: XYFinderDevice) {}
 }
