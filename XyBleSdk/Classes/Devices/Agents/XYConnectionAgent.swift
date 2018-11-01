@@ -29,6 +29,11 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         self.delegateKey = "XYConnectionAgent:\(device.id)"
     }
 
+    deinit {
+        self.central.removeDelegate(for: self.delegateKey)
+        print("XYConnectionAgent DEINIT --------------")
+    }
+
     // 2. Create a connection, or fulfill the promise if the device already is connected
     @discardableResult func connect(_ timeout: DispatchTimeInterval? = nil) -> Promise<Void> {
         guard self.device.peripheral?.state != .connected && self.device.peripheral?.state != .connecting else {
@@ -42,6 +47,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
             guard let strong = self else { return }
             strong.central.stopScan()
+            strong.central.removeDelegate(for: strong.delegateKey)
             strong.timer = nil
             strong.promise.reject(XYBluetoothError.timedOut)
         }
