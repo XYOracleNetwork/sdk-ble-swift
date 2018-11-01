@@ -21,21 +21,18 @@ internal final class XYCentralAgent: XYCentralDelegate {
         self.delegateKey = "XYCentralAgent:\(UUID.init().uuidString)"
     }
 
-    deinit {
-        self.central.removeDelegate(for: self.delegateKey)
-        print("OASDHASDASDASDSD --------------")
-    }
-
     @discardableResult func powerOn() -> Promise<Void> {
         guard self.central.state != .poweredOn else { return Promise(()) }
 
         self.central.setDelegate(self, key: self.delegateKey)
         self.central.enable()
-        return promise
+
+        return promise.always(on: XYCentral.centralQueue) {
+            self.central.removeDelegate(for: self.delegateKey)
+        }
     }
 
     func stateChanged(newState: CBManagerState) {
-        self.central.removeDelegate(for: self.delegateKey)
         newState == .poweredOn ?
             promise.fulfill(()) :
             promise.reject(XYBluetoothError.couldNotPowerOnCentral)
