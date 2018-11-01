@@ -116,4 +116,5 @@ public extension XYBluetoothDevice {
             print((error as! XYBluetoothError).toString)
         }
     }
+
 }

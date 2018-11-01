@@ -19,11 +19,13 @@ class BackgroundDeviceTestManager {
 
     init() {
         smartScan.setDelegate(self, key: "BackgroundDeviceTestManager")
-        self.subUuid = XYFinderDeviceEventManager.subscribe(to: [.connected, .alreadyConnected]) { event in
+        self.subUuid = XYFinderDeviceEventManager.subscribe(to: [.connected, .alreadyConnected, .buttonPressed]) { event in
             switch event {
             case .connected, .alreadyConnected:
                 self.device = event.device
                 self.connected()
+            case .buttonPressed(let device, _):
+                print("Button pressed!!! ------------ \(device.id) ------------ ")
             default:
                 break
             }
@@ -38,13 +40,8 @@ class BackgroundDeviceTestManager {
         guard let device = self.device, device.state == .connected else { return }
         smartScan.start(for: device, mode: .foreground)
         device.connection {
-//            if device.unlock().hasError == false {
-//                let sleep = device.lock()
-//                if sleep.hasError {
-//                    print("Error is \(sleep.error?.toString)")
-//                }
-//            }
             if device.unlock().hasError == false {
+                device.stayAwake()
                 let result = device.version()
                 if result.hasError {
                     print("Error is \(result.error?.toString)")
@@ -61,7 +58,9 @@ class BackgroundDeviceTestManager {
 
 extension BackgroundDeviceTestManager: XYSmartScanDelegate {
     func smartScan(status: XYSmartScanStatus) {}
-    func smartScan(location: XYLocationCoordinate2D) {}
+    func smartScan(location: XYLocationCoordinate2D) {
+        print("LOCATION")
+    }
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {
         guard let device = self.device else { return }
 //        print("poopasdasD")
