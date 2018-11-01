@@ -26,4 +26,8 @@ public class XYLocationCoordinate2D {
     public var isValid: Bool {
         return self.latitude != 0 && self.longitude != 0
     }
+
+    var toCoreLocation: CLLocation {
+        return CLLocation(latitude: self.latitude, longitude: self.longitude)
+    }
 }
