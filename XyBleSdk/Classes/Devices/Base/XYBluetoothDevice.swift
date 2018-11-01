@@ -88,25 +88,32 @@ public extension XYBluetoothDevice {
 public extension XYBluetoothDevice {
 
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
-        // Must have BTLE on to attempt a connection
-        guard XYCentral.instance.state == .poweredOn else {
-            return Promise<Void>(XYBluetoothError.centralNotPoweredOn)
-        }
-
-        // Must be in range
-        guard self.proximity != .outOfRange && self.proximity != .none else {
-            return Promise<Void>(XYBluetoothError.deviceNotInRange)
-        }
+//        // Check range before running operations block
+//        guard self.proximity != .outOfRange && self.proximity != .none else {
+//            return Promise<Void>(XYBluetoothError.deviceNotInRange)
+//        }
 
         // Process the queue, adding the connections agent if needed
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
             self.lock()
+
+            // If we don't have a powered on central, we'll see if we can't get that running
+            if XYCentral.instance.state != .poweredOn {
+                try await(XYCentralAgent().powerOn())
+            }
+
+            // If we are no connected, use the agent to handle that before running the operations block
             if self.peripheral?.state != .connected {
                 try await(XYConnectionAgent(for: self).connect())
             }
+
+            // Run the requested Gatt operations
             try operations()
+
         }).always(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
+        }.catch { error in
+            print((error as! XYBluetoothError).toString)
         }
     }
 }

@@ -31,39 +31,24 @@ class BackgroundDeviceTestManager {
     }
 
     func prep() {
-        central.setDelegate(self, key: "RangedDevicesManager")
-        central.enable()
+        XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")?.connect()
     }
 
     func connected() {
         guard let device = self.device, device.state == .connected else { return }
         smartScan.start(for: device, mode: .foreground)
-//        device.connection {
-//            let result = device.find(.findIt)
-//            if result.hasError {
-//                print("fuck")
-//            }
-//        }.then {
-//
-//        }.catch { error in
-//            print("error: \((error as! XYBluetoothError).toString)")
-//        }
-    }
-
-}
-
-extension BackgroundDeviceTestManager: XYCentralDelegate {
-    func located(peripheral: XYPeripheral) {}
-    func connected(peripheral: XYPeripheral) {}
-    func timeout() {}
-    func couldNotConnect(peripheral: XYPeripheral) {}
-    func disconnected(periperhal: XYPeripheral) {}
-
-    func stateChanged(newState: CBManagerState) {
-        if newState == .poweredOn {
-            XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")?.connect()
+        device.connection {
+            if device.unlock().hasError == false {
+                let result = device.find(.findIt)
+                if result.hasError {
+                    print("Error is \(result.error?.toString)")
+                }
+            }
+        }.catch { error in
+            print("error: \((error as! XYBluetoothError).toString)")
         }
     }
+
 }
 
 extension BackgroundDeviceTestManager: XYSmartScanDelegate {

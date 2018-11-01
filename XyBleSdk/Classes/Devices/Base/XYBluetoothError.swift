@@ -22,6 +22,7 @@ public enum XYBluetoothError: Error {
     case actionNotSupported
     case couldNotConnect
     case centralNotPoweredOn
+    case couldNotPowerOnCentral
     case deviceNotInRange
     case couldNotUnlock
 
@@ -51,6 +52,8 @@ public enum XYBluetoothError: Error {
             return "Bluetooth is Off"
         case .couldNotUnlock:
             return "Could not unlock"
+        case .couldNotPowerOnCentral:
+            return "Could not power on Central"
         case .deviceNotInRange:
             return "Device not in range"
         }

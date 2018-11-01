@@ -72,6 +72,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     }
 
     func couldNotConnect(peripheral: XYPeripheral) {
+        self.central.stopScan()
         self.central.removeDelegate(for: self.delegateKey)
         promise.reject(XYBluetoothError.notConnected)
     }

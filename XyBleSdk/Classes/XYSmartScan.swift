@@ -50,6 +50,8 @@ public class XYSmartScan {
 
     fileprivate var mode: XYSmartScan2Mode = .background
 
+    fileprivate var isCheckingExits: Bool = false
+
     fileprivate static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
 
     private init() {
@@ -66,6 +68,7 @@ public class XYSmartScan {
         }
 
         self.isActive = true
+        self.isCheckingExits = true
     }
 
     public func start(for device: XYFinderDevice, mode: XYSmartScan2Mode) {
@@ -73,6 +76,7 @@ public class XYSmartScan {
         self.mode = mode
         self.startTracking(for: device)
         self.isActive = true
+        self.isCheckingExits = true
     }
 
     public func stop() {
@@ -83,6 +87,7 @@ public class XYSmartScan {
         self.trackedDevices.map { $1 }.forEach { $0.disconnect() }
         self.trackedDevices.removeAll()
         self.isActive = false
+        self.isCheckingExits = false
         self.mode = .background
     }
 
@@ -188,6 +193,7 @@ public extension XYSmartScan {
     // Another recursive method for checking exits of devices so we can alter the user
     private func checkExits() {
         XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
+            guard self.isCheckingExits else { return }
 
             for device in XYDeviceConnectionManager.instance.connectedDevices {
                 guard
