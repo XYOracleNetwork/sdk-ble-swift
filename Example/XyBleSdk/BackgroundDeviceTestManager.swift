@@ -38,20 +38,20 @@ class BackgroundDeviceTestManager {
         guard let device = self.device, device.state == .connected else { return }
         smartScan.start(for: device, mode: .foreground)
         device.connection {
-            if device.unlock().hasError == false {
-                let sleep = device.lock()
-                if sleep.hasError {
-                    print("Error is \(sleep.error?.toString)")
-                }
-            }
 //            if device.unlock().hasError == false {
-//                let result = device.version()
-//                if result.hasError {
-//                    print("Error is \(result.error?.toString)")
-//                } else {
-//                    print("+++++++++++++++++++++++++++++++++++ Version is \(result.asString ?? "unkniown")")
+//                let sleep = device.lock()
+//                if sleep.hasError {
+//                    print("Error is \(sleep.error?.toString)")
 //                }
 //            }
+            if device.unlock().hasError == false {
+                let result = device.version()
+                if result.hasError {
+                    print("Error is \(result.error?.toString)")
+                } else {
+                    print("+++++++++++++++++++++++++++++++++++ Version is \(result.asString ?? "unkniown")")
+                }
+            }
         }.catch { error in
             print("error: \((error as! XYBluetoothError).toString)")
         }

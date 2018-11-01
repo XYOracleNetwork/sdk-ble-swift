@@ -34,8 +34,6 @@ public enum XYSmartScan2Mode {
 
 public class XYSmartScan {
 
-    fileprivate static var detectedCounter = 0
-
     public static let instance = XYSmartScan()
 
     fileprivate var delegates = [String: XYSmartScanDelegate?]()
@@ -226,9 +224,6 @@ extension XYSmartScan: XYLocationDelegate {
 
     public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
         guard let family = family else { return }
-
-        XYSmartScan.detectedCounter += 1
-        print("Hello, I am called! \(XYSmartScan.detectedCounter)")
 
         // Get the unique buttons that got pressed
         let buttonPressedBeacons = beacons.filter { $0.powerLevel == 8 }.reduce([], { initial, beacon in

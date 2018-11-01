@@ -31,20 +31,20 @@ class RangedDevicesManager: NSObject {
     static let instance = RangedDevicesManager()
 
     private override init() {
-//        super.init()
-//        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected, .alreadyConnected]) { event in
-//            switch event {
-//            case .buttonPressed(let device, _):
-//                guard let currentDevice = self.selectedDevice, currentDevice == device else { return }
-//                self.delegate?.buttonPressed(on: device)
-//            case .connected, .alreadyConnected:
-//                DispatchQueue.main.async {
-//                    self.delegate?.showDetails()
-//                }
-//            default:
-//                break
-//            }
-//        }
+        super.init()
+        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected, .alreadyConnected]) { event in
+            switch event {
+            case .buttonPressed(let device, _):
+                guard let currentDevice = self.selectedDevice, currentDevice == device else { return }
+                self.delegate?.buttonPressed(on: device)
+            case .connected, .alreadyConnected:
+                DispatchQueue.main.async {
+                    self.delegate?.showDetails()
+                }
+            default:
+                break
+            }
+        }
     }
 
     func setDelegate(_ delegate: RangedDevicesManagerDelegate) {

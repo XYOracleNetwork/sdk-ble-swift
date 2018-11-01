@@ -25,6 +25,13 @@ final class XYDeviceConnectionManager {
     // Add a tracked device and connect to it, ensuring we do not add the same device twice as this method
     // will be called multiple times over the course of a session from the location and peripheral delegates
     func add(device: XYBluetoothDevice) {
+        // Quick escape if we already have the device and it is connected
+        if let xyDevice = self.devices[device.id] as? XYFinderDevice, xyDevice.state == .connected {
+            XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
+            return
+        }
+
+        // Check and connect
         guard self.devices[device.id] == nil else { return }
         self.managerQueue.async(flags: .barrier) {
             guard self.devices[device.id] == nil else { return }
@@ -56,6 +63,7 @@ private extension XYDeviceConnectionManager {
             if let xyDevice = device as? XYFinderDevice {
                 XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
                 if xyDevice.peripheral?.state == .connected {
+                    xyDevice.unlock()
                     xyDevice.subscribeToButtonPress()
                     xyDevice.peripheral?.readRSSI()
                 }
