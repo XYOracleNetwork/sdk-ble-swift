@@ -6,6 +6,7 @@
 //
 
 import Promises
+import CoreBluetooth
 
 // A helper to allow for adding connecting to a peripheral to a connection() operation closure
 // NOTE: The agent is not thread-safe, and should be used in conjunction with other locking mechanisms
