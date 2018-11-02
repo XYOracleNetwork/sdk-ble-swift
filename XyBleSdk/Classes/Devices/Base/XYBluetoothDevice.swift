@@ -87,6 +87,31 @@ public extension XYBluetoothDevice {
 // MARK: Connecting to a device in order to complete a block of operations defined above, as well as disconnect from the peripheral
 public extension XYBluetoothDevice {
 
+    @discardableResult func queueDisconnected(_ operations: @escaping () throws -> Void) -> Promise<Void> {
+        // Process the queue, adding the connections agent if needed
+        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
+            self.lock()
+
+            // If we don't have a powered on central, we'll see if we can't get that running
+            if XYCentral.instance.state != .poweredOn {
+                try await(XYCentralAgent().powerOn())
+            }
+
+            // If we are no connected, use the agent to handle that before running the operations block
+            if self.peripheral?.state != .connected {
+                try await(XYConnectionAgent(for: self).connect())
+            }
+
+            // Run the requested Gatt operations
+            try operations()
+
+        }).always(on: XYBluetoothDeviceBase.workQueue) {
+            self.unlock()
+            }.catch { error in
+                print((error as! XYBluetoothError).toString)
+        }
+    }
+
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
 //        // Check range before running operations block
 //        guard self.proximity != .outOfRange && self.proximity != .none else {

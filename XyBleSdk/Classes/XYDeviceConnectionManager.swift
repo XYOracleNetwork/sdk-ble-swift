@@ -14,6 +14,7 @@ final class XYDeviceConnectionManager {
     private init() {}
 
     fileprivate var devices = [String: XYBluetoothDevice]()
+    fileprivate lazy var waitQueue = [String]()
     fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
 
     fileprivate let connectionLock = GenericLock(0)
@@ -47,6 +48,31 @@ final class XYDeviceConnectionManager {
             guard let device = self.devices[id] else { return }
             self.devices.removeValue(forKey: device.id)
             self.disconnect(from: device)
+        }
+    }
+
+    func wait(for device: XYBluetoothDevice) {
+        // Quick escape if we already have the device and it is connected
+        if let xyDevice = self.devices[device.id] as? XYFinderDevice, xyDevice.state == .connected {
+            XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
+            return
+        }
+
+        // We have lost contact with the device, so we'll do a non-expiring connectiong try
+        guard !waitQueue.contains(where: { $0 == device.id }) else { return }
+        self.managerQueue.async(flags: .barrier) {
+            guard !self.waitQueue.contains(where: { $0 == device.id }) else { return }
+            XYConnectionAgent.init(for: device).connect(DispatchTimeInterval.never).then {
+                self.waitQueue.removeAll(where: { $0 == device.id })
+                if let xyDevice = device as? XYFinderDevice {
+                    XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
+                    xyDevice.connection {
+                        xyDevice.unlock()
+                        xyDevice.subscribeToButtonPress()
+                        xyDevice.peripheral?.readRSSI()
+                    }
+                }
+            }
         }
     }
 }
