@@ -18,6 +18,7 @@ final class XYDeviceConnectionManager {
     fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
 
     fileprivate let connectionLock = GenericLock(0)
+    fileprivate let reconnectLock = GenericLock(0)
 
     public var connectedDevices: [XYBluetoothDevice] {
         return self.devices.map { $1 }
@@ -62,15 +63,21 @@ final class XYDeviceConnectionManager {
         guard !waitQueue.contains(where: { $0 == device.id }) else { return }
         self.managerQueue.async(flags: .barrier) {
             guard !self.waitQueue.contains(where: { $0 == device.id }) else { return }
-            XYConnectionAgent.init(for: device).connect(DispatchTimeInterval.never).then {
+            print("Adding \(device.id) to wait queue...")
+            XYConnectionAgent(for: device).connect(.never).then(on: XYBluetoothDeviceBase.workQueue) {
                 self.waitQueue.removeAll(where: { $0 == device.id })
+                print("\(device.id) is found again!")
                 if let xyDevice = device as? XYFinderDevice {
-                    XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
                     xyDevice.connection {
                         xyDevice.unlock()
                         xyDevice.subscribeToButtonPress()
                         xyDevice.peripheral?.readRSSI()
+                        XYFinderDeviceEventManager.report(events: [.reconnected(device: xyDevice)])
+                    }.always(on: XYBluetoothDeviceBase.workQueue) {
+                        self.reconnectLock.unlock()
                     }
+
+                    self.reconnectLock.lock()
                 }
             }
         }
@@ -94,7 +101,7 @@ private extension XYDeviceConnectionManager {
                     xyDevice.peripheral?.readRSSI()
                 }
             }
-        }.always {
+        }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.connectionLock.unlock()
         }.catch { error in
             // TODO report an error?

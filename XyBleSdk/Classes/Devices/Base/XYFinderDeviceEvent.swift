@@ -10,6 +10,7 @@ import Foundation
 public enum XYFinderEvent: Int {
     case connected = 0
     case alreadyConnected
+    case reconnected
     case disconnected
     case buttonPressed
     case buttonRecentlyPressed
@@ -23,6 +24,7 @@ public enum XYFinderEvent: Int {
 public enum XYFinderEventNotification {
     case connected(device: XYFinderDevice)
     case alreadyConnected(device: XYFinderDevice)
+    case reconnected(device: XYFinderDevice)
     case disconnected(device: XYFinderDevice)
     case buttonPressed(device: XYFinderDevice, type: XYButtonType2)
     case buttonRecentlyPressed(device: XYFinderDevice, type: XYButtonType2)
@@ -38,6 +40,7 @@ public enum XYFinderEventNotification {
         switch self {
         case .connected(let device): return device
         case .alreadyConnected(let device): return device
+        case .reconnected(let device): return device
         case .disconnected(let device): return device
         case .buttonPressed(let device, _): return device
         case .buttonRecentlyPressed(let device, _): return device
@@ -54,6 +57,7 @@ public enum XYFinderEventNotification {
         switch self {
         case .connected: return .connected
         case .alreadyConnected: return .alreadyConnected
+        case .reconnected: return .reconnected
         case .disconnected: return .disconnected
         case .buttonPressed: return .buttonPressed
         case .buttonRecentlyPressed: return .buttonRecentlyPressed

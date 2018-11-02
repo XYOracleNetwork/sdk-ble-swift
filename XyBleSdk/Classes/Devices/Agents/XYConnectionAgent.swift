@@ -48,7 +48,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
         // If we have no peripheral, we'll need to scan for the device
         if device.peripheral == nil {
             self.central.scan()
-            // Otherwise we can just try to connect
+        // Otherwise we can just try to connect
         } else {
             self.central.connect(to: device)
         }

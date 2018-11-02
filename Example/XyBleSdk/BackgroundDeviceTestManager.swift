@@ -19,11 +19,13 @@ class BackgroundDeviceTestManager {
 
     init() {
         smartScan.setDelegate(self, key: "BackgroundDeviceTestManager")
-        self.subUuid = XYFinderDeviceEventManager.subscribe(to: [.connected, .alreadyConnected, .buttonPressed]) { event in
+        self.subUuid = XYFinderDeviceEventManager.subscribe(to: [.connected, .alreadyConnected, .buttonPressed, .reconnected]) { event in
             switch event {
             case .connected, .alreadyConnected:
                 self.device = event.device
                 self.connected()
+            case .reconnected:
+                print(" ----- Reconnected to device \(event.device.id) -------- ")
             case .buttonPressed(let device, _):
                 print("Button pressed!!! ------------ \(device.id) ------------ ")
             default:
@@ -34,6 +36,8 @@ class BackgroundDeviceTestManager {
 
     func prep() {
         XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")?.connect()
+        XYFinderDeviceFactory.build(from: "xy:ibeacon:08885dd0-111b-11e4-9191-0800200c9a66.9275.50660")?.connect()
+        XYFinderDeviceFactory.build(from: "xy:ibeacon:08885dd0-111b-11e4-9191-0800200c9a66.9291.35700")?.connect()
     }
 
     func connected() {
@@ -59,7 +63,7 @@ class BackgroundDeviceTestManager {
 extension BackgroundDeviceTestManager: XYSmartScanDelegate {
     func smartScan(status: XYSmartScanStatus) {}
     func smartScan(location: XYLocationCoordinate2D) {
-        print("LOCATION")
+//        print("LOCATION")
     }
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {
         guard let device = self.device else { return }
