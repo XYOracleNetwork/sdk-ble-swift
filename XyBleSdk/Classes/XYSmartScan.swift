@@ -193,15 +193,16 @@ public extension XYSmartScan {
         XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
             guard self.isCheckingExits else { return }
 
+            // Loop through known devices that are connected
             for device in XYDeviceConnectionManager.instance.connectedDevices {
                 guard
                     let xyDevice = device as? XYFinderDevice,
-                    let lastPulseTime = xyDevice.lastPulseTime,
+                    let lastPulseTime = device.lastPulseTime,
                     fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
                     else { continue }
 
-                XYFinderDeviceEventManager.report(events: [.exited(device: xyDevice)])
-                device.verifyExit(nil)
+                XYFinderDeviceEventManager.report(events: [.exiting(device: xyDevice)])
+                xyDevice.verifyExit(nil)
             }
 
             self.checkExits()
