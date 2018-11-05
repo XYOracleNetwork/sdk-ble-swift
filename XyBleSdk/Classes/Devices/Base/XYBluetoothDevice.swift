@@ -19,6 +19,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     var peripheral: CBPeripheral? { get }
     var inRange: Bool { get }
     var connected: Bool { get }
+    var markedForDeletion: Bool? { get }
 
     func stayConnected(_ value: Bool)
 

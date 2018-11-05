@@ -50,7 +50,7 @@ public class XYSmartScan {
 
     fileprivate var isCheckingExits: Bool = false
 
-    fileprivate static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
+    internal static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
 
     private init() {
         self.location.setDelegate(self, key: "XYSmartScan")

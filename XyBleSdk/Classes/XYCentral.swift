@@ -172,11 +172,14 @@ extension XYCentral: CBCentralManagerDelegate {
         // dict[CBCentralManagerRestoredStateScanServicesKey] as? [CBUUID]
         // dict[CBCentralManagerRestoredStateScanOptionsKey] as? [String : Any]
 
-        // Disconnect anything that was here when the app got nuked when centralManagerDidUpdateState is called after this
         guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
         knownPeripherals.removeAll()
         for peripheral in peripherals {
-            self.knownPeripherals[peripheral.identifier] = XYPeripheral(peripheral, markedForDisconnect: true)
+            if let device = XYFinderDeviceFactory.build(from: peripheral) {
+                XYDeviceConnectionManager.instance.add(device: device)
+            } else {
+                self.knownPeripherals[peripheral.identifier] = XYPeripheral(peripheral, markedForDisconnect: true)
+            }
         }
     }
 
@@ -184,6 +187,8 @@ extension XYCentral: CBCentralManagerDelegate {
         // TODO move to XYSmartScan::checkExits ? Use this instead? Use a batch?
         self.knownPeripherals.removeValue(forKey: peripheral.identifier)
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
+            if let marked = device.markedForDeletion, marked == true { return }
+            device.resetRssi()
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
             XYDeviceConnectionManager.instance.remove(for: device.id)

@@ -61,7 +61,14 @@ extension XYFinderDeviceBase: XYBluetoothDeviceNotifyDelegate {
             let buttonPressed = XYButtonType2.init(rawValue: rawValue)
             else { return }
 
-        XYFinderDeviceEventManager.report(events: [.buttonPressed(device: self, type: buttonPressed)])
+        if !self.handlingButtonPress {
+            self.handlingButtonPress = true
+            XYFinderDeviceEventManager.report(events: [.buttonPressed(device: self, type: buttonPressed)])
+
+            XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(3.0)) {
+                self.handlingButtonPress = false
+            }
+        }
     }
 }
 

@@ -104,8 +104,16 @@ private extension XYDeviceConnectionManager {
         }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.connectionLock.unlock()
         }.catch { error in
-            // TODO report an error?
-            print(error.localizedDescription)
+            guard let err = error as? XYBluetoothError else { return }
+            switch err {
+            case .timedOut:
+                print("I've timed out trying to connect, so what should I do?")
+                self.disconnect(from: device)
+                if let xyDevice = device as? XYFinderDevice {
+                    XYFinderDeviceEventManager.report(events: [.disconnected(device: xyDevice)])
+                }
+            default: break
+            }
         }
 
         self.connectionLock.lock()

@@ -19,6 +19,7 @@ public protocol XYBluetoothBase {
     var proximity: XYDeviceProximity { get }
 
     func update(_ rssi: Int, powerLevel: UInt8)
+    func resetRssi()
 
     var supportedServices: [CBUUID] { get }
 }

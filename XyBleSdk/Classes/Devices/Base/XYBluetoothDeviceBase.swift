@@ -15,7 +15,9 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     firstPulseTime: Date?,
     lastPulseTime: Date?
 
-    public fileprivate(set) var totalPulseCount = 0
+    public fileprivate(set) var
+    totalPulseCount = 0,
+    markedForDeletion: Bool? = nil
 
     fileprivate var deviceLock = GenericLock(3)
 
@@ -60,6 +62,10 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
         }
 
         self.lastPulseTime = Date()
+    }
+
+    public func resetRssi() {
+        self.rssi = XYDeviceProximity.defaultProximity
     }
 
     public func verifyExit(_ callback:((_ exited: Bool) -> Void)?) {}
@@ -138,6 +144,7 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
     }
 
     public func disconnect() {
+        self.markedForDeletion = true
         XYDeviceConnectionManager.instance.remove(for: self.id)
     }
 }

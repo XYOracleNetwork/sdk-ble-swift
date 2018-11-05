@@ -22,6 +22,8 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     batteryLevel: Int = -1,
     firmware: String = ""
 
+    internal var handlingButtonPress: Bool = false
+
     public init(_ family: XYFinderDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
         self.family = family
         self.iBeacon = iBeacon
