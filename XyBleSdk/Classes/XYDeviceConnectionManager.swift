@@ -33,6 +33,9 @@ final class XYDeviceConnectionManager {
             return
         }
 
+
+        if device.state == .connecting { return }
+
         // Check and connect
         guard self.devices[device.id] == nil else { return }
         self.managerQueue.async(flags: .barrier) {
@@ -58,6 +61,8 @@ final class XYDeviceConnectionManager {
             XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
             return
         }
+
+        if device.state == .connecting { return }
 
         // We have lost contact with the device, so we'll do a non-expiring connectiong try
         guard !waitQueue.contains(where: { $0 == device.id }) else { return }
