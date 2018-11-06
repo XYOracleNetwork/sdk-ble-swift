@@ -23,6 +23,7 @@ class BackgroundDeviceTestManager {
             switch event {
             case .connected, .alreadyConnected:
                 self.device = event.device
+                print("CONNECTED event:\(event.device.id.shortId)...")
                 self.connected()
             case .reconnected:
                 print(" ----- Reconnected to device \(event.device.id) -------- ")

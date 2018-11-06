@@ -120,7 +120,8 @@ public extension XYBluetoothDevice {
 //        }
 
         // Process the queue, adding the connections agent if needed
-        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
+        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue) {
+            print("STEP 2: Trying to lock for \(self.id.shortId)...")
             self.lock()
 
             // If we don't have a powered on central, we'll see if we can't get that running
@@ -128,17 +129,23 @@ public extension XYBluetoothDevice {
                 try await(XYCentralAgent().powerOn())
             }
 
+            print("STEP 3: Trying to connect for \(self.id.shortId)...")
+
             // If we are no connected, use the agent to handle that before running the operations block
             if self.peripheral?.state != .connected {
                 try await(XYConnectionAgent(for: self).connect())
             }
 
+            print("STEP 4: Trying to run operations for \(self.id.shortId)...")
+
             // Run the requested Gatt operations
             try operations()
 
-        }).always(on: XYBluetoothDeviceBase.workQueue) {
+        }.then(on: XYBluetoothDeviceBase.workQueue) {
+            print("STEP 5: All done for \(self.id.shortId)...")
+        }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
-        }.catch { error in
+        }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
             print((error as! XYBluetoothError).toString)
         }
     }

@@ -12,3 +12,11 @@ public extension Collection {
         return indices.contains(index) ? self[index] : nil
     }
 }
+
+public extension String {
+    var shortId: String {
+        guard self.count > 0 else { return "" }
+        let index = self.index(self.endIndex, offsetBy: -10)
+        return String(self[index...])
+    }
+}

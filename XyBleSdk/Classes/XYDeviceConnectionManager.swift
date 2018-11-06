@@ -27,14 +27,8 @@ final class XYDeviceConnectionManager {
     // Add a tracked device and connect to it, ensuring we do not add the same device twice as this method
     // will be called multiple times over the course of a session from the location and peripheral delegates
     func add(device: XYBluetoothDevice) {
-        // Quick escape if we already have the device and it is connected
-        if let xyDevice = self.devices[device.id] as? XYFinderDevice, xyDevice.state == .connected {
-            XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
-            return
-        }
-
-
-        if device.state == .connecting { return }
+        // Quick escape if we already have the device and it is connected or it's already connecting
+        guard !isConnectedOrConnecting(for: self.devices[device.id]) else { return }
 
         // Check and connect
         guard self.devices[device.id] == nil else { return }
@@ -55,14 +49,11 @@ final class XYDeviceConnectionManager {
         }
     }
 
+    // If we lose connection to a device, we can put it in the wait queue and it will automatically reconnect
+    // even if the user leaves the area (as long as the app is still running in the backgound)
     func wait(for device: XYBluetoothDevice) {
-        // Quick escape if we already have the device and it is connected
-        if let xyDevice = self.devices[device.id] as? XYFinderDevice, xyDevice.state == .connected {
-            XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
-            return
-        }
-
-        if device.state == .connecting { return }
+        // Quick escape if we already have the device and it is connected or it's already connecting
+        guard !isConnectedOrConnecting(for: self.devices[device.id]) else { return }
 
         // We have lost contact with the device, so we'll do a non-expiring connectiong try
         guard !waitQueue.contains(where: { $0 == device.id }) else { return }
@@ -92,23 +83,39 @@ final class XYDeviceConnectionManager {
 // MARK: Connect and disconnection
 private extension XYDeviceConnectionManager {
 
+    func isConnectedOrConnecting(for device: XYBluetoothDevice?) -> Bool {
+        if let xyDevice = device as? XYFinderDevice {
+            guard xyDevice.state == .connecting else { return true }
+            if xyDevice.state == .connected {
+                XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
+                return true
+            }
+        }
+
+        return false
+    }
+
     // Connect to the device using the connection agent, then subscribe to the button press and
     // start the readRSSI recursive loop. Use a 0-based sempahore to ensure only once device
     // can be in the connection state at one time
     func connect(to device: XYBluetoothDevice) {
+        print("STEP 1: Trying to connect to \(device.id.shortId)...")
         device.connection {
             // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
             if let xyDevice = device as? XYFinderDevice {
-                XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
                 if xyDevice.peripheral?.state == .connected {
                     xyDevice.unlock()
                     xyDevice.subscribeToButtonPress()
                     xyDevice.peripheral?.readRSSI()
                 }
             }
+        }.then(on: XYBluetoothDeviceBase.workQueue) {
+            if let xyDevice = device as? XYFinderDevice {
+                XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
+            }
         }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.connectionLock.unlock()
-        }.catch { error in
+        }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
             guard let err = error as? XYBluetoothError else { return }
             switch err {
             case .timedOut:
