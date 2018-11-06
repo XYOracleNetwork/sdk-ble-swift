@@ -36,7 +36,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult
     func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval?) -> XYBluetoothResult
 
-    func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate))
+    func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) -> XYBluetoothResult
     func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) -> XYBluetoothResult
 
     func subscribe(_ delegate: CBPeripheralDelegate, key: String)
@@ -90,7 +90,7 @@ public extension XYBluetoothDevice {
 
     @discardableResult func queueDisconnected(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         // Process the queue, adding the connections agent if needed
-        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue, {
+        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue) {
             self.lock()
 
             // If we don't have a powered on central, we'll see if we can't get that running
@@ -106,13 +106,14 @@ public extension XYBluetoothDevice {
             // Run the requested Gatt operations
             try operations()
 
-        }).always(on: XYBluetoothDeviceBase.workQueue) {
+        }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
-            }.catch { error in
-                print((error as! XYBluetoothError).toString)
+        }.catch { error in
+            print((error as! XYBluetoothError).toString)
         }
     }
 
+    // TODO need a timeout here!
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
 //        // Check range before running operations block
 //        guard self.proximity != .outOfRange && self.proximity != .none else {
@@ -142,10 +143,10 @@ public extension XYBluetoothDevice {
             try operations()
 
         }.then(on: XYBluetoothDeviceBase.workQueue) {
-            print("STEP 5: All done for \(self.id.shortId)...")
-        }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
+            print("STEP 5: All done for \(self.id.shortId)...")
         }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
+            self.unlock()
             print((error as! XYBluetoothError).toString)
         }
     }

@@ -25,11 +25,9 @@ public protocol XYBluetoothBase {
 }
 
 public extension XYBluetoothBase {
-
     var proximity: XYDeviceProximity {
         return XYDeviceProximity.fromSignalStrength(self.rssi)
     }
-
 }
 
 public func ==(lhs: XYBluetoothBase, rhs: XYBluetoothBase) -> Bool {

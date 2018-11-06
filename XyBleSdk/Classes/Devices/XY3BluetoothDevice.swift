@@ -20,8 +20,8 @@ public class XY3BluetoothDevice: XYFinderDeviceBase {
         self.init(iBeacon.xyId(from: .xy3), iBeacon: iBeacon, rssi: rssi)
     }
 
-    public override func subscribeToButtonPress() {
-        self.subscribe(to: ControlService.button, delegate: (self.id, self))
+    public override func subscribeToButtonPress() -> XYBluetoothResult {
+        return self.subscribe(to: ControlService.button, delegate: (self.id, self))
     }
 
     public override func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {

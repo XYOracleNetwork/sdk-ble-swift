@@ -37,8 +37,9 @@ class BackgroundDeviceTestManager {
 
     func prep() {
         XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")?.connect()
-        XYFinderDeviceFactory.build(from: "xy:ibeacon:08885dd0-111b-11e4-9191-0800200c9a66.9275.50660")?.connect()
-        XYFinderDeviceFactory.build(from: "xy:ibeacon:08885dd0-111b-11e4-9191-0800200c9a66.9291.35700")?.connect()
+//        XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.80.59060")?.connect()
+//        XYFinderDeviceFactory.build(from: "xy:ibeacon:08885dd0-111b-11e4-9191-0800200c9a66.9275.50660")?.connect()
+//        XYFinderDeviceFactory.build(from: "xy:ibeacon:08885dd0-111b-11e4-9191-0800200c9a66.9291.35700")?.connect()
     }
 
     func connected() {

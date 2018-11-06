@@ -10,15 +10,15 @@ import CoreBluetooth
 final class XYDeviceConnectionManager {
 
     static let instance = XYDeviceConnectionManager()
-
     private init() {}
 
     fileprivate var devices = [String: XYBluetoothDevice]()
     fileprivate lazy var waitQueue = [String]()
     fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
 
-    fileprivate let connectionLock = GenericLock(0)
-    fileprivate let reconnectLock = GenericLock(0)
+    fileprivate let
+    connectionLock = GenericLock(0),
+    reconnectLock = GenericLock(0)
 
     public var connectedDevices: [XYBluetoothDevice] {
         return self.devices.map { $1 }
@@ -64,13 +64,24 @@ final class XYDeviceConnectionManager {
                 self.waitQueue.removeAll(where: { $0 == device.id })
                 print("\(device.id) is found again!")
                 if let xyDevice = device as? XYFinderDevice {
+                    // Lock and try for a reconnection
                     xyDevice.connection {
-                        xyDevice.unlock()
-                        xyDevice.subscribeToButtonPress()
-                        xyDevice.peripheral?.readRSSI()
-                        XYFinderDeviceEventManager.report(events: [.reconnected(device: xyDevice)])
-                    }.always(on: XYBluetoothDeviceBase.workQueue) {
+                        // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
+                        if let xyDevice = device as? XYFinderDevice {
+                            if !xyDevice.unlock().hasError && !xyDevice.subscribeToButtonPress().hasError {
+                                xyDevice.peripheral?.readRSSI()
+                            } else {
+                                throw XYBluetoothError.couldNotConnect
+                            }
+                        }
+                    }.then(on: XYBluetoothDeviceBase.workQueue) {
+                        if let xyDevice = device as? XYFinderDevice {
+                            XYFinderDeviceEventManager.report(events: [.reconnected(device: xyDevice)])
+                        }
                         self.reconnectLock.unlock()
+                    }.catch { _ in
+                        // TODO do we retry here?
+                        self.reconnectLock.lock()
                     }
 
                     self.reconnectLock.lock()
@@ -103,23 +114,22 @@ private extension XYDeviceConnectionManager {
         device.connection {
             // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
             if let xyDevice = device as? XYFinderDevice {
-                if xyDevice.peripheral?.state == .connected {
-                    xyDevice.unlock()
-                    xyDevice.subscribeToButtonPress()
+                if !xyDevice.unlock().hasError && !xyDevice.subscribeToButtonPress().hasError {
                     xyDevice.peripheral?.readRSSI()
+                } else {
+                    throw XYBluetoothError.couldNotConnect
                 }
             }
         }.then(on: XYBluetoothDeviceBase.workQueue) {
             if let xyDevice = device as? XYFinderDevice {
                 XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
             }
-        }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.connectionLock.unlock()
         }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
+            self.connectionLock.unlock()
             guard let err = error as? XYBluetoothError else { return }
             switch err {
             case .timedOut:
-                print("I've timed out trying to connect, so what should I do?")
                 self.disconnect(from: device)
                 if let xyDevice = device as? XYFinderDevice {
                     XYFinderDeviceEventManager.report(events: [.disconnected(device: xyDevice)])

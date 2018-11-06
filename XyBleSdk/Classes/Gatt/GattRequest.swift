@@ -58,14 +58,17 @@ final class GattRequest: NSObject {
 
     func get(from device: XYBluetoothDevice) -> Promise<Data?> {
         var operationPromise = Promise<Data?>.pending()
-        guard let peripheral = device.peripheral else {
+        guard let peripheral = device.peripheral, peripheral.state == .connected else {
             operationPromise.reject(XYBluetoothError.notConnected)
             return operationPromise
         }
 
+        print("START Get: \(device.id.shortId)")
+
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
+            print("TIMEOUT Get: \(device.id.shortId)")
             s.timer = nil
             s.status = .timedOut
             operationPromise.reject(XYBluetoothError.timedOut)
@@ -79,6 +82,7 @@ final class GattRequest: NSObject {
         }.always(on: XYCentral.centralQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
+            print("ALWAYS Get: \(device.id.shortId)")
         }.catch(on: XYCentral.centralQueue) { error in
             operationPromise.reject(error)
         }
@@ -88,14 +92,17 @@ final class GattRequest: NSObject {
 
     func set(to device: XYBluetoothDevice, valueObj: XYBluetoothResult, withResponse: Bool = true) -> Promise<Void> {
         var operationPromise = Promise<Void>.pending()
-        guard let peripheral = device.peripheral else {
+        guard let peripheral = device.peripheral, peripheral.state == .connected else {
             operationPromise.reject(XYBluetoothError.notConnected)
             return operationPromise
         }
 
+        print("START Set: \(device.id.shortId)")
+
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
+            print("TIMEOUT Set: \(device.id.shortId)")
             s.timer = nil
             s.status = .timedOut
             operationPromise.reject(XYBluetoothError.timedOut)
@@ -109,6 +116,7 @@ final class GattRequest: NSObject {
         }.always(on: XYCentral.centralQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
+            print("ALWAYS Set: \(device.id.shortId)")
         }.catch(on: XYCentral.centralQueue) { error in
             operationPromise.reject(error)
         }
@@ -118,14 +126,17 @@ final class GattRequest: NSObject {
 
     func notify(for device: XYBluetoothDevice, enabled: Bool) -> Promise<Void> {
         var operationPromise = Promise<Void>.pending()
-        guard let peripheral = device.peripheral else {
+        guard let peripheral = device.peripheral, peripheral.state == .connected else {
             operationPromise.reject(XYBluetoothError.notConnected)
             return operationPromise
         }
 
+        print("START Notify: \(device.id.shortId)")
+
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
             guard let s = self else { return }
+            print("TIMEOUT Notify: \(device.id.shortId)")
             s.timer = nil
             s.status = .timedOut
             operationPromise.reject(XYBluetoothError.timedOut)
@@ -139,11 +150,12 @@ final class GattRequest: NSObject {
         }.always(on: XYCentral.centralQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
+            print("ALWAYS Notify: \(device.id.shortId)")
         }.catch(on: XYCentral.centralQueue) { error in
             operationPromise.reject(error)
         }
 
-        return notifyPromise
+        return operationPromise
     }
 }
 
@@ -193,6 +205,7 @@ private extension GattRequest {
 
     func write(_ device: XYBluetoothDevice, data: XYBluetoothResult, withResponse: Bool) -> Promise<Void> {
         guard
+            self.status != .timedOut,
             let characteristic = self.characteristic,
             let peripheral = device.peripheral,
             peripheral.state == .connected,
@@ -217,7 +230,7 @@ private extension GattRequest {
             let peripheral = device.peripheral,
             peripheral.state == .connected
             else {
-                self.readPromise.reject(XYBluetoothError.notConnected)
+                self.notifyPromise.reject(XYBluetoothError.notConnected)
                 return self.notifyPromise
             }
 

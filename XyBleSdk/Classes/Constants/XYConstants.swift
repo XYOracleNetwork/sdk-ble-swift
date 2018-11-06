@@ -84,7 +84,8 @@ public enum XYFinderSong {
 // A generic semaphore lock with configurable lock amounts and timeout
 internal class GenericLock {
 
-    private static let genericLockTimeout: TimeInterval = 60
+    // Default 5 minute wait time
+    private static let genericLockTimeout: TimeInterval = 300
 
     private let
     semaphore: DispatchSemaphore,

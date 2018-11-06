@@ -30,8 +30,6 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         super.init(id, rssi: rssi)
     }
 
-    // Ensures we only fire the button press once when it is detected for 30 seconds
-    // TODO find a better way to handle this
     fileprivate static let buttonTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let buttonTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceButtonTimerQueue")
     fileprivate var buttonTimer: DispatchSourceTimer?
@@ -108,8 +106,11 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     }
 
     // Handles the xy1 and xy2 cases
-    public func subscribeToButtonPress() {}
-    public func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {
+    @discardableResult public func subscribeToButtonPress() -> XYBluetoothResult {
+        return XYBluetoothResult.empty
+    }
+
+    @discardableResult public func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {
         return XYBluetoothResult.empty
     }
 

@@ -101,10 +101,14 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         self.delegates.removeValue(forKey: key)
     }
 
-    public func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) {
-        if !self.notify(serviceCharacteristic, enabled: true).hasError {
+    public func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) -> XYBluetoothResult {
+        let result = self.notify(serviceCharacteristic, enabled: true)
+
+        if !result.hasError {
             self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
         }
+
+        return result
     }
 
     public func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) -> XYBluetoothResult {
