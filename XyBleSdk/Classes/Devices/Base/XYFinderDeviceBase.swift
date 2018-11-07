@@ -56,12 +56,10 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     }
 
     public func getRegistrationFlag() {
-        self.connection {
-            if !self.unlock().hasError {
-                let result = self.isAwake()
-                if !result.hasError, let value = result.asByteArray, value.count > 0 {
-                    self.isRegistered = value[0] != 0x00
-                }
+        if !self.unlock().hasError {
+            let result = self.isAwake()
+            if !result.hasError, let value = result.asByteArray, value.count > 0 {
+                self.isRegistered = value[0] != 0x00
             }
         }
     }
