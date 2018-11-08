@@ -17,10 +17,13 @@ public struct XYPeripheral: Hashable, Equatable {
     advertisementData: [String: Any]?,
     rssi: NSNumber?
 
-    public init(_ peripheral: CBPeripheral, advertisementData: [String: Any]? = nil, rssi: NSNumber? = nil) {
+    let markedForDisconnect: Bool
+
+    public init(_ peripheral: CBPeripheral, advertisementData: [String: Any]? = nil, rssi: NSNumber? = nil, markedForDisconnect: Bool = false) {
         self.peripheral = peripheral
         self.advertisementData = advertisementData
         self.rssi = rssi
+        self.markedForDisconnect = markedForDisconnect
     }
 
     public static func == (lhs: XYPeripheral, rhs: XYPeripheral) -> Bool {
@@ -130,21 +133,6 @@ public class XYCentral: NSObject {
     public func removeDelegate(for key: String) {
         self.delegates.removeValue(forKey: key)
     }
-
-    public func getPeripheralByService(_ serviceUuid: CBUUID) -> XYPeripheral? {
-        for peripheral in restoredPeripherals {
-            if (peripheral.peripheral.services != nil) {
-                for service in peripheral.peripheral.services! {
-                    if service == serviceUuid {
-                        return peripheral
-                    }
-                }
-            }
-        }
-
-        return nil
-    }
-
 }
 
 extension XYCentral: CBCentralManagerDelegate {
@@ -155,6 +143,10 @@ extension XYCentral: CBCentralManagerDelegate {
         }
 
         guard central.state == .poweredOn else { return }
+
+        self.restoredPeripherals.filter { $0.markedForDisconnect }.forEach {
+            self.cbManager?.cancelPeripheralConnection($0.peripheral)
+        }
     }
 
     // Central delegate method called when scanForPeripherals() locates a device. The peripheral will be cached if it is not already and
@@ -179,23 +171,12 @@ extension XYCentral: CBCentralManagerDelegate {
         guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
 
         peripherals.forEach { peripheral in
-            self.restoredPeripherals.insert(XYPeripheral(peripheral))
+            self.restoredPeripherals.insert(XYPeripheral(peripheral, markedForDisconnect: true))
         }
-
-//        guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
-//        knownPeripherals.removeAll()
-//        for peripheral in peripherals {
-//            if let device = XYFinderDeviceFactory.build(from: peripheral) {
-//                XYDeviceConnectionManager.instance.add(device: device)
-//            } else {
-//                self.knownPeripherals[peripheral.identifier] = XYPeripheral(peripheral, markedForDisconnect: true)
-//            }
-//        }
     }
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         // TODO move to XYSmartScan::checkExits ? Use this instead? Use a batch?
-//        self.knownPeripherals.removeValue(forKey: peripheral.identifier)
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
             if let marked = device.markedForDeletion, marked == true { return }
             device.resetRssi()
