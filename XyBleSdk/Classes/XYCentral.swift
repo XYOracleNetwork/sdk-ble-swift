@@ -11,20 +11,24 @@ import CoreBluetooth
 import Promises
 
 // A wrapper around CBPeripheral, used also to mark any devices for restore or delete if the app is killed in the background
-public struct XYPeripheral {
+public struct XYPeripheral: Hashable, Equatable {
     public let
     peripheral: CBPeripheral,
-    advertisementData: [String: Any]?
+    advertisementData: [String: Any]?,
+    rssi: NSNumber?
 
-    var rssi: NSNumber?
-
-    var markedForDisconnect: Bool = false
-
-    public init(_ peripheral: CBPeripheral, advertisementData: [String: Any]? = nil, rssi: NSNumber? = nil, markedForDisconnect: Bool = false) {
+    public init(_ peripheral: CBPeripheral, advertisementData: [String: Any]? = nil, rssi: NSNumber? = nil) {
         self.peripheral = peripheral
         self.advertisementData = advertisementData
         self.rssi = rssi
-        self.markedForDisconnect = markedForDisconnect
+    }
+
+    public static func == (lhs: XYPeripheral, rhs: XYPeripheral) -> Bool {
+        return lhs.peripheral == rhs.peripheral
+    }
+
+    public var hashValue: Int {
+        return self.peripheral.hashValue
     }
 }
 
@@ -60,7 +64,7 @@ public class XYCentral: NSObject {
 
     fileprivate var cbManager: CBCentralManager?
 
-    fileprivate var knownPeripherals = [UUID: XYPeripheral]()
+    fileprivate var restoredPeripherals = Set<XYPeripheral>()
 
     // All BLE operations should be done on this queue
     internal static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYCentralWorkQueue")
@@ -81,7 +85,7 @@ public class XYCentral: NSObject {
                 delegate: self,
                 queue: XYCentral.centralQueue,
                 options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
-            self.knownPeripherals.removeAll()
+            self.restoredPeripherals.removeAll()
         }
     }
 
@@ -92,7 +96,7 @@ public class XYCentral: NSObject {
                 delegate: self,
                 queue: XYCentral.centralQueue,
                 options: [CBCentralManagerOptionRestoreIdentifierKey: "com.xyfindables.sdk.XYLocate"])
-            self.knownPeripherals.removeAll()
+            self.restoredPeripherals.removeAll()
         }
     }
 
@@ -127,6 +131,20 @@ public class XYCentral: NSObject {
         self.delegates.removeValue(forKey: key)
     }
 
+    public func getPeripheralByService(_ serviceUuid: CBUUID) -> XYPeripheral? {
+        for peripheral in restoredPeripherals {
+            if (peripheral.peripheral.services != nil) {
+                for service in peripheral.peripheral.services! {
+                    if service == serviceUuid {
+                        return peripheral
+                    }
+                }
+            }
+        }
+
+        return nil
+    }
+
 }
 
 extension XYCentral: CBCentralManagerDelegate {
@@ -137,26 +155,12 @@ extension XYCentral: CBCentralManagerDelegate {
         }
 
         guard central.state == .poweredOn else { return }
-
-        // Destroy anything marked for removal from restore below
-        self.knownPeripherals.filter { $1.markedForDisconnect }.forEach {
-            self.cbManager?.cancelPeripheralConnection($1.peripheral)
-        }
     }
 
     // Central delegate method called when scanForPeripherals() locates a device. The peripheral will be cached if it is not already and
     // the associated located() delegate method is called
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        var wrappedPeripheral: XYPeripheral
-        if let alreadySeenPeripehral = knownPeripherals[peripheral.identifier] {
-            wrappedPeripheral = alreadySeenPeripehral
-            guard alreadySeenPeripehral.peripheral == peripheral else { return }
-            wrappedPeripheral.rssi = RSSI
-        } else {
-            wrappedPeripheral = XYPeripheral(peripheral, advertisementData: advertisementData, rssi: RSSI)
-            self.knownPeripherals[peripheral.identifier] = wrappedPeripheral
-        }
-
+        let wrappedPeripheral = XYPeripheral(peripheral, advertisementData: advertisementData, rssi: RSSI)
         self.delegates.forEach { $1?.located(peripheral: wrappedPeripheral) }
     }
 
@@ -173,19 +177,25 @@ extension XYCentral: CBCentralManagerDelegate {
         // dict[CBCentralManagerRestoredStateScanOptionsKey] as? [String : Any]
 
         guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
-        knownPeripherals.removeAll()
-        for peripheral in peripherals {
-            if let device = XYFinderDeviceFactory.build(from: peripheral) {
-                XYDeviceConnectionManager.instance.add(device: device)
-            } else {
-                self.knownPeripherals[peripheral.identifier] = XYPeripheral(peripheral, markedForDisconnect: true)
-            }
+
+        peripherals.forEach { peripheral in
+            self.restoredPeripherals.insert(XYPeripheral(peripheral))
         }
+
+//        guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
+//        knownPeripherals.removeAll()
+//        for peripheral in peripherals {
+//            if let device = XYFinderDeviceFactory.build(from: peripheral) {
+//                XYDeviceConnectionManager.instance.add(device: device)
+//            } else {
+//                self.knownPeripherals[peripheral.identifier] = XYPeripheral(peripheral, markedForDisconnect: true)
+//            }
+//        }
     }
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         // TODO move to XYSmartScan::checkExits ? Use this instead? Use a batch?
-        self.knownPeripherals.removeValue(forKey: peripheral.identifier)
+//        self.knownPeripherals.removeValue(forKey: peripheral.identifier)
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
             if let marked = device.markedForDeletion, marked == true { return }
             device.resetRssi()

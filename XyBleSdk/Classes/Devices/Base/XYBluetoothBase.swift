@@ -14,7 +14,7 @@ public protocol XYBluetoothBase {
     var powerLevel: UInt8 { get set }
     var name: String { get }
     var id: String { get }
-    var lastPulseTime: Date? { get }
+    var lastPulseTime: Date? { get set }
     var totalPulseCount: Int { get }
     var proximity: XYDeviceProximity { get }
 

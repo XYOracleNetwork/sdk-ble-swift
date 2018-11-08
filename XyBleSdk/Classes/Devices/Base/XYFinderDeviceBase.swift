@@ -98,8 +98,12 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             return
         }
 
+        // We set the proximity to none to ensure the visual meters pick up the change,
+        // and change last pulse time to nil so this method is not picked up again by
+        // checkExits()
         self.rssi = XYDeviceProximity.defaultProximity
-//        XYFinderDeviceEventManager.report(events: [.exited(device: self)])
+        self.lastPulseTime = nil
+        XYFinderDeviceEventManager.report(events: [.exited(device: self)])
         callback?(true)
     }
 

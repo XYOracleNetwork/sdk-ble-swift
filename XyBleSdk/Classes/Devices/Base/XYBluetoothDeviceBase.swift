@@ -11,7 +11,7 @@ import CoreBluetooth
 // A concrete base class to base any BLE device off of
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
-    public fileprivate(set) var
+    public var
     firstPulseTime: Date?,
     lastPulseTime: Date?
 
