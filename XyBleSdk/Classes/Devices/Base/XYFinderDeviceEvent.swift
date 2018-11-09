@@ -13,7 +13,6 @@ public enum XYFinderEvent: Int {
     case reconnected
     case disconnected
     case buttonPressed
-    case buttonRecentlyPressed
     case detected
     case entered
     case exiting
@@ -27,7 +26,6 @@ public enum XYFinderEventNotification {
     case reconnected(device: XYFinderDevice)
     case disconnected(device: XYFinderDevice)
     case buttonPressed(device: XYFinderDevice, type: XYButtonType2)
-    case buttonRecentlyPressed(device: XYFinderDevice, type: XYButtonType2)
     case detected(device: XYFinderDevice, powerLevel: Int, signalStrength: Int, distance: Double)
     case entered(device: XYFinderDevice)
     case exiting(device: XYFinderDevice)
@@ -43,7 +41,6 @@ public enum XYFinderEventNotification {
         case .reconnected(let device): return device
         case .disconnected(let device): return device
         case .buttonPressed(let device, _): return device
-        case .buttonRecentlyPressed(let device, _): return device
         case .detected(let device, _, _ , _): return device
         case .entered(let device): return device
         case .exiting(let device): return device
@@ -60,7 +57,6 @@ public enum XYFinderEventNotification {
         case .reconnected: return .reconnected
         case .disconnected: return .disconnected
         case .buttonPressed: return .buttonPressed
-        case .buttonRecentlyPressed: return .buttonRecentlyPressed
         case .detected: return .detected
         case .entered: return .entered
         case .exiting: return .exiting

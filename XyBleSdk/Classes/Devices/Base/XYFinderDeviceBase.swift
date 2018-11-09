@@ -75,8 +75,6 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
                     strong.buttonTimer = nil
                 }
                 events.append(.buttonPressed(device: self, type: .single))
-            } else {
-                events.append(.buttonRecentlyPressed(device: self, type: .single))
             }
         }
 
