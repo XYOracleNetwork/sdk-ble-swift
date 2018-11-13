@@ -12,16 +12,8 @@ import CoreBluetooth
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public var
-    firstPulseTime: Date?
-
-    public var
-    lastPulseTime: Date? {
-        didSet {
-            if self.id == "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772" {
-                print("ewerw")
-            }
-        }
-    }
+    firstPulseTime: Date?,
+    lastPulseTime: Date?
 
     public fileprivate(set) var
     totalPulseCount = 0,
