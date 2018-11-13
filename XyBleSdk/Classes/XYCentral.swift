@@ -176,14 +176,12 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        // TODO move to XYSmartScan::checkExits ? Use this instead? Use a batch?
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
             if let marked = device.markedForDeletion, marked == true { return }
             device.resetRssi()
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
-            XYDeviceConnectionManager.instance.remove(for: device.id)
-            XYDeviceConnectionManager.instance.wait(for: device)
+//            XYDeviceConnectionManager.instance.remove(for: device.id)
         }
     }
 }

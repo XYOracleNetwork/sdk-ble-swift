@@ -145,9 +145,13 @@ public extension XYBluetoothDevice {
         }.then(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
             print("STEP 5: All done for \(self.id.shortId)...")
+
         }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
             self.unlock()
-            print((error as! XYBluetoothError).toString)
+            print("STEP 6: All done for \((error as! XYBluetoothError).toString)")
+
+        }.always(on:XYBluetoothDeviceBase.workQueue) {
+            self.unlock()
         }
     }
 

@@ -52,9 +52,6 @@ public class XYFinderDeviceFactory {
             }
         }
 
-        // Update the device based on the read value
-        device?.update(rssi, powerLevel: iBeacon.powerLevel)
-
         return device
     }
 

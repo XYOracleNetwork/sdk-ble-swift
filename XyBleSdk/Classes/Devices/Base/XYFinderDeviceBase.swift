@@ -102,6 +102,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         self.rssi = XYDeviceProximity.defaultProximity
         self.lastPulseTime = nil
         XYFinderDeviceEventManager.report(events: [.exited(device: self)])
+        XYDeviceConnectionManager.instance.wait(for: self)
         callback?(true)
     }
 

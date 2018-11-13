@@ -13,8 +13,9 @@ final class XYDeviceConnectionManager {
     private init() {}
 
     fileprivate var devices = [String: XYBluetoothDevice]()
-    fileprivate lazy var waitQueue = [String]()
+    fileprivate lazy var waitingDeviceIds = [String]()
     fileprivate let managerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceManagerQueue", attributes: .concurrent)
+    fileprivate let waitQueue = DispatchQueue(label: "com.xyfindables.sdk.XYDeviceConnectionManager.WaitQueue")
 
     fileprivate let
     connectionLock = GenericLock(0),
@@ -45,7 +46,9 @@ final class XYDeviceConnectionManager {
         self.managerQueue.async(flags: .barrier) {
             guard let device = self.devices[id] else { return }
             self.devices.removeValue(forKey: device.id)
-            self.disconnect(from: device)
+            if device.state != .disconnected {
+                self.disconnect(from: device)
+            }
         }
     }
 
@@ -53,16 +56,18 @@ final class XYDeviceConnectionManager {
     // even if the user leaves the area (as long as the app is still running in the backgound)
     func wait(for device: XYBluetoothDevice) {
         // Quick escape if we already have the device and it is connected or it's already connecting
-        guard !isConnectedOrConnecting(for: self.devices[device.id]) else { return }
+        guard !isConnectedOrConnecting(for: device) else { return }
 
         // We have lost contact with the device, so we'll do a non-expiring connectiong try
-        guard !waitQueue.contains(where: { $0 == device.id }) else { return }
+        guard !waitingDeviceIds.contains(where: { $0 == device.id }) else { return }
         self.managerQueue.async(flags: .barrier) {
-            guard !self.waitQueue.contains(where: { $0 == device.id }) else { return }
+            guard !self.waitingDeviceIds.contains(where: { $0 == device.id }) else { return }
             print("Adding \(device.id) to wait queue...")
-            XYConnectionAgent(for: device).connect(.never).then(on: XYBluetoothDeviceBase.workQueue) {
-                self.waitQueue.removeAll(where: { $0 == device.id })
+
+            XYConnectionAgent(for: device).connect(.never).then(on: self.waitQueue) {
+                self.waitingDeviceIds.removeAll(where: { $0 == device.id })
                 print("\(device.id) is found again!")
+
                 if let xyDevice = device as? XYFinderDevice {
                     // Lock and try for a reconnection
                     xyDevice.connection {
@@ -74,19 +79,22 @@ final class XYDeviceConnectionManager {
                                 throw XYBluetoothError.couldNotConnect
                             }
                         }
-                    }.then(on: XYBluetoothDeviceBase.workQueue) {
+
+                    }.then(on: self.waitQueue) {
                         if let xyDevice = device as? XYFinderDevice {
                             XYFinderDeviceEventManager.report(events: [.reconnected(device: xyDevice)])
                         }
                         self.reconnectLock.unlock()
-                    }.catch { _ in
-                        // TODO do we retry here?
-                        self.reconnectLock.lock()
-                    }
 
-                    self.reconnectLock.lock()
+                    }.always(on: self.waitQueue) {
+                        self.reconnectLock.unlock()
+                    }
+                } else {
+                    self.reconnectLock.unlock()
                 }
             }
+
+            self.reconnectLock.lock()
         }
     }
 }
@@ -96,7 +104,7 @@ private extension XYDeviceConnectionManager {
 
     func isConnectedOrConnecting(for device: XYBluetoothDevice?) -> Bool {
         if let xyDevice = device as? XYFinderDevice {
-            guard xyDevice.state == .connecting else { return true }
+            if xyDevice.state == .connecting { return true }
             if xyDevice.state == .connected {
                 XYFinderDeviceEventManager.report(events: [.alreadyConnected(device: xyDevice)])
                 return true
@@ -120,22 +128,15 @@ private extension XYDeviceConnectionManager {
                     throw XYBluetoothError.couldNotConnect
                 }
             }
+
         }.then(on: XYBluetoothDeviceBase.workQueue) {
             if let xyDevice = device as? XYFinderDevice {
                 XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
             }
             self.connectionLock.unlock()
-        }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
+
+        }.always(on: XYBluetoothDeviceBase.workQueue) {
             self.connectionLock.unlock()
-            guard let err = error as? XYBluetoothError else { return }
-            switch err {
-            case .timedOut:
-                self.disconnect(from: device)
-                if let xyDevice = device as? XYFinderDevice {
-                    XYFinderDeviceEventManager.report(events: [.disconnected(device: xyDevice)])
-                }
-            default: break
-            }
         }
 
         self.connectionLock.lock()

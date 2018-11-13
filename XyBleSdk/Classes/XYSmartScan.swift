@@ -116,7 +116,7 @@ fileprivate extension XYSmartScan {
 
         self.mode = .background
         self.location.clearRanging()
-        self.location.startMonitoring(for: families)
+        // self.location.startMonitoring(for: families)
         self.updateTracking()
         self.updateStatus()
     }
@@ -247,6 +247,9 @@ extension XYSmartScan: XYLocationDelegate {
             self.delegates.forEach {
                 $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)
             }
+
+            // We use this to touch the last ping time and pulse count
+            beacon.update(beacon.rssi, powerLevel: beacon.powerLevel)
 
             // Handles button presses and other notifications
             beacon.detected()
