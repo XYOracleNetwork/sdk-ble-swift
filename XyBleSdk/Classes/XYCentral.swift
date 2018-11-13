@@ -181,7 +181,6 @@ extension XYCentral: CBCentralManagerDelegate {
             device.resetRssi()
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
-//            XYDeviceConnectionManager.instance.remove(for: device.id)
         }
     }
 }
