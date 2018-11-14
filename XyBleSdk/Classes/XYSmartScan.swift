@@ -71,16 +71,6 @@ public class XYSmartScan {
         self.isCheckingExits = true
     }
 
-    public func start(for device: XYFinderDevice, mode: XYSmartScan2Mode) {
-        guard !isActive else { return }
-
-        self.location.start()
-        self.mode = mode
-        self.startTracking(for: device)
-        self.isActive = true
-        self.isCheckingExits = true
-    }
-
     public func stop() {
         guard isActive else { return }
 
@@ -89,6 +79,7 @@ public class XYSmartScan {
         self.location.clearMonitoring()
         self.location.clearRanging()
         self.trackedDevices.removeAll()
+
         self.isActive = false
         self.isCheckingExits = false
         self.mode = .background
