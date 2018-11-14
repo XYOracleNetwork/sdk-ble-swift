@@ -27,11 +27,7 @@ public class XYLocation: NSObject {
 
     private override init() {
         super.init()
-        manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        manager.allowsBackgroundLocationUpdates = true
-        manager.distanceFilter = XYConstants.DEVICE_TUNING_LOCATION_CHANGE_THRESHOLD
-        manager.requestAlwaysAuthorization()
-        manager.delegate = self
+        self.manager.delegate = self
     }
 
     public func setDelegate(_ delegate: XYLocationDelegate, key: String) {
@@ -43,6 +39,10 @@ public class XYLocation: NSObject {
 public extension XYLocation {
 
     func start() {
+        self.manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        self.manager.allowsBackgroundLocationUpdates = true
+        self.manager.distanceFilter = XYConstants.DEVICE_TUNING_LOCATION_CHANGE_THRESHOLD
+        self.manager.requestAlwaysAuthorization()
         self.manager.startUpdatingLocation()
     }
 
