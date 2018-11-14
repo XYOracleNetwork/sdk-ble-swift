@@ -5,7 +5,7 @@
 //  Created by Darren Sutherland on 10/31/18.
 //  Copyright © 2018 CocoaPods. All rights reserved.
 //
-
+/*
 import XyBleSdk
 import CoreBluetooth
 
@@ -82,3 +82,4 @@ extension BackgroundDeviceTestManager: XYSmartScanDelegate {
         print("--- EXITED")
     }
 }
+*/

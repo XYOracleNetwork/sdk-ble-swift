@@ -28,7 +28,7 @@ public class XYFinderDeviceFactory {
     }
 
     // Create a device from an iBeacon definition, or update a cached device with the latest iBeacon/rssi data
-    public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.defaultProximity) -> XYFinderDevice? {
+    public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.defaultProximity, updateRssiAndPower: Bool = false) -> XYFinderDevice? {
         guard let family = XYFinderDeviceFamily.get(from: iBeacon) else { return nil }
 
         // Build or update
@@ -54,6 +54,12 @@ public class XYFinderDeviceFactory {
             if let device = device {
                 deviceCache[device.id] = device
             }
+        }
+
+        if updateRssiAndPower {
+            // Update the device based on the read value if requested (typically when ranging beacons
+            // to detect button presses and rssi changes)
+            device?.update(rssi, powerLevel: iBeacon.powerLevel)
         }
 
         return device

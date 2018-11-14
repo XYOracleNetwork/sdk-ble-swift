@@ -113,7 +113,6 @@ public extension XYBluetoothDevice {
         }
     }
 
-    // TODO need a timeout here!
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
 //        // Check range before running operations block
 //        guard self.proximity != .outOfRange && self.proximity != .none else {

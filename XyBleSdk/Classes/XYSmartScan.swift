@@ -46,7 +46,11 @@ public class XYSmartScan {
     public fileprivate(set) var currentStatus = XYSmartScanStatus.none
     fileprivate var isActive: Bool = false
 
-    fileprivate var mode: XYSmartScan2Mode = .background
+    fileprivate var mode: XYSmartScan2Mode = .background {
+        didSet {
+            print("asadsAD")
+        }
+    }
 
     fileprivate var isCheckingExits: Bool = false
 
@@ -54,11 +58,10 @@ public class XYSmartScan {
 
     private init() {
         self.location.setDelegate(self, key: "XYSmartScan")
-        self.checkExits()
     }
 
     public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScan2Mode) {
-        guard !isActive else { return }
+        if mode == self.mode { return }
 
         self.location.start()
 
@@ -69,6 +72,7 @@ public class XYSmartScan {
 
         self.isActive = true
         self.isCheckingExits = true
+        self.checkExits()
     }
 
     public func stop() {
@@ -117,9 +121,9 @@ fileprivate extension XYSmartScan {
 
         self.mode = .background
         self.location.clearRanging()
-        // self.location.startMonitoring(for: families)
+        self.location.startMonitoring(for: families)
         self.updateTracking()
-        self.updateStatus()
+//        self.updateStatus()
     }
 
 }
@@ -192,7 +196,9 @@ public extension XYSmartScan {
     // Another recursive method for checking exits of devices so we can alter the user
     private func checkExits() {
         XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
-            guard self.isCheckingExits else { return }
+            guard self.isCheckingExits else {
+                return
+            }
 
             // Loop through known devices that are connected
             for device in XYDeviceConnectionManager.instance.connectedDevices {
@@ -248,9 +254,6 @@ extension XYSmartScan: XYLocationDelegate {
             self.delegates.forEach {
                 $1?.smartScan(detected: beacon, signalStrength: beacon.rssi, family: family)
             }
-
-            // We use this to touch the last ping time and pulse count
-            beacon.update(beacon.rssi, powerLevel: beacon.powerLevel)
 
             // Handles button presses and other notifications
             beacon.detected()
