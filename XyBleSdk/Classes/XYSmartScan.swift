@@ -58,6 +58,8 @@ public class XYSmartScan {
     }
 
     public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScan2Mode) {
+        guard !isActive else { return }
+
         self.location.start()
 
         switch mode {
@@ -70,6 +72,8 @@ public class XYSmartScan {
     }
 
     public func start(for device: XYFinderDevice, mode: XYSmartScan2Mode) {
+        guard !isActive else { return }
+
         self.location.start()
         self.mode = mode
         self.startTracking(for: device)
@@ -78,11 +82,12 @@ public class XYSmartScan {
     }
 
     public func stop() {
+        guard isActive else { return }
+
         self.location.stop()
 
         self.location.clearMonitoring()
         self.location.clearRanging()
-        self.trackedDevices.map { $1 }.forEach { $0.disconnect() }
         self.trackedDevices.removeAll()
         self.isActive = false
         self.isCheckingExits = false
@@ -95,6 +100,11 @@ public class XYSmartScan {
 
     public func removeDelegate(for key: String) {
         self.delegates.removeValue(forKey: key)
+    }
+
+    public func invalidateSession() {
+        XYDeviceConnectionManager.instance.invalidate()
+        XYFinderDeviceFactory.invalidateCache()
     }
 }
 

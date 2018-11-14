@@ -25,6 +25,10 @@ final class XYDeviceConnectionManager {
         return self.devices.map { $1 }
     }
 
+    func invalidate() {
+        devices.forEach { $0.value.disconnect() }
+    }
+
     // Add a tracked device and connect to it, ensuring we do not add the same device twice as this method
     // will be called multiple times over the course of a session from the location and peripheral delegates
     func add(device: XYBluetoothDevice) {
@@ -41,12 +45,12 @@ final class XYDeviceConnectionManager {
     }
 
     // Remove the devices from the dictionary of tracked, connected devices, and let central know to disconnect
-    func remove(for id: String) {
+    func remove(for id: String, disconnect: Bool) {
         guard self.devices[id] != nil else { return }
         self.managerQueue.async(flags: .barrier) {
             guard let device = self.devices[id] else { return }
             self.devices.removeValue(forKey: device.id)
-            if device.state != .disconnected {
+            if disconnect && device.state != .disconnected {
                 self.disconnect(from: device)
             }
         }

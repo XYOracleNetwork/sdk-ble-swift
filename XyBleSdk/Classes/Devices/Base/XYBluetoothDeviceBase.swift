@@ -150,7 +150,7 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
 
     public func disconnect() {
         self.markedForDeletion = true
-        XYDeviceConnectionManager.instance.remove(for: self.id)
+        XYDeviceConnectionManager.instance.remove(for: self.id, disconnect: true)
     }
 }
 

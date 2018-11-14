@@ -13,6 +13,12 @@ class XYDeviceCache {
     internal private(set) var devices = [String: XYFinderDevice]()
     private let accessQueue = DispatchQueue(label:"com.xyfindables.sdk.XYDeviceCacheQueue", attributes: .concurrent)
 
+    func removeAll() {
+        self.accessQueue.async(flags: .barrier) {
+            self.devices.removeAll()
+        }
+    }
+
     func remove(at index: String) {
         self.accessQueue.async(flags: .barrier) {
             self.devices.removeValue(forKey: index)
