@@ -34,6 +34,10 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     fileprivate static let buttonTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceButtonTimerQueue")
     fileprivate var buttonTimer: DispatchSourceTimer?
 
+    fileprivate static let monitorTimeout: DispatchTimeInterval = .seconds(10)
+    fileprivate static let monitorTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceMonitorTimerQueue")
+    fileprivate var monitorTimer: DispatchSourceTimer?
+
     public var connectableServices: [CBUUID] {
         guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
 
@@ -62,6 +66,24 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
                 self.isRegistered = value[0] != 0x00
             }
         }
+    }
+
+    // If while we are monitoring the device we detect it has exited, we start a timer as a device may have just
+    // triggered the exit while still being close by. Once the timer expires before it enters, we fire the notification
+    public func startMonitorTimer() {
+        if monitorTimer == nil {
+            self.monitorTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.monitorTimeout, queue: XYFinderDeviceBase.monitorTimerQueue) { [weak self] in
+                guard let strong = self else { return }
+                print("MONITOR TIMER EXPIRE: Device \(strong.id)")
+                XYFinderDeviceEventManager.report(events: [.exited(device: strong)])
+            }
+        }
+    }
+
+    // If the device enters while monitoring, we always cancel the timer and report it is back
+    public func cancelMonitorTimer() {
+        self.monitorTimer = nil
+        XYFinderDeviceEventManager.report(events: [.entered(device: self)])
     }
 
     public func detected() {
@@ -101,8 +123,18 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         // checkExits()
         self.rssi = XYDeviceProximity.defaultProximity
         self.lastPulseTime = nil
-        XYFinderDeviceEventManager.report(events: [.exited(device: self)])
+
+        // We will only report this when the app is in the foreground, as monitoring
+        // will handle the messaging while in the background
+        if XYSmartScan.instance.mode == .foreground {
+            XYFinderDeviceEventManager.report(events: [.exited(device: self)])
+        }
+
+        // We put the device in the wait queue so it auto-reconnects when it comes back
+        // into range. This works only while the app is in the foreground/background
         XYDeviceConnectionManager.instance.wait(for: self)
+
+        // The call back is used for app logic uses only
         callback?(true)
     }
 

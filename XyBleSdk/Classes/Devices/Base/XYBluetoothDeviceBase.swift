@@ -13,7 +13,8 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public var
     firstPulseTime: Date?,
-    lastPulseTime: Date?
+    lastPulseTime: Date?,
+    lastMonitoredTime: Date?
 
     public fileprivate(set) var
     totalPulseCount = 0,

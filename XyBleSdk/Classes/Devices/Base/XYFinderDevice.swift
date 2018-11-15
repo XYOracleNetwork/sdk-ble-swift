@@ -40,6 +40,10 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     // I'm unsure as to what this is used for
     func getRegistrationFlag()
 
+    // TODO make this an internal protocol or something...
+    func startMonitorTimer()
+    func cancelMonitorTimer()
+
     // Convenience methods for common operations
     @discardableResult func find(_ song: XYFinderSong) -> XYBluetoothResult
     @discardableResult func stayAwake() -> XYBluetoothResult

@@ -140,7 +140,11 @@ public extension XYLocation {
         monitoredDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach { self.stopMonitoring(for: $0) }
 
         // Add unmonitored devices
-        devices.filter { device in !monitoredDevices.contains(where: { $0.id == device.id }) }.forEach { self.startMonitoring(for: $0, isHighPriority: false) }
+        devices.filter { device in !monitoredDevices.contains(where: { $0.id == device.id }) }.forEach {
+            self.startMonitoring(for: $0, isHighPriority: false)
+        }
+
+        dump(self.manager.monitoredRegions)
     }
 
     func startMonitoring(for device: XYFinderDevice, isHighPriority: Bool) {

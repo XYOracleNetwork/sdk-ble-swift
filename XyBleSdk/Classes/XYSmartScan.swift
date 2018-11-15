@@ -46,11 +46,7 @@ public class XYSmartScan {
     public fileprivate(set) var currentStatus = XYSmartScanStatus.none
     fileprivate var isActive: Bool = false
 
-    fileprivate var mode: XYSmartScan2Mode = .background {
-        didSet {
-            print("asadsAD")
-        }
-    }
+    internal fileprivate(set) var mode: XYSmartScan2Mode = .background
 
     fileprivate var isCheckingExits: Bool = false
 
@@ -123,7 +119,7 @@ fileprivate extension XYSmartScan {
         self.location.clearRanging()
         self.location.startMonitoring(for: families)
         self.updateTracking()
-//        self.updateStatus()
+        self.updateStatus()
     }
 
 }
@@ -162,6 +158,7 @@ extension XYSmartScan {
 
         if self.currentStatus != newStatus {
             self.currentStatus = newStatus
+            // Currently used only by the app for displaying BLE status
             self.delegates.map { $1 }.forEach { $0?.smartScan(status: self.currentStatus)}
         }
     }
@@ -208,6 +205,7 @@ public extension XYSmartScan {
                     fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
                     else { continue }
 
+                // Currently used by the refresh signal meters, this will show .none
                 XYFinderDeviceEventManager.report(events: [.exiting(device: xyDevice)])
                 xyDevice.verifyExit(nil)
             }
@@ -264,12 +262,14 @@ extension XYSmartScan: XYLocationDelegate {
 
     public func deviceEntered(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(entered: device) }
-        XYFinderDeviceEventManager.report(events: [.entered(device: device)])
+        print("MONITOR ENTER: Device \(device.id)")
+        device.cancelMonitorTimer()
     }
 
     public func deviceExited(_ device: XYFinderDevice) {
         self.delegates.forEach { $1?.smartScan(exited: device) }
-        XYFinderDeviceEventManager.report(events: [.exited(device: device)])
+        print("MONITOR EXIT: Device \(device.id)")
+        device.startMonitorTimer()
     }
     
 }
