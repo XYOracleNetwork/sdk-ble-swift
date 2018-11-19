@@ -46,7 +46,7 @@ public class XYSmartScan {
     public fileprivate(set) var currentStatus = XYSmartScanStatus.none
     fileprivate var isActive: Bool = false
 
-    internal fileprivate(set) var mode: XYSmartScan2Mode = .background
+    public fileprivate(set) var mode: XYSmartScan2Mode = .background
 
     fileprivate var isCheckingExits: Bool = false
 
@@ -67,8 +67,6 @@ public class XYSmartScan {
         }
 
         self.isActive = true
-        self.isCheckingExits = true
-        self.checkExits()
     }
 
     public func stop() {
@@ -108,6 +106,8 @@ fileprivate extension XYSmartScan {
         self.mode = .foreground
         self.location.clearMonitoring()
         self.location.startRanging(for: families)
+        self.isCheckingExits = true
+        self.checkExits()
         self.updateTracking()
         self.updateStatus()
     }
@@ -117,6 +117,7 @@ fileprivate extension XYSmartScan {
 
         self.mode = .background
         self.location.clearRanging()
+        self.isCheckingExits = false
         self.location.startMonitoring(for: families)
         self.updateTracking()
         self.updateStatus()

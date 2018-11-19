@@ -75,7 +75,9 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             self.monitorTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.monitorTimeout, queue: XYFinderDeviceBase.monitorTimerQueue) { [weak self] in
                 guard let strong = self else { return }
                 print("MONITOR TIMER EXPIRE: Device \(strong.id)")
-                XYFinderDeviceEventManager.report(events: [.exited(device: strong)])
+                if strong.iBeacon?.hasMajor ?? false && strong.iBeacon?.hasMinor ?? false {
+                    strong.verifyExit()
+                }
             }
         }
     }
@@ -126,9 +128,9 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
 
         // We will only report this when the app is in the foreground, as monitoring
         // will handle the messaging while in the background
-        if XYSmartScan.instance.mode == .foreground {
+        // if XYSmartScan.instance.mode == .foreground {
             XYFinderDeviceEventManager.report(events: [.exited(device: self)])
-        }
+        // }
 
         // We put the device in the wait queue so it auto-reconnects when it comes back
         // into range. This works only while the app is in the foreground/background
