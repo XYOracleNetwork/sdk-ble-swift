@@ -42,7 +42,63 @@ $ pod install
 ```
 
 ## Code Example
-Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral` with no clear path to handling multiple connections. Often tutorial code for Core Bluetooth is a chain of use-case specific method calls from within these delegates.
+Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral` with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Add in the often upredictable nature of Bluetooth and the associated hardware and it 
+
+The XyBleSdk provides a simple interface to communicating with an XY Finder or other Bluetooth device. Let's take a look at an example for an XY Finder device:
+
+```swift
+let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+device.connection {
+    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+    if batteryLevel > 15 {
+        self.batteryStatus = "\(batteryLevel)"
+    } else {
+        self.batteryStatus = "Battery level low"
+    }
+}
+```
+
+The `XYFinderDeviceFactory` can build a device from a string, peripheral, etc. The calls made inside the `connection` closure are run one at a time in order. Using `connection` manages wrangling `CBCentral` and the associated `CBPeripheral` delegates, ensuring you have a connection before trying the GATT operation(s) in the block.
+
+Once all the operations have completed, you can use `then` if there are post actions you wish to run:
+
+```swift
+let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+device.connection {
+    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+}.then {
+
+}
+```
+
+You can check for an error from your operations by using `catch`:
+
+```swift
+let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+device.connection {
+    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+}.then {
+
+}.catch { error in
+
+}
+```
+
+If you wish a specific action to always be run regardless of the result, you can use `always`:
+
+```swift
+let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+device.connection {
+    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+}.then {
+
+}.catch { error in
+
+}.always {
+
+}
+```
+
 
 ## Example
 

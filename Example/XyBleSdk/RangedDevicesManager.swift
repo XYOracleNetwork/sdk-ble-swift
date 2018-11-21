@@ -16,27 +16,6 @@ protocol RangedDevicesManagerDelegate: class {
     func buttonPressed(on device: XYFinderDevice)
 }
 
-class MockRangedDevicesManager: NSObject, UITableViewDataSource {
-    var rangedDevices = [XYFinderDevice]()
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell(frame: CGRect.zero)
-    }
-
-    func startRanging() {}
-    func stopRanging() {}
-
-    func scan(for deviceIndex: NSInteger) {}
-
-    func disconnect() {}
-
-    func setDelegate(_ delegate: RangedDevicesManagerDelegate) {}
-}
-
 class RangedDevicesManager: NSObject {
 
     fileprivate let central = XYCentral.instance
