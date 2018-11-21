@@ -144,6 +144,7 @@ extension XYCentral: CBCentralManagerDelegate {
 
         guard central.state == .poweredOn else { return }
 
+        // Disconnected any previously connected peripherals
         self.restoredPeripherals.filter { $0.markedForDisconnect }.forEach {
             self.cbManager?.cancelPeripheralConnection($0.peripheral)
         }
@@ -165,21 +166,19 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
-        // dict[CBCentralManagerRestoredStateScanServicesKey] as? [CBUUID]
-        // dict[CBCentralManagerRestoredStateScanOptionsKey] as? [String : Any]
-
         guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
 
+        // Mark any peripherals still connected from the application being closed to be deleted
         peripherals.forEach { peripheral in
             self.restoredPeripherals.insert(XYPeripheral(peripheral, markedForDisconnect: true))
         }
     }
 
+    // If the periperhal disconnects, we will reset the RSSI and report
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
             if let marked = device.markedForDeletion, marked == true { return }
             device.resetRssi()
-            // XYDeviceConnectionManager.instance.remove(for: device.id, disconnect: false)
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
         }
