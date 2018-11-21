@@ -1,6 +1,6 @@
 //
 //  XYConnectionAgent.swift
-//  Pods-XyBleSdk_Example
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 11/1/18.
 //
