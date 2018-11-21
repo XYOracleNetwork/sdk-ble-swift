@@ -1,24 +1,49 @@
-# XyBleSdk
+[logo]: https://www.xy.company/img/home/logo_xy.png
 
-[![CI Status](https://img.shields.io/travis/Darren Sutherland/XyBleSdk.svg?style=flat)](https://travis-ci.org/Darren Sutherland/XyBleSdk)
-[![Version](https://img.shields.io/cocoapods/v/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk)
-[![License](https://img.shields.io/cocoapods/l/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk)
-[![Platform](https://img.shields.io/cocoapods/p/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk)
+![logo]
+
+# sdk-ble-ios
+A Bluetooth library designed primarily for use with XY Finder devices.
+
+## Requirements
+
+- iOS 11.0+
+- Xcode 9.3+
+- Swift 3.1+
+
+## Installation
+
+### CocoaPods
+
+[CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
+
+```bash
+$ gem install cocoapods
+```
+
+> CocoaPods 1.1+ is required.
+
+To integrate into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '11.0'
+use_frameworks!
+
+target '<Your Target Name>' do
+    pod 'XYSdkBle', '~> 0.1.0'
+end
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
 
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## Requirements
-
-## Installation
-
-XyBleSdk is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod 'XyBleSdk'
-```
 
 ## Author
 
