@@ -3,6 +3,7 @@
 //  XYBleSdk
 //
 //  Created by Darren Sutherland on 10/11/18.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation

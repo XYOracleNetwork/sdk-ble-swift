@@ -1,6 +1,6 @@
 //
 //  XYCentral.swift
-//  XYSdk
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/6/18.
 //  Copyright © 2018 XY - The Findables Company. All rights reserved.
