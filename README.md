@@ -3,7 +3,7 @@
 ![logo]
 
 # sdk-ble-ios
-A Bluetooth library designed primarily for use with XY Finder devices.
+A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API that allows the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
 
 ## Requirements
 
@@ -40,6 +40,9 @@ Then, run the following command:
 ```bash
 $ pod install
 ```
+
+## Code Example
+Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral` with no clear path to handling multiple connections. Often tutorial code for Core Bluetooth is a chain of use-case specific method calls from within these delegates.
 
 ## Example
 
