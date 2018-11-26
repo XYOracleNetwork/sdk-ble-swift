@@ -48,10 +48,16 @@ class XYFirmwareUpdateManager {
     patchBaseAddress: Int = 0
 
     fileprivate var
+    spiMISOAddress: Int = 0,
+    spiMOSIAddress: Int = 0,
+    spiCSAddress: Int = 0,
+    spiSCKAddress: Int = 0
+
+    fileprivate var
     success: (() -> Void)?,
     failure: ((_ error: XYBluetoothError) -> Void)?
 
-    var memoryType: Int = XYFirmwareUpdateMemoryType.SPOTA_SPI.rawValue
+    var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SPOTA_SPI
 
     init(for device: XYBluetoothDevice) {
         self.device = device
@@ -84,13 +90,29 @@ private extension XYFirmwareUpdateManager {
             nextStep = 2
 
             // Set the memory type. This will write the value, which will trigger the notification in readValue() below
-            let memDevData = (self.memoryType << 24) | (self.patchBaseAddress & 0xFFFFFF)
+            let memDevData = (self.memoryType.rawValue << 24) | (self.patchBaseAddress & 0xFFFFFF)
             let data = NSData(bytes: [memDevData] as [Int], length: MemoryLayout<Int>.size)
             let parameter = XYBluetoothResult(data: Data(referencing: data))
-            self.writeValue(parameter, service: OtaService.memDev)
+            self.writeValue(to: .memDev, value: parameter)
 
         case 2:
-            break
+            if self.memoryType == XYFirmwareUpdateMemoryType.SPOTA_SPI {
+                let memInfoData = (self.spiMISOAddress << 24) | (self.spiMOSIAddress << 16) | (self.spiCSAddress << 8) | self.spiSCKAddress
+                let data = NSData(bytes: [memInfoData] as [Int], length: MemoryLayout<Int>.size)
+                let parameter = XYBluetoothResult(data: Data(referencing: data))
+
+                self.currentStep = 3
+                self.writeValue(to: .gpioMap, value: parameter)
+
+            } else {
+                self.currentStep = 3
+                doStep()
+            }
+
+        case 3:
+            self.currentStep = 4
+            self.readValue(from: .memInfo)
+
         default:
             break
         }
@@ -100,7 +122,7 @@ private extension XYFirmwareUpdateManager {
 
 private extension XYFirmwareUpdateManager {
 
-    func writeValue(_ value: XYBluetoothResult, service: XYServiceCharacteristic) {
+    func writeValue(to service: OtaService, value: XYBluetoothResult) {
         self.device.connection {
             if self.device.set(service, value: value).hasError == false {
                 self.doStep()
@@ -108,22 +130,46 @@ private extension XYFirmwareUpdateManager {
         }
     }
 
-    func readValue(for serviceCharacteristic: OtaService, value: XYBluetoothResult) {
+    func readValue(from service: OtaService) {
+        self.device.connection {
+            let result = self.device.get(service)
+            if result.hasError == false {
+                self.processValue(for: service, value: result)
+            } else {
+                // TODO error
+            }
+        }
+    }
+
+    func processValue(for serviceCharacteristic: OtaService, value: XYBluetoothResult) {
         switch serviceCharacteristic {
         case .servStatus:
-            guard let value = value.asInteger else { break }
+            guard let data = value.asInteger else { break }
 
-            if self.expectedValue != 0, value == self.expectedValue {
+            if self.expectedValue != 0, data == self.expectedValue {
                 self.currentStep = self.nextStep
                 self.doStep()
             } else {
-                self.handleResponse(for: value)
+                self.handleResponse(for: data)
             }
 
             expectedValue = 0
 
         case .memInfo:
-            break
+            guard let data = value.asInteger else {
+                // TODO error
+                return
+            }
+
+            let patches = (data >> 16) & 0xff
+            let patchsize = data & 0xff
+
+            print("Patch Memory Info:\n  Number of patches: \(patches)\n  Size of patches: \(ceil(Double(patchsize)/4)) (\(patchsize))")
+
+            if self.currentStep > 0 {
+                self.doStep()
+            }
+
         default:
             break
         }
@@ -169,7 +215,7 @@ extension XYFirmwareUpdateManager: XYBluetoothDeviceNotifyDelegate {
 
     func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
         guard let characteristic = serviceCharacteristic as? OtaService else { return }
-        self.readValue(for: characteristic, value: value)
+        self.processValue(for: characteristic, value: value)
     }
 
 }
