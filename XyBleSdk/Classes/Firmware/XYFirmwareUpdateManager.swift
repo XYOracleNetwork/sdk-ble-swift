@@ -21,6 +21,18 @@ enum XYFirmwareUpdateMemoryType: Int {
     case SPOTA_SPI = 0x03
 }
 
+enum XYFirmwareStatusValues: Int {
+    case SPOTAR_SRV_STARTED       = 0x01     // Valid memory device has been configured by initiator. No sleep state while in this mode
+    case SPOTAR_CMP_OK            = 0x02     // SPOTA process completed successfully.
+    case SPOTAR_SRV_EXIT          = 0x03     // Forced exit of SPOTAR service.
+    case SPOTAR_CRC_ERR           = 0x04     // Overall Patch Data CRC failed
+    case SPOTAR_PATCH_LEN_ERR     = 0x05     // Received patch Length not equal to PATCH_LEN characteristic value
+    case SPOTAR_EXT_MEM_WRITE_ERR = 0x06     // External Mem Error (Writing to external device failed)
+    case SPOTAR_INT_MEM_ERR       = 0x07     // Internal Mem Error (not enough space for Patch)
+    case SPOTAR_INVAL_MEM_TYPE    = 0x08     // Invalid memory device
+    case SPOTAR_APP_ERROR         = 0x09     // Application error
+}
+
 class XYFirmwareUpdateManager {
 
     fileprivate let device: XYBluetoothDevice
@@ -96,8 +108,59 @@ private extension XYFirmwareUpdateManager {
         }
     }
 
-    func readValue(_ value: XYBluetoothResult) {
+    func readValue(for serviceCharacteristic: OtaService, value: XYBluetoothResult) {
+        switch serviceCharacteristic {
+        case .servStatus:
+            guard let value = value.asInteger else { break }
 
+            if self.expectedValue != 0, value == self.expectedValue {
+                self.currentStep = self.nextStep
+                self.doStep()
+            } else {
+                self.handleResponse(for: value)
+            }
+
+            expectedValue = 0
+
+        case .memInfo:
+            break
+        default:
+            break
+        }
+    }
+
+}
+
+private extension XYFirmwareUpdateManager {
+
+    func handleResponse(for responseValue: Int) {
+        var message: String
+
+        guard let errorEnum = XYFirmwareStatusValues(rawValue: responseValue) else {
+            message = "Unhandled status code \(responseValue)"
+            return
+        }
+
+        switch errorEnum {
+        case .SPOTAR_SRV_STARTED:
+            message = "Valid memory device has been configured by initiator. No sleep state while in this mode"
+        case .SPOTAR_CMP_OK:
+            message = "SPOTA process completed successfully."
+        case .SPOTAR_SRV_EXIT:
+            message = "Forced exit of SPOTAR service."
+        case .SPOTAR_CRC_ERR:
+            message = "Overall Patch Data CRC failed"
+        case .SPOTAR_PATCH_LEN_ERR:
+            message = "Received patch Length not equal to PATCH_LEN characteristic value"
+        case .SPOTAR_EXT_MEM_WRITE_ERR:
+            message = "External Mem Error (Writing to external device failed)"
+        case .SPOTAR_INT_MEM_ERR:
+            message = "Internal Mem Error (not enough space for Patch)"
+        case .SPOTAR_INVAL_MEM_TYPE:
+            message = "Invalid memory device"
+        case .SPOTAR_APP_ERROR:
+            message = "Application error"
+        }
     }
 
 }
@@ -105,7 +168,8 @@ private extension XYFirmwareUpdateManager {
 extension XYFirmwareUpdateManager: XYBluetoothDeviceNotifyDelegate {
 
     func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
-        self.readValue(value)
+        guard let characteristic = serviceCharacteristic as? OtaService else { return }
+        self.readValue(for: characteristic, value: value)
     }
 
 }
