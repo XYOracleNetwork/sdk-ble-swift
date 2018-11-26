@@ -405,7 +405,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-XyBleSdk_Example/Pods-XyBleSdk_Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-XyBleSdk_Example/Pods-XyBleSdk_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/PromisesSwift/Promises.framework",
 				"${BUILT_PRODUCTS_DIR}/XyBleSdk/XyBleSdk.framework",
@@ -418,7 +418,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-XyBleSdk_Example/Pods-XyBleSdk_Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-XyBleSdk_Example/Pods-XyBleSdk_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

@@ -12,6 +12,15 @@ enum XYFirmwareUpdateStep {
     case memoryType
 }
 
+enum XYFirmwareUpdateMemoryType: Int {
+    case SUOTA_I2C = 0x12
+    case SUOTA_SPI = 0x13
+    case SPOTA_SYSTEM_RAM = 0x00
+    case SPOTA_RETENTION_RAM = 0x01
+    case SPOTA_I2C = 0x02
+    case SPOTA_SPI = 0x03
+}
+
 class XYFirmwareUpdateManager {
 
     fileprivate var
