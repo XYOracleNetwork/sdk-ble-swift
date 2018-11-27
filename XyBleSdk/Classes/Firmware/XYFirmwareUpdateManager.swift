@@ -35,7 +35,9 @@ enum XYFirmwareStatusValues: Int {
 
 class XYFirmwareUpdateManager {
 
-    fileprivate let device: XYBluetoothDevice
+    fileprivate let
+    device: XYBluetoothDevice,
+    firmwareData: Data
 
     private let notifyKey = "XYFirmwareUpdateManager"
 
@@ -59,8 +61,9 @@ class XYFirmwareUpdateManager {
 
     var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SPOTA_SPI
 
-    init(for device: XYBluetoothDevice) {
+    init(for device: XYBluetoothDevice, firmwareData: Data) {
         self.device = device
+        self.firmwareData = firmwareData
     }
 
     func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
@@ -113,6 +116,53 @@ private extension XYFirmwareUpdateManager {
             self.currentStep = 4
             self.readValue(from: .memInfo)
 
+        case 4:
+            // TODO Data validate? We already have it at this point
+
+            self.currentStep = 5
+            self.doStep()
+
+        case 5:
+            let dataLength = firmwareData.count
+            let data = NSData(bytes: [dataLength] as [Int], length: MemoryLayout<Int>.size)
+            let parameter = XYBluetoothResult(data: Data(referencing: data))
+
+            self.currentStep = 6
+
+            self.writeValue(to: .patchLen, value: parameter)
+
+        case 6:
+            self.currentStep = 0
+            self.expectedValue = 0x02
+            self.nextStep = 7
+
+            let dataLength = firmwareData.count
+            var bytesRemaining = dataLength
+
+            while bytesRemaining > 0 {
+                // Check if we have less than current block-size bytes remaining
+                if bytesRemaining < chunkSize {
+                    chunkSize = bytesRemaining
+                }
+
+                let payload = UnsafeMutableBufferPointer<[Int]>.allocate(capacity: dataLength)
+                let range = NSMakeRange(self.chunkStartByte, self.chunkSize)
+                _ = self.firmwareData.copyBytes(to: payload, from: Range(range))
+                let parameter = XYBluetoothResult(data: Data(buffer: payload))
+
+                self.chunkStartByte += self.chunkSize
+                bytesRemaining = dataLength - self.chunkStartByte
+
+                self.writeValue(to: .patchData, value: parameter)
+            }
+
+        case 7:
+            self.currentStep = 8
+            self.readValue(from: .memInfo)
+
+        case 8:
+            self.success?()
+
         default:
             break
         }
@@ -126,6 +176,8 @@ private extension XYFirmwareUpdateManager {
         self.device.connection {
             if self.device.set(service, value: value).hasError == false {
                 self.doStep()
+            } else {
+                // TODO error
             }
         }
     }
