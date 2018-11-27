@@ -7,6 +7,18 @@
 //
 //  Ported from Dialog SPOTA Demo
 
+struct XYFirmwareUpdateParameters {
+    let
+    spiMISOAddress: Int,
+    spiMOSIAddress: Int,
+    spiCSAddress: Int,
+    spiSCKAddress: Int
+
+    static var xy4: XYFirmwareUpdateParameters {
+        return XYFirmwareUpdateParameters(spiMISOAddress: 0x05, spiMOSIAddress: 0x06, spiCSAddress: 0x07, spiSCKAddress: 0x00)
+    }
+}
+
 class XYFirmwareUpdateManager {
 
     enum XYFirmwareUpdateMemoryType: Int {
@@ -26,17 +38,15 @@ class XYFirmwareUpdateManager {
 
     fileprivate var
     currentStep: XYFirmwareUpdateStep = .unstarted,
-    nextStep: XYFirmwareUpdateStep = .unstarted,
+    nextStep: XYFirmwareUpdateStep = .unstarted
+
+    fileprivate var
     expectedValue: Int = 0,
     chunkSize: Int = 20,
     chunkStartByte: Int = 0,
     patchBaseAddress: Int = 0
 
-    fileprivate var
-    spiMISOAddress: Int = 0,
-    spiMOSIAddress: Int = 0,
-    spiCSAddress: Int = 0,
-    spiSCKAddress: Int = 0
+    fileprivate let parameters: XYFirmwareUpdateParameters
 
     fileprivate var
     success: (() -> Void)?,
@@ -44,8 +54,9 @@ class XYFirmwareUpdateManager {
 
     var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SPOTA_SPI
 
-    init(for device: XYBluetoothDevice, firmwareData: Data) {
+    init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data) {
         self.device = device
+        self.parameters = parameters
         self.firmwareData = firmwareData
     }
 
@@ -98,7 +109,11 @@ private extension XYFirmwareUpdateManager {
 
         case .setMemoryParameters:
             if self.memoryType == XYFirmwareUpdateMemoryType.SPOTA_SPI {
-                let memInfoData = (self.spiMISOAddress << 24) | (self.spiMOSIAddress << 16) | (self.spiCSAddress << 8) | self.spiSCKAddress
+                let memInfoData =
+                    (self.parameters.spiMISOAddress << 24) |
+                    (self.parameters.spiMOSIAddress << 16) |
+                    (self.parameters.spiCSAddress << 8) |
+                    self.parameters.spiSCKAddress
                 let data = NSData(bytes: [memInfoData] as [Int], length: MemoryLayout<Int>.size)
                 let parameter = XYBluetoothResult(data: Data(referencing: data))
 
