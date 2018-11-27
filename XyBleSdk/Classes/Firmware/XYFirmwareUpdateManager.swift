@@ -71,10 +71,6 @@ class XYFirmwareUpdateManager {
             }
         }
     }
-
-    deinit {
-        _ = self.device.unsubscribe(from: OtaService.servStatus, key: notifyKey)
-    }
 }
 
 // MARK: Multi-step updater
@@ -174,7 +170,12 @@ private extension XYFirmwareUpdateManager {
             self.readValue(from: .memInfo)
 
         case .completed:
-            self.success?()
+            self.device.connection {
+                _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
+            }.always {
+                self.success?()
+            }
+
         }
     }
 
