@@ -5,35 +5,18 @@
 //  Created by Darren Sutherland on 9/6/18.
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
-
-//enum XYFirmwareUpdateStep {
-//    case unstarted
-//    case start
-//    case memoryType
-//}
-
-enum XYFirmwareUpdateMemoryType: Int {
-    case SUOTA_I2C = 0x12
-    case SUOTA_SPI = 0x13
-    case SPOTA_SYSTEM_RAM = 0x00
-    case SPOTA_RETENTION_RAM = 0x01
-    case SPOTA_I2C = 0x02
-    case SPOTA_SPI = 0x03
-}
-
-enum XYFirmwareStatusValues: Int {
-    case SPOTAR_SRV_STARTED       = 0x01     // Valid memory device has been configured by initiator. No sleep state while in this mode
-    case SPOTAR_CMP_OK            = 0x02     // SPOTA process completed successfully.
-    case SPOTAR_SRV_EXIT          = 0x03     // Forced exit of SPOTAR service.
-    case SPOTAR_CRC_ERR           = 0x04     // Overall Patch Data CRC failed
-    case SPOTAR_PATCH_LEN_ERR     = 0x05     // Received patch Length not equal to PATCH_LEN characteristic value
-    case SPOTAR_EXT_MEM_WRITE_ERR = 0x06     // External Mem Error (Writing to external device failed)
-    case SPOTAR_INT_MEM_ERR       = 0x07     // Internal Mem Error (not enough space for Patch)
-    case SPOTAR_INVAL_MEM_TYPE    = 0x08     // Invalid memory device
-    case SPOTAR_APP_ERROR         = 0x09     // Application error
-}
+//  Ported from Dialog SPOTA Demo
 
 class XYFirmwareUpdateManager {
+
+    enum XYFirmwareUpdateMemoryType: Int {
+        case SUOTA_I2C = 0x12
+        case SUOTA_SPI = 0x13
+        case SPOTA_SYSTEM_RAM = 0x00
+        case SPOTA_RETENTION_RAM = 0x01
+        case SPOTA_I2C = 0x02
+        case SPOTA_SPI = 0x03
+    }
 
     fileprivate let
     device: XYBluetoothDevice,
@@ -42,8 +25,8 @@ class XYFirmwareUpdateManager {
     private let notifyKey = "XYFirmwareUpdateManager"
 
     fileprivate var
-    currentStep: Int = 1,
-    nextStep: Int = 0,
+    currentStep: XYFirmwareUpdateStep = .unstarted,
+    nextStep: XYFirmwareUpdateStep = .unstarted,
     expectedValue: Int = 0,
     chunkSize: Int = 20,
     chunkStartByte: Int = 0,
@@ -83,14 +66,29 @@ class XYFirmwareUpdateManager {
     }
 }
 
+// MARK: Multi-step updater
 private extension XYFirmwareUpdateManager {
+
+    enum XYFirmwareUpdateStep {
+        case unstarted
+        case setMemoryType
+        case setMemoryParameters
+        case validateMemoryType
+        case validatePatchData
+        case setPatchLength
+        case sendPatch
+        case validatePatchComplete
+        case completed
+    }
 
     func doStep() {
         switch self.currentStep {
-        case 1:
-            currentStep = 0
+        case .unstarted:
+            break
+        case .setMemoryType:
+            currentStep = .unstarted
             expectedValue = 0x1
-            nextStep = 2
+            nextStep = .setMemoryParameters
 
             // Set the memory type. This will write the value, which will trigger the notification in readValue() below
             let memDevData = (self.memoryType.rawValue << 24) | (self.patchBaseAddress & 0xFFFFFF)
@@ -98,43 +96,43 @@ private extension XYFirmwareUpdateManager {
             let parameter = XYBluetoothResult(data: Data(referencing: data))
             self.writeValue(to: .memDev, value: parameter)
 
-        case 2:
+        case .setMemoryParameters:
             if self.memoryType == XYFirmwareUpdateMemoryType.SPOTA_SPI {
                 let memInfoData = (self.spiMISOAddress << 24) | (self.spiMOSIAddress << 16) | (self.spiCSAddress << 8) | self.spiSCKAddress
                 let data = NSData(bytes: [memInfoData] as [Int], length: MemoryLayout<Int>.size)
                 let parameter = XYBluetoothResult(data: Data(referencing: data))
 
-                self.currentStep = 3
+                self.currentStep = .validateMemoryType
                 self.writeValue(to: .gpioMap, value: parameter)
 
             } else {
-                self.currentStep = 3
+                self.currentStep = .validateMemoryType
                 doStep()
             }
 
-        case 3:
-            self.currentStep = 4
+        case .validateMemoryType:
+            self.currentStep = .validatePatchData
             self.readValue(from: .memInfo)
 
-        case 4:
+        case .validatePatchData:
             // TODO Data validate? We already have it at this point
 
-            self.currentStep = 5
+            self.currentStep = .setPatchLength
             self.doStep()
 
-        case 5:
+        case .setPatchLength:
             let dataLength = firmwareData.count
             let data = NSData(bytes: [dataLength] as [Int], length: MemoryLayout<Int>.size)
             let parameter = XYBluetoothResult(data: Data(referencing: data))
 
-            self.currentStep = 6
+            self.currentStep = .sendPatch
 
             self.writeValue(to: .patchLen, value: parameter)
 
-        case 6:
-            self.currentStep = 0
+        case .sendPatch:
+            self.currentStep = .unstarted
             self.expectedValue = 0x02
-            self.nextStep = 7
+            self.nextStep = .validatePatchComplete
 
             let dataLength = firmwareData.count
             var bytesRemaining = dataLength
@@ -156,20 +154,18 @@ private extension XYFirmwareUpdateManager {
                 self.writeValue(to: .patchData, value: parameter)
             }
 
-        case 7:
-            self.currentStep = 8
+        case .validatePatchComplete:
+            self.currentStep = .completed
             self.readValue(from: .memInfo)
 
-        case 8:
+        case .completed:
             self.success?()
-
-        default:
-            break
         }
     }
 
 }
 
+// MARK: Read and write values to the device, as well as process any response
 private extension XYFirmwareUpdateManager {
 
     func writeValue(to service: OtaService, value: XYBluetoothResult) {
@@ -218,7 +214,7 @@ private extension XYFirmwareUpdateManager {
 
             print("Patch Memory Info:\n  Number of patches: \(patches)\n  Size of patches: \(ceil(Double(patchsize)/4)) (\(patchsize))")
 
-            if self.currentStep > 0 {
+            if self.currentStep != .unstarted {
                 self.doStep()
             }
 
@@ -229,7 +225,20 @@ private extension XYFirmwareUpdateManager {
 
 }
 
+// MARK: Handle firmware responses
 private extension XYFirmwareUpdateManager {
+
+    enum XYFirmwareStatusValues: Int {
+        case SPOTAR_SRV_STARTED       = 0x01     // Valid memory device has been configured by initiator. No sleep state while in this mode
+        case SPOTAR_CMP_OK            = 0x02     // SPOTA process completed successfully.
+        case SPOTAR_SRV_EXIT          = 0x03     // Forced exit of SPOTAR service.
+        case SPOTAR_CRC_ERR           = 0x04     // Overall Patch Data CRC failed
+        case SPOTAR_PATCH_LEN_ERR     = 0x05     // Received patch Length not equal to PATCH_LEN characteristic value
+        case SPOTAR_EXT_MEM_WRITE_ERR = 0x06     // External Mem Error (Writing to external device failed)
+        case SPOTAR_INT_MEM_ERR       = 0x07     // Internal Mem Error (not enough space for Patch)
+        case SPOTAR_INVAL_MEM_TYPE    = 0x08     // Invalid memory device
+        case SPOTAR_APP_ERROR         = 0x09     // Application error
+    }
 
     func handleResponse(for responseValue: Int) {
         var message: String
@@ -259,10 +268,13 @@ private extension XYFirmwareUpdateManager {
         case .SPOTAR_APP_ERROR:
             message = "Application error"
         }
+
+        print(message)
     }
 
 }
 
+// MARK: XYBluetoothDeviceNotifyDelegate
 extension XYFirmwareUpdateManager: XYBluetoothDeviceNotifyDelegate {
 
     func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
