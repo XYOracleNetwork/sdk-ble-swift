@@ -36,7 +36,6 @@ class ViewController: UIViewController {
         rangedDevicesManager.setDelegate(self)
         self.navigationItem.rightBarButtonItem = self.pauseButton
         rangedDevicesManager.startRanging()
-        // bgTestManager.prep()
     }
 
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
