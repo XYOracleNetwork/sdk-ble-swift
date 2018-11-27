@@ -92,6 +92,7 @@ private extension XYFirmwareUpdateManager {
         case setPatchLength
         case sendPatch
         case completePatch
+        case rebootDevice
         case completed
     }
 
@@ -101,12 +102,12 @@ private extension XYFirmwareUpdateManager {
             break
         case .setMemoryType:
             currentStep = .unstarted
-            expectedValue = 0x10
+            expectedValue = XYFirmwareStatusValues.SPOTAR_IMG_STARTED.rawValue
             nextStep = .setMemoryParameters
 
             // Set the memory type. This will write the value, which will trigger the notification in readValue() below
             var memDevData: Int32 = (self.memoryType.rawValue << 24) | (self.patchBaseAddress & 0xFF)
-            let data = NSData(bytes: &memDevData, length: MemoryLayout<Int32>.size) // MemoryLayout.size(ofValue: memDevData))
+            let data = NSData(bytes: &memDevData, length: MemoryLayout<Int32>.size)
             let parameter = XYBluetoothResult(data: Data(referencing: data))
 
             print("- FIRMWARE Step: \(XYFirmwareUpdateStep.setMemoryType.rawValue) - Value is \(parameter.asInteger ?? -1)")
@@ -152,17 +153,18 @@ private extension XYFirmwareUpdateManager {
             }
 
             self.currentStep = .unstarted
-            self.expectedValue = 0x02
+            self.expectedValue = XYFirmwareStatusValues.SPOTAR_CMP_OK.rawValue
             self.nextStep = .sendPatch
 
             let dataLength: Int32 = Int32(firmwareData.count)
             var chunkStartByte: Int32 = 0
 
             while chunkStartByte < self.blockSize {
-
                 // Check if we have less than current block-size bytes remaining
                 let bytesRemaining: Int32 = blockSize - chunkStartByte
                 let currChunkSize: Int32  = bytesRemaining >= self.chunkSize ? self.chunkSize : bytesRemaining
+
+                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Sending bytes \(blockStartByte + chunkStartByte + 1) to \(blockStartByte + chunkStartByte + currChunkSize) (\(chunkStartByte + currChunkSize)/\(blockSize)) of \(dataLength)")
 
                 // Send next n bytes of the patch
                 let payload = UnsafeMutableBufferPointer<[UInt32]>.allocate(capacity: Int(currChunkSize))
@@ -187,14 +189,37 @@ private extension XYFirmwareUpdateManager {
                     }
                 }
 
-                self.writeValue(to: .patchData, value: parameter)
+                self.writeValue(to: .patchData, value: parameter, withResponse: false)
             }
 
         case .completePatch:
+            self.currentStep = .unstarted
+            self.expectedValue = XYFirmwareStatusValues.SPOTAR_CMP_OK.rawValue
+            self.nextStep = .rebootDevice
+
+            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.completePatch.rawValue)")
+
+            var suotaEnd: UInt32 = 0xFE000000
+            let data = NSData(bytes: &suotaEnd, length: MemoryLayout<UInt32>.size)
+            let parameter = XYBluetoothResult(data: Data(referencing: data))
+
+            self.writeValue(to: .memDev, value: parameter)
+
+        case .rebootDevice:
             self.currentStep = .completed
-            self.readValue(from: .memInfo)
+
+            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.rebootDevice.rawValue)")
+
+            var suotaEnd: UInt32 = 0xFD000000
+            let data = NSData(bytes: &suotaEnd, length: MemoryLayout<UInt32>.size)
+            let parameter = XYBluetoothResult(data: Data(referencing: data))
+
+            self.writeValue(to: .memDev, value: parameter)
 
         case .completed:
+
+            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.completed.rawValue)")
+
             self.device.connection {
                 _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
             }.always {
@@ -217,9 +242,9 @@ private extension XYFirmwareUpdateManager {
 // MARK: Read and write values to the device, as well as process any response
 private extension XYFirmwareUpdateManager {
 
-    func writeValue(to service: OtaService, value: XYBluetoothResult) {
+    func writeValue(to service: OtaService, value: XYBluetoothResult, withResponse: Bool = true) {
         self.device.connection {
-            let result = self.device.set(service, value: value)
+            let result = self.device.set(service, value: value, withResponse: withResponse)
             if result.hasError == false {
                 self.doStep()
             } else {
@@ -263,7 +288,7 @@ private extension XYFirmwareUpdateManager {
             let patches = (data >> 16) & 0xff
             let patchsize = data & 0xff
 
-            print("Patch Memory Info:\n  Number of patches: \(patches)\n  Size of patches: \(ceil(Double(patchsize)/4)) (\(patchsize))")
+            print("- FIRMWARE Patch Memory Info:\n  Number of patches: \(patches)\n  Size of patches: \(ceil(Double(patchsize)/4)) (\(patchsize))")
 
             if self.currentStep != .unstarted {
                 self.doStep()
@@ -340,7 +365,6 @@ private extension XYFirmwareUpdateManager {
             message = "Same Image Error"
         case .SPOTAR_EXT_MEM_READ_ERR:
             message = "Failed to read from external memory device"
-
         }
 
         print(message)

@@ -34,7 +34,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
 
     func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval?) -> XYBluetoothResult
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval?) -> XYBluetoothResult
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval?, withResponse: Bool) -> XYBluetoothResult
 
     func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) -> XYBluetoothResult
     func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) -> XYBluetoothResult
@@ -65,9 +65,9 @@ public extension XYBluetoothDevice {
         }
     }
 
-    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
+    func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval? = nil, withResponse: Bool = true) -> XYBluetoothResult {
         do {
-            try await(serivceCharacteristic.set(to: self, value: value, timeout: timeout))
+            try await(serivceCharacteristic.set(to: self, value: value, timeout: timeout, withResponse: withResponse))
             return XYBluetoothResult(data: nil)
         } catch {
             return XYBluetoothResult(error: error as? XYBluetoothError)
