@@ -209,11 +209,12 @@ private extension XYFirmwareUpdateManager {
         case .servStatus:
             guard let data = value.asInteger else { break }
 
+            // Debug output
+            self.handleResponse(for: data)
+
             if self.expectedValue != 0, data == self.expectedValue {
                 self.currentStep = self.nextStep
                 self.doStep()
-            } else {
-                self.handleResponse(for: data)
             }
 
             expectedValue = 0
@@ -259,7 +260,7 @@ private extension XYFirmwareUpdateManager {
         var message: String
 
         guard let errorEnum = XYFirmwareStatusValues(rawValue: responseValue) else {
-            message = "Unhandled status code \(responseValue)"
+            print("Unhandled status code \(responseValue)")
             return
         }
 
