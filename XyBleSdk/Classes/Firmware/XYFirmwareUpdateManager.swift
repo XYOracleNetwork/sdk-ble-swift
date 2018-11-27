@@ -31,7 +31,9 @@ public class XYFirmwareUpdateManager {
     }
 
     fileprivate let
-    device: XYBluetoothDevice,
+    device: XYBluetoothDevice
+
+    fileprivate var
     firmwareData: Data
 
     private let notifyKey = "XYFirmwareUpdateManager"
@@ -40,10 +42,13 @@ public class XYFirmwareUpdateManager {
     currentStep: XYFirmwareUpdateStep = .unstarted,
     nextStep: XYFirmwareUpdateStep = .unstarted
 
+    fileprivate let
+    chunkSize: Int32 = 20
+
     fileprivate var
     expectedValue: Int = 0,
-    chunkSize: Int = 20,
-    chunkStartByte: Int = 0,
+    blockSize: Int32 = 128,
+    blockStartByte: Int32 = 0,
     patchBaseAddress: Int32 = 0
 
     fileprivate let parameters: XYFirmwareUpdateParameters
@@ -83,11 +88,10 @@ private extension XYFirmwareUpdateManager {
         case unstarted
         case setMemoryType
         case setMemoryParameters
-        case validateMemoryType
-        case validatePatchData
+        case processFirmwareData
         case setPatchLength
         case sendPatch
-        case validatePatchComplete
+        case completePatch
         case completed
     }
 
@@ -105,73 +109,88 @@ private extension XYFirmwareUpdateManager {
             let data = NSData(bytes: &memDevData, length: MemoryLayout<Int32>.size) // MemoryLayout.size(ofValue: memDevData))
             let parameter = XYBluetoothResult(data: Data(referencing: data))
 
-            print("- FIRMWARE Step: \(self.currentStep.rawValue) - Value is \(parameter.asInteger ?? -1)")
+            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.setMemoryType.rawValue) - Value is \(parameter.asInteger ?? -1)")
 
             self.writeValue(to: .memDev, value: parameter)
 
         case .setMemoryParameters:
-            if self.memoryType == XYFirmwareUpdateMemoryType.SPOTA_SPI {
+            // NOTE: Only supporting SUOTA_SPI for now
+            if self.memoryType == XYFirmwareUpdateMemoryType.SUOTA_SPI {
                 var memInfoData: Int32 =
                     (self.parameters.spiMISOAddress << 24) |
                     (self.parameters.spiMOSIAddress << 16) |
                     (self.parameters.spiCSAddress << 8) |
                     self.parameters.spiSCKAddress
+
                 let data = NSData(bytes: &memInfoData, length: MemoryLayout<Int32>.size)
                 let parameter = XYBluetoothResult(data: Data(referencing: data))
 
-                self.currentStep = .validateMemoryType
-                self.writeValue(to: .gpioMap, value: parameter)
+                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.setMemoryParameters.rawValue) - Value is \(parameter.asInteger ?? -1)")
 
-            } else {
-                self.currentStep = .validateMemoryType
-                doStep()
+                self.currentStep = .processFirmwareData
+                self.writeValue(to: .gpioMap, value: parameter)
             }
 
-        case .validateMemoryType:
-            self.currentStep = .validatePatchData
-            self.readValue(from: .memInfo)
-
-        case .validatePatchData:
-            // TODO Data validate? We already have it at this point
-
+        case .processFirmwareData:
+            // Append checksum and move on as we have the chunk and block size preset for the XY4
+            self.appendChecksum()
             self.currentStep = .setPatchLength
             self.doStep()
 
         case .setPatchLength:
-            let dataLength = firmwareData.count
-            let data = NSData(bytes: [dataLength] as [Int], length: MemoryLayout<Int>.size)
+            let data = NSData(bytes: &blockSize, length: MemoryLayout<UInt16>.size)
             let parameter = XYBluetoothResult(data: Data(referencing: data))
 
-            self.currentStep = .sendPatch
+            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.setPatchLength.rawValue) - Value is \(blockSize)")
 
+            self.currentStep = .sendPatch
             self.writeValue(to: .patchLen, value: parameter)
 
         case .sendPatch:
+            if blockStartByte == 0 {
+                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Starting...")
+            }
+
             self.currentStep = .unstarted
             self.expectedValue = 0x02
-            self.nextStep = .validatePatchComplete
+            self.nextStep = .sendPatch
 
-            let dataLength = firmwareData.count
-            var bytesRemaining = dataLength
+            let dataLength: Int32 = Int32(firmwareData.count)
+            var chunkStartByte: Int32 = 0
 
-            while bytesRemaining > 0 {
+            while chunkStartByte < self.blockSize {
+
                 // Check if we have less than current block-size bytes remaining
-                if bytesRemaining < chunkSize {
-                    chunkSize = bytesRemaining
-                }
+                let bytesRemaining: Int32 = blockSize - chunkStartByte
+                let currChunkSize: Int32  = bytesRemaining >= self.chunkSize ? self.chunkSize : bytesRemaining
 
-                let payload = UnsafeMutableBufferPointer<[Int]>.allocate(capacity: dataLength)
-                let range = NSMakeRange(self.chunkStartByte, self.chunkSize)
+                // Send next n bytes of the patch
+                let payload = UnsafeMutableBufferPointer<[UInt32]>.allocate(capacity: Int(currChunkSize))
+                let range = NSMakeRange(Int(self.blockStartByte + chunkStartByte), Int(currChunkSize))
                 _ = self.firmwareData.copyBytes(to: payload, from: Range(range))
                 let parameter = XYBluetoothResult(data: Data(buffer: payload))
 
-                self.chunkStartByte += self.chunkSize
-                bytesRemaining = dataLength - self.chunkStartByte
+                // On to the chunk
+                chunkStartByte += currChunkSize
+
+                // Check if we are passing the current block
+                if chunkStartByte >= self.blockSize {
+                    // Prepare for next block
+                    self.blockStartByte += self.blockSize
+
+                    let bytesRemaining = dataLength - blockStartByte
+                    if bytesRemaining == 0 {
+                        nextStep = .completePatch
+                    } else if bytesRemaining < blockSize {
+                        blockSize = bytesRemaining
+                        nextStep = .setPatchLength
+                    }
+                }
 
                 self.writeValue(to: .patchData, value: parameter)
             }
 
-        case .validatePatchComplete:
+        case .completePatch:
             self.currentStep = .completed
             self.readValue(from: .memInfo)
 
@@ -184,6 +203,13 @@ private extension XYFirmwareUpdateManager {
             }
 
         }
+    }
+
+    func appendChecksum() {
+        var crcCode: UInt8 = 0
+        [UInt8](self.firmwareData).forEach { crcCode ^= $0 }
+        print("- FIRMWARE appendChecksum - Value: \(crcCode)")
+        self.firmwareData.append(&crcCode, count: MemoryLayout<UInt8>.size)
     }
 
 }
