@@ -5,8 +5,32 @@
 //  Created by Darren Sutherland on 10/31/18.
 //  Copyright © 2018 CocoaPods. All rights reserved.
 //
-/*
+
 import XyBleSdk
+
+class FirmwareTester {
+
+    class func loadFirmware() {
+        // Get the first one
+        guard
+            let firmwareUrl = XYFirmwareLoader.locateLocalFirmware().first,
+            let firmwareData = XYFirmwareLoader.getFirmwareData(from: firmwareUrl),
+            let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.80.59060")
+            else { return }
+
+        let manager = XYFirmwareUpdateManager(for: device, parameters: XYFirmwareUpdateParameters.xy4, firmwareData: firmwareData)
+        manager.update({
+
+        }, failure: { error in
+
+        })
+
+    }
+
+}
+
+/*
+
 import CoreBluetooth
 
 class BackgroundDeviceTestManager {

@@ -7,21 +7,21 @@
 //
 //  Ported from Dialog SPOTA Demo
 
-struct XYFirmwareUpdateParameters {
+public  struct XYFirmwareUpdateParameters {
     let
-    spiMISOAddress: Int,
-    spiMOSIAddress: Int,
-    spiCSAddress: Int,
-    spiSCKAddress: Int
+    spiMISOAddress: Int32,
+    spiMOSIAddress: Int32,
+    spiCSAddress: Int32,
+    spiSCKAddress: Int32
 
-    static var xy4: XYFirmwareUpdateParameters {
+    public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(spiMISOAddress: 0x05, spiMOSIAddress: 0x06, spiCSAddress: 0x07, spiSCKAddress: 0x00)
     }
 }
 
-class XYFirmwareUpdateManager {
+public class XYFirmwareUpdateManager {
 
-    enum XYFirmwareUpdateMemoryType: Int {
+    enum XYFirmwareUpdateMemoryType: Int32 {
         case SUOTA_I2C = 0x12
         case SUOTA_SPI = 0x13
         case SPOTA_SYSTEM_RAM = 0x00
@@ -44,7 +44,7 @@ class XYFirmwareUpdateManager {
     expectedValue: Int = 0,
     chunkSize: Int = 20,
     chunkStartByte: Int = 0,
-    patchBaseAddress: Int = 0
+    patchBaseAddress: Int32 = 0
 
     fileprivate let parameters: XYFirmwareUpdateParameters
 
@@ -52,15 +52,15 @@ class XYFirmwareUpdateManager {
     success: (() -> Void)?,
     failure: ((_ error: XYBluetoothError) -> Void)?
 
-    var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SPOTA_SPI
+    var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SUOTA_SPI
 
-    init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data) {
+    public init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data) {
         self.device = device
         self.parameters = parameters
         self.firmwareData = firmwareData
     }
 
-    func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
+    public func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
         self.success = success
         self.failure = failure
 
@@ -68,6 +68,9 @@ class XYFirmwareUpdateManager {
         self.device.connection {
             if self.device.subscribe(to: OtaService.servStatus, delegate: (key: self.notifyKey, delegate: self)).hasError {
                 self.failure?(XYBluetoothError.serviceNotFound)
+            } else {
+                self.currentStep = .setMemoryType
+                self.doStep()
             }
         }
     }
@@ -76,7 +79,7 @@ class XYFirmwareUpdateManager {
 // MARK: Multi-step updater
 private extension XYFirmwareUpdateManager {
 
-    enum XYFirmwareUpdateStep {
+    enum XYFirmwareUpdateStep: String {
         case unstarted
         case setMemoryType
         case setMemoryParameters
@@ -94,23 +97,26 @@ private extension XYFirmwareUpdateManager {
             break
         case .setMemoryType:
             currentStep = .unstarted
-            expectedValue = 0x1
+            expectedValue = 0x10
             nextStep = .setMemoryParameters
 
             // Set the memory type. This will write the value, which will trigger the notification in readValue() below
-            let memDevData = (self.memoryType.rawValue << 24) | (self.patchBaseAddress & 0xFFFFFF)
-            let data = NSData(bytes: [memDevData] as [Int], length: MemoryLayout<Int>.size)
+            var memDevData: Int32 = (self.memoryType.rawValue << 24) | (self.patchBaseAddress & 0xFF)
+            let data = NSData(bytes: &memDevData, length: MemoryLayout<Int32>.size) // MemoryLayout.size(ofValue: memDevData))
             let parameter = XYBluetoothResult(data: Data(referencing: data))
+
+            print("- FIRMWARE Step: \(self.currentStep.rawValue) - Value is \(parameter.asInteger ?? -1)")
+
             self.writeValue(to: .memDev, value: parameter)
 
         case .setMemoryParameters:
             if self.memoryType == XYFirmwareUpdateMemoryType.SPOTA_SPI {
-                let memInfoData =
+                var memInfoData: Int32 =
                     (self.parameters.spiMISOAddress << 24) |
                     (self.parameters.spiMOSIAddress << 16) |
                     (self.parameters.spiCSAddress << 8) |
                     self.parameters.spiSCKAddress
-                let data = NSData(bytes: [memInfoData] as [Int], length: MemoryLayout<Int>.size)
+                let data = NSData(bytes: &memInfoData, length: MemoryLayout<Int32>.size)
                 let parameter = XYBluetoothResult(data: Data(referencing: data))
 
                 self.currentStep = .validateMemoryType
@@ -173,6 +179,7 @@ private extension XYFirmwareUpdateManager {
             self.device.connection {
                 _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
             }.always {
+                self.device.disconnect()
                 self.success?()
             }
 
@@ -186,10 +193,11 @@ private extension XYFirmwareUpdateManager {
 
     func writeValue(to service: OtaService, value: XYBluetoothResult) {
         self.device.connection {
-            if self.device.set(service, value: value).hasError == false {
+            let result = self.device.set(service, value: value)
+            if result.hasError == false {
                 self.doStep()
             } else {
-                // TODO error
+                print(result.error?.toString ?? "<unknown>")
             }
         }
     }
@@ -200,7 +208,7 @@ private extension XYFirmwareUpdateManager {
             if result.hasError == false {
                 self.processValue(for: service, value: result)
             } else {
-                // TODO error
+                print(result.error?.toString ?? "<unknown>")
             }
         }
     }
@@ -255,6 +263,14 @@ private extension XYFirmwareUpdateManager {
         case SPOTAR_INT_MEM_ERR       = 0x07     // Internal Mem Error (not enough space for Patch)
         case SPOTAR_INVAL_MEM_TYPE    = 0x08     // Invalid memory device
         case SPOTAR_APP_ERROR         = 0x09     // Application error
+
+        case SPOTAR_IMG_STARTED       = 0x10     // SPOTA started for downloading image (SUOTA application)
+        case SPOTAR_INVAL_IMG_BANK    = 0x11     // Invalid image bank
+        case SPOTAR_INVAL_IMG_HDR     = 0x12     // Invalid image header
+        case SPOTAR_INVAL_IMG_SIZE    = 0x13     // Invalid image size
+        case SPOTAR_INVAL_PRODUCT_HDR = 0x14     // Invalid product header
+        case SPOTAR_SAME_IMG_ERR      = 0x15     // Same Image Error
+        case SPOTAR_EXT_MEM_READ_ERR  = 0x16     // Failed to read from external memory device
     }
 
     func handleResponse(for responseValue: Int) {
@@ -284,6 +300,21 @@ private extension XYFirmwareUpdateManager {
             message = "Invalid memory device"
         case .SPOTAR_APP_ERROR:
             message = "Application error"
+        case .SPOTAR_IMG_STARTED:
+            message = "SPOTA started for downloading image"
+        case .SPOTAR_INVAL_IMG_BANK:
+            message = "Invalid image bank"
+        case .SPOTAR_INVAL_IMG_HDR:
+            message = "Invalid image header"
+        case .SPOTAR_INVAL_IMG_SIZE:
+            message = "Invalid image size"
+        case .SPOTAR_INVAL_PRODUCT_HDR:
+            message = "Invalid product header"
+        case .SPOTAR_SAME_IMG_ERR:
+            message = "Same Image Error"
+        case .SPOTAR_EXT_MEM_READ_ERR:
+            message = "Failed to read from external memory device"
+
         }
 
         print(message)
@@ -294,7 +325,7 @@ private extension XYFirmwareUpdateManager {
 // MARK: XYBluetoothDeviceNotifyDelegate
 extension XYFirmwareUpdateManager: XYBluetoothDeviceNotifyDelegate {
 
-    func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
+    public func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
         guard let characteristic = serviceCharacteristic as? OtaService else { return }
         self.processValue(for: characteristic, value: value)
     }

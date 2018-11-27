@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var deviceCountLabel: UILabel!
     @IBOutlet weak var pulseCount: UILabel!
 
-    fileprivate let rangedDevicesManager = RangedDevicesManager.instance // MockRangedDevicesManager() // 
+    fileprivate let rangedDevicesManager =  MockRangedDevicesManager() // RangedDevicesManager.instance
     // fileprivate let bgTestManager = BackgroundDeviceTestManager()
 
     fileprivate var pauseButton: UIBarButtonItem?
@@ -36,6 +36,8 @@ class ViewController: UIViewController {
         rangedDevicesManager.setDelegate(self)
         self.navigationItem.rightBarButtonItem = self.pauseButton
         rangedDevicesManager.startRanging()
+
+        FirmwareTester.loadFirmware()
     }
 
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
