@@ -5,7 +5,7 @@
 //  Created by Darren Sutherland on 9/6/18.
 //  Copyright © 2018 Darren Sutherland. All rights reserved.
 //
-//  Ported from Dialog SPOTA Demo
+//  Ported from Dialog Obj-C SPOTA Demo
 
 public  struct XYFirmwareUpdateParameters {
     let
@@ -39,18 +39,8 @@ public class XYFirmwareUpdateManager {
     private let notifyKey = "XYFirmwareUpdateManager"
 
     fileprivate var
-    currentStep: XYFirmwareUpdateStep = .unstarted {
-        didSet {
-            print(" ####### CurrentStep value set to \(self.currentStep)")
-        }
-    }
-
-    fileprivate var
-    nextStep: XYFirmwareUpdateStep = .unstarted {
-        didSet {
-            print(" ####### NextStep value set to \(self.nextStep)")
-        }
-    }
+    currentStep: XYFirmwareUpdateStep = .unstarted,
+    nextStep: XYFirmwareUpdateStep = .unstarted
 
     fileprivate let
     chunkSize: Int32 = 20
@@ -58,14 +48,8 @@ public class XYFirmwareUpdateManager {
     fileprivate var
     blockSize: Int32 = 128,
     blockStartByte: Int32 = 0,
-    patchBaseAddress: Int32 = 0
-
-    fileprivate var
-    expectedValue: Int = 0 {
-        didSet {
-            print(" ####### Expected value set to \(self.expectedValue)")
-        }
-    }
+    patchBaseAddress: Int32 = 0,
+    expectedValue: Int = 0
 
     fileprivate let parameters: XYFirmwareUpdateParameters
 
@@ -88,7 +72,7 @@ public class XYFirmwareUpdateManager {
         // Set notifications on for the update service
         self.device.connection {
             if self.device.subscribe(to: OtaService.servStatus, delegate: (key: self.notifyKey, delegate: self)).hasError {
-                self.failure?(XYBluetoothError.serviceNotFound)
+                self.failure?(XYBluetoothError.unableToUpdateFirmware)
             } else {
                 self.currentStep = .setMemoryType
                 self.doStep()
@@ -113,8 +97,6 @@ private extension XYFirmwareUpdateManager {
     }
 
     func doStep() {
-        print(" *** - FIRMWARE doing step \(self.currentStep.rawValue)")
-
         switch self.currentStep {
         case .unstarted:
             break
@@ -165,7 +147,7 @@ private extension XYFirmwareUpdateManager {
             self.currentStep = .sendPatch
             self.writeValue(to: .patchLen, value: parameter)
 
-        case .sendPatch: // Looking for 7 chunks
+        case .sendPatch:
             if blockStartByte == 0 {
                 print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Starting...")
             }
@@ -186,9 +168,13 @@ private extension XYFirmwareUpdateManager {
 
                 print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Sending bytes \(blockStartByte + chunkStartByte + 1) to \(blockStartByte + chunkStartByte + currChunkSize) (\(chunkStartByte + currChunkSize)/\(blockSize)) of \(dataLength)")
 
-                // Send next n bytes of the patch
+                // Create an empty buffer of the current chunk size of bytes
                 var payload = [UInt8](repeating: 0, count: Int(currChunkSize))
+
+                // Create a range to capture the size of the current cunk
                 let range = NSMakeRange(Int(self.blockStartByte + chunkStartByte), Int(currChunkSize))
+
+                // Copy the range bytes to the payload pointer and add to the update array
                 _ = self.firmwareData.copyBytes(to: &payload, from: Range(range)!)
                 chunkedUpdate.append(XYBluetoothResult(data: Data(bytes: payload)))
 
@@ -210,6 +196,7 @@ private extension XYFirmwareUpdateManager {
                 }
             }
 
+            // Write out the patch chunks in one connection
             self.writeFirmware(to: .patchData, values: chunkedUpdate)
 
         case .completePatch:
@@ -262,12 +249,10 @@ private extension XYFirmwareUpdateManager {
 // MARK: Read and write values to the device, as well as process any response
 private extension XYFirmwareUpdateManager {
 
+    // Used for bulk udpating with no response needed
     func writeFirmware(to service: OtaService, values: [XYBluetoothResult]) {
-        print("- FIRMWARE Sending to device via BLE -------------------")
         self.device.connection {
-            values.forEach {
-                _ = self.device.set(service, value: $0, timeout: .seconds(120), withResponse: false)                
-            }
+            values.forEach { _ = self.device.set(service, value: $0, timeout: .seconds(120), withResponse: false) }
         }.then {
             self.doStep()
         }.catch { error in
@@ -297,40 +282,22 @@ private extension XYFirmwareUpdateManager {
         }
     }
 
+    // Handler for the notification callback for the service status
     func processValue(for serviceCharacteristic: OtaService, value: XYBluetoothResult) {
-        switch serviceCharacteristic {
-        case .servStatus:
-            guard let data = value.asInteger else { break }
+        guard
+            serviceCharacteristic == .servStatus,
+            let data = value.asInteger else { return }
 
-            // Debug output
-            self.handleResponse(for: data)
+        // Debug output
+        self.handleResponse(for: data)
 
-            print(" ^^^^^ Expected Val: \(self.expectedValue), data Val: \(data)")
-
-            if self.expectedValue != 0, data == self.expectedValue {
-                self.currentStep = self.nextStep
-                print(" --------------- EXPECTED 0 ----------------")
-                expectedValue = 0
-                self.doStep()
-            }
-
-        case .memInfo:
-            guard let data = value.asInteger else {
-                // TODO error
-                return
-            }
-
-            let patches = (data >> 16) & 0xff
-            let patchsize = data & 0xff
-
-            print("- FIRMWARE Patch Memory Info:\n  Number of patches: \(patches)\n  Size of patches: \(ceil(Double(patchsize)/4)) (\(patchsize))")
-
-            if self.currentStep != .unstarted {
-                self.doStep()
-            }
-
-        default:
-            break
+        // If the service gives us a good response, reset expected and do the next step
+        if self.expectedValue != 0, data == self.expectedValue {
+            self.currentStep = self.nextStep
+            expectedValue = 0
+            self.doStep()
+        } else {
+            self.failure?(XYBluetoothError.unableToUpdateFirmware)
         }
     }
 

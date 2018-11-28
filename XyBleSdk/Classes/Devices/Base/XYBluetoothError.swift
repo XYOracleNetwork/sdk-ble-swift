@@ -25,6 +25,7 @@ public enum XYBluetoothError: Error {
     case couldNotPowerOnCentral
     case deviceNotInRange
     case couldNotUnlock
+    case unableToUpdateFirmware
 
     public var toString: String {
         switch self {
@@ -56,6 +57,8 @@ public enum XYBluetoothError: Error {
             return "Could not power on Central"
         case .deviceNotInRange:
             return "Device not in range"
+        case .unableToUpdateFirmware:
+            return "Unable to update firmware"
         }
     }
 }
