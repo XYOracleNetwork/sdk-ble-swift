@@ -159,6 +159,8 @@ private extension XYFirmwareUpdateManager {
             let dataLength: Int32 = Int32(firmwareData.count)
             var chunkStartByte: Int32 = 0
 
+            var chunkedUpdate = [XYBluetoothResult]()
+
             while chunkStartByte < self.blockSize {
                 // Check if we have less than current block-size bytes remaining
                 let bytesRemaining: Int32 = blockSize - chunkStartByte
@@ -167,10 +169,10 @@ private extension XYFirmwareUpdateManager {
                 print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Sending bytes \(blockStartByte + chunkStartByte + 1) to \(blockStartByte + chunkStartByte + currChunkSize) (\(chunkStartByte + currChunkSize)/\(blockSize)) of \(dataLength)")
 
                 // Send next n bytes of the patch
-                let payload = UnsafeMutableBufferPointer<[UInt32]>.allocate(capacity: Int(currChunkSize))
+                let payload = UnsafeMutableBufferPointer<[Int32]>.allocate(capacity: Int(currChunkSize))
                 let range = NSMakeRange(Int(self.blockStartByte + chunkStartByte), Int(currChunkSize))
                 _ = self.firmwareData.copyBytes(to: payload, from: Range(range))
-                let parameter = XYBluetoothResult(data: Data(buffer: payload))
+                chunkedUpdate.append(XYBluetoothResult(data: Data(buffer: payload)))
 
                 // On to the chunk
                 chunkStartByte += currChunkSize
@@ -188,9 +190,9 @@ private extension XYFirmwareUpdateManager {
                         nextStep = .setPatchLength
                     }
                 }
-
-                self.writeValue(to: .patchData, value: parameter, withResponse: false)
             }
+
+            self.writeFirmware(to: .patchData, values: chunkedUpdate)
 
         case .completePatch:
             self.currentStep = .unstarted
@@ -242,9 +244,20 @@ private extension XYFirmwareUpdateManager {
 // MARK: Read and write values to the device, as well as process any response
 private extension XYFirmwareUpdateManager {
 
-    func writeValue(to service: OtaService, value: XYBluetoothResult, withResponse: Bool = true) {
+    func writeFirmware(to service: OtaService, values: [XYBluetoothResult]) {
+        print("- FIRMWARE Sending to device via BLE -------------------")
         self.device.connection {
-            let result = self.device.set(service, value: value, withResponse: withResponse)
+            values.forEach { _ = self.device.set(service, value: $0, withResponse: true) }
+        }.then {
+            self.doStep()
+        }.catch { error in
+            print((error as? XYBluetoothError)?.toString ?? "<unknown>")
+        }
+    }
+
+    func writeValue(to service: OtaService, value: XYBluetoothResult) {
+        self.device.connection {
+            let result = self.device.set(service, value: value)
             if result.hasError == false {
                 self.doStep()
             } else {
@@ -377,7 +390,7 @@ extension XYFirmwareUpdateManager: XYBluetoothDeviceNotifyDelegate {
 
     public func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
         guard let characteristic = serviceCharacteristic as? OtaService else { return }
-        self.processValue(for: characteristic, value: value)
+//        self.processValue(for: characteristic, value: value)
     }
 
 }

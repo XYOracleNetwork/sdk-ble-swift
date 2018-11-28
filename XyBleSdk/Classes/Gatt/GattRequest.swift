@@ -97,7 +97,7 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        print("START Set: \(device.id.shortId)")
+        print("START Set: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
@@ -219,6 +219,11 @@ private extension GattRequest {
 
         self.status = .writing
         peripheral.writeValue(data, for: characteristic, type: withResponse ? .withResponse : .withoutResponse)
+
+        if !withResponse {
+            print("Gatt(set): set as no response, done")
+            writePromise.fulfill(())
+        }
 
         return self.writePromise
     }
