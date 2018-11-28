@@ -77,11 +77,15 @@ final class XYDeviceConnectionManager {
                     xyDevice.connection {
                         // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
                         if let xyDevice = device as? XYFinderDevice {
-                            if !xyDevice.unlock().hasError && !xyDevice.subscribeToButtonPress().hasError {
-                                xyDevice.peripheral?.readRSSI()
-                            } else {
+                            if xyDevice.unlock().hasError {
                                 throw XYBluetoothError.couldNotConnect
                             }
+
+                            if xyDevice.subscribeToButtonPress().hasError {
+                                throw XYBluetoothError.couldNotConnect
+                            }
+
+                            xyDevice.peripheral?.readRSSI()
                         }
 
                     }.then(on: self.waitQueue) {
@@ -126,11 +130,15 @@ private extension XYDeviceConnectionManager {
         device.connection {
             // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
             if let xyDevice = device as? XYFinderDevice {
-                if !xyDevice.unlock().hasError && !xyDevice.subscribeToButtonPress().hasError {
-                    xyDevice.peripheral?.readRSSI()
-                } else {
+                if xyDevice.unlock().hasError {
                     throw XYBluetoothError.couldNotConnect
                 }
+
+                if xyDevice.subscribeToButtonPress().hasError {
+                    throw XYBluetoothError.couldNotConnect
+                }
+
+                xyDevice.peripheral?.readRSSI()
             }
 
         }.then(on: XYBluetoothDeviceBase.workQueue) {

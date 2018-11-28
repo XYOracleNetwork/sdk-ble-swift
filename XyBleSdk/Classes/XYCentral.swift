@@ -179,7 +179,6 @@ extension XYCentral: CBCentralManagerDelegate {
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
             if let marked = device.markedForDeletion, marked == true { return }
             device.resetRssi()
-            // XYDeviceConnectionManager.instance.remove(for: device.id, disconnect: false)
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
         }
