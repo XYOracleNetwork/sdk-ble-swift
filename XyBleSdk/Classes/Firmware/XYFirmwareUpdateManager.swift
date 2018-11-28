@@ -39,17 +39,33 @@ public class XYFirmwareUpdateManager {
     private let notifyKey = "XYFirmwareUpdateManager"
 
     fileprivate var
-    currentStep: XYFirmwareUpdateStep = .unstarted,
-    nextStep: XYFirmwareUpdateStep = .unstarted
+    currentStep: XYFirmwareUpdateStep = .unstarted {
+        didSet {
+            print(" ####### CurrentStep value set to \(self.currentStep)")
+        }
+    }
+
+    fileprivate var
+    nextStep: XYFirmwareUpdateStep = .unstarted {
+        didSet {
+            print(" ####### NextStep value set to \(self.nextStep)")
+        }
+    }
 
     fileprivate let
     chunkSize: Int32 = 20
 
     fileprivate var
-    expectedValue: Int = 0,
     blockSize: Int32 = 128,
     blockStartByte: Int32 = 0,
     patchBaseAddress: Int32 = 0
+
+    fileprivate var
+    expectedValue: Int = 0 {
+        didSet {
+            print(" ####### Expected value set to \(self.expectedValue)")
+        }
+    }
 
     fileprivate let parameters: XYFirmwareUpdateParameters
 
@@ -97,6 +113,8 @@ private extension XYFirmwareUpdateManager {
     }
 
     func doStep() {
+        print(" *** - FIRMWARE doing step \(self.currentStep.rawValue)")
+
         switch self.currentStep {
         case .unstarted:
             break
@@ -147,7 +165,7 @@ private extension XYFirmwareUpdateManager {
             self.currentStep = .sendPatch
             self.writeValue(to: .patchLen, value: parameter)
 
-        case .sendPatch:
+        case .sendPatch: // Looking for 7 chunks
             if blockStartByte == 0 {
                 print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Starting...")
             }
@@ -169,10 +187,10 @@ private extension XYFirmwareUpdateManager {
                 print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Sending bytes \(blockStartByte + chunkStartByte + 1) to \(blockStartByte + chunkStartByte + currChunkSize) (\(chunkStartByte + currChunkSize)/\(blockSize)) of \(dataLength)")
 
                 // Send next n bytes of the patch
-                let payload = UnsafeMutableBufferPointer<[Int32]>.allocate(capacity: Int(currChunkSize))
+                var payload = [UInt8](repeating: 0, count: Int(currChunkSize))
                 let range = NSMakeRange(Int(self.blockStartByte + chunkStartByte), Int(currChunkSize))
-                _ = self.firmwareData.copyBytes(to: payload, from: Range(range))
-                chunkedUpdate.append(XYBluetoothResult(data: Data(buffer: payload)))
+                _ = self.firmwareData.copyBytes(to: &payload, from: Range(range)!)
+                chunkedUpdate.append(XYBluetoothResult(data: Data(bytes: payload)))
 
                 // On to the chunk
                 chunkStartByte += currChunkSize
@@ -247,7 +265,9 @@ private extension XYFirmwareUpdateManager {
     func writeFirmware(to service: OtaService, values: [XYBluetoothResult]) {
         print("- FIRMWARE Sending to device via BLE -------------------")
         self.device.connection {
-            values.forEach { _ = self.device.set(service, value: $0, withResponse: true) }
+            values.forEach {
+                _ = self.device.set(service, value: $0, timeout: .seconds(120), withResponse: false)                
+            }
         }.then {
             self.doStep()
         }.catch { error in
@@ -285,12 +305,14 @@ private extension XYFirmwareUpdateManager {
             // Debug output
             self.handleResponse(for: data)
 
+            print(" ^^^^^ Expected Val: \(self.expectedValue), data Val: \(data)")
+
             if self.expectedValue != 0, data == self.expectedValue {
                 self.currentStep = self.nextStep
+                print(" --------------- EXPECTED 0 ----------------")
+                expectedValue = 0
                 self.doStep()
             }
-
-            expectedValue = 0
 
         case .memInfo:
             guard let data = value.asInteger else {
@@ -390,7 +412,7 @@ extension XYFirmwareUpdateManager: XYBluetoothDeviceNotifyDelegate {
 
     public func update(for serviceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult) {
         guard let characteristic = serviceCharacteristic as? OtaService else { return }
-//        self.processValue(for: characteristic, value: value)
+        self.processValue(for: characteristic, value: value)
     }
 
 }
