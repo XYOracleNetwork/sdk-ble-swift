@@ -129,8 +129,6 @@ fileprivate extension XYSmartScan {
 extension XYSmartScan {
 
     public func updateStatus() {
-        guard self.isActive else { return }
-
         var newStatus = XYSmartScanStatus.enabled
         let central = XYCentral.instance
         if !XYLocation.instance.locationServicesEnabled {
