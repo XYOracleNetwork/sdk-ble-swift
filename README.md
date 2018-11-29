@@ -3,7 +3,7 @@
 ![logo]
 
 # sdk-ble-ios
-A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API that allows the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
+A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the Google Promises](https://github.com/google/promises) library as a dependency.
 
 ## Requirements
 
@@ -41,46 +41,62 @@ Then, run the following command:
 $ pod install
 ```
 
-## Code Example
-Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral` with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Add in the often upredictable nature of Bluetooth and the associated hardware and it 
+## Overview
+Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral`, with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Bluetooth devices are often not predictable in their reponse times due to firmware and environmental conditions, which can make them tricky to deal with, especially if the application requires multiple, disparate devices connected to operate properly.
 
+## Code Example
 The XyBleSdk provides a simple interface to communicating with an XY Finder or other Bluetooth device. Let's take a look at an example for an XY Finder device:
 
 ```swift
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+var batteryLevel: Int?
 device.connection {
-    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
-    if batteryLevel > 15 {
-        self.batteryStatus = "\(batteryLevel)"
+    batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    if let level = batteryLevel, level > 15 {
+        self.batteryStatus = "Battery at \(level)"
     } else {
         self.batteryStatus = "Battery level low"
     }
 }
 ```
 
-The `XYFinderDeviceFactory` can build a device from a string, peripheral, etc. The calls made inside the `connection` closure are run one at a time in order. Using `connection` manages wrangling `CBCentral` and the associated `CBPeripheral` delegates, ensuring you have a connection before trying the GATT operation(s) in the block.
+The `XYFinderDeviceFactory` can build a device from a string, peripheral, etc. Using `connection` manages the wrangling of the `CBCentral` and associated `CBPeripheral` delegates, ensuring you have a connection before trying any GATT operation(s) in the block.
+
+The `get`, `set`, and `notify` methods operate on the specified device and block until the result is returned. This allows the developer to write syncronous code without waiting for a callback or delegate method to be called, or deal with the underlying promises directly. Each operation can also take a timeout if so desired; the default is 30 seconds.
 
 Once all the operations have completed, you can use `then` if there are post actions you wish to run:
 
 ```swift
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+var batteryLevel: Int = 0
 device.connection {
-    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    if let level = batteryLevel, level > 15 {
+        self.batteryStatus = "Battery at \(level)"
+    } else {
+        self.batteryStatus = "Battery level low"
+    }
 }.then {
-
+    self.showBatteryNotification(for: batteryLevel)
 }
 ```
 
-You can check for an error from your operations by using `catch`:
+You can check for an error from your operations by using `catch`. The error is of type `XYFinderBluetoothError`.
 
 ```swift
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+var batteryLevel: Int = 0
 device.connection {
-    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    if let level = batteryLevel, level > 15 {
+        self.batteryStatus = "Battery at \(level)"
+    } else {
+        self.batteryStatus = "Battery level low"
+    }
 }.then {
-
+    self.showBatteryNotification(for: batteryLevel)
 }.catch { error in
-
+    self.showErrorNotification(for: error)
 }
 ```
 
@@ -88,14 +104,20 @@ If you wish a specific action to always be run regardless of the result, you can
 
 ```swift
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+var batteryLevel: Int = 0
 device.connection {
-    let batteryLevel = device.get(BatteryService.level, timeout: .seconds(10))
+     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    if let level = batteryLevel, level > 15 {
+        self.batteryStatus = "Battery at \(level)"
+    } else {
+        self.batteryStatus = "Battery level low"
+    }
 }.then {
-
+    self.showBatteryNotification(for: batteryLevel)
 }.catch { error in
-
+    self.showErrorNotification(for: error)
 }.always {
-
+    self.updateView()
 }
 ```
 
