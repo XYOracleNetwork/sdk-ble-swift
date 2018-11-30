@@ -27,3 +27,6 @@ Darren Sutherland, darren@xyo.network
 ## License
 
 XyBleSdk is available under the MIT license. See the LICENSE file for more info.
+
+<br><hr><br>
+<p align="center">Made with  ❤️  by [<b>XY - The Persistent Company</b>] (https://xy.company)</p>
