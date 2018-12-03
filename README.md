@@ -157,10 +157,6 @@ public enum MyService: String, XYServiceCharacteristic {
 
 The `XYBluetoothResult` class wraps the data received from a `get` call and allows data to be passed to a `get` service call. The `XYBluetoothResult` allows for access to the raw data, as well as the convenience methods `asInteger`, `asString` and `asByteArray`. Any error information is available in `error` as an `XYFinderBluetoothError`.
 
-## Connecting And Disconnecting From Devices
-
-The `build` method of the `XYFinderDeviceFactory` does not make a connection to the specified device. Once the device is created by the factory, use the `connect` and `disconnect` methods. These calls use the `XYDeviceConnectionManager` under the hood to keep track of your connected devices.
-
 ## Device Event Notifications
 
 When a connected device changes state or an operation is performed (such as pressing the button on an XY4+) a `XYFinderEvent` notification is sent out via the `XYFinderDeviceEventManager`. You can subscribe to these events as shown here:
