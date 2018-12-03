@@ -3,7 +3,7 @@
 ![logo]
 
 # sdk-ble-ios
-A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the Google Promises](https://github.com/google/promises) library as a dependency.
+A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
 
 ## Requirements
 
@@ -70,7 +70,7 @@ Once all the operations have completed, you can use `then` if there are post act
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
-     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
     if let level = batteryLevel, level > 15 {
         self.batteryStatus = "Battery at \(level)"
     } else {
@@ -87,7 +87,7 @@ You can check for an error from your operations by using `catch`. The error is o
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
-     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
     if let level = batteryLevel, level > 15 {
         self.batteryStatus = "Battery at \(level)"
     } else {
@@ -106,7 +106,7 @@ If you wish a specific action to always be run regardless of the result, you can
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
-     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
     if let level = batteryLevel, level > 15 {
         self.batteryStatus = "Battery at \(level)"
     } else {
@@ -120,11 +120,48 @@ device.connection {
     self.updateView()
 }
 ```
+## Services
 
+The library provides three types of communication with a Bluetooth device, `get`, `set`, and `notify`. These operate on the characteristic of a GATT service, which is defined with the `XYServiceCharacteristicType` protocol. Add a new service by creating an enumeration that implements this protocol:
+
+```swift
+public enum MyService: String, XYServiceCharacteristic {
+
+    public var serviceUuid: CBUUID { return MyService.serviceUuid }
+
+    case level
+
+    public var characteristicUuid: CBUUID {
+        return BatterySeMyServicervice.uuids[self]!
+    }
+
+    public var characteristicType: XYServiceCharacteristicType {
+        return .integer
+    }
+
+    public var displayName: String {
+        return "My Level"
+    }
+
+    private static let serviceUuid = CBUUID(string: "0000180F-0000-1000-8000-00805F9B34FB")
+
+    private static let uuids: [MyService: CBUUID] = [
+        .level: CBUUID(string: "00002a19-0000-1000-8000-00805f9b34fb")
+    ]
+
+    public static var values: [XYServiceCharacteristic] = [
+        level
+    ]
+}
+```
+
+## Operation Results
+
+The `XYBluetoothResult` class wraps the data received from a `get` call and allows data to be passed to a `get` service call. The `XYBluetoothResult` allows for access to the raw data, as well as the convenience methods `asInteger`, `asString` and `asByteArray`. Any error information is available in `error` as an `XYBluetoothError`.
 
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+To run the example project, clone the repo, and run `pod install` from the Example directory first. This project is a simple XY locator scanner, allowing you to view the characteristics of the devices various services.
 
 ## Author
 
