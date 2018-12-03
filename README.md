@@ -81,13 +81,14 @@ device.connection {
 }
 ```
 
-You can check for an error from your operations by using `catch`. The error is of type `XYFinderBluetoothError`.
+You can check for an error from your operations by using `hasError` in the result. The error is of type `XYFinderBluetoothError`.
 
 ```swift
 let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    guard batteryLevel.hasError == false else { return }
     if let level = batteryLevel, level > 15 {
         self.batteryStatus = "Battery at \(level)"
     } else {
@@ -95,8 +96,6 @@ device.connection {
     }
 }.then {
     self.showBatteryNotification(for: batteryLevel)
-}.catch { error in
-    self.showErrorNotification(for: error)
 }
 ```
 
@@ -107,6 +106,7 @@ let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-00
 var batteryLevel: Int = 0
 device.connection {
     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
+    guard batteryLevel.hasError == false else { return }
     if let level = batteryLevel, level > 15 {
         self.batteryStatus = "Battery at \(level)"
     } else {
@@ -114,8 +114,6 @@ device.connection {
     }
 }.then {
     self.showBatteryNotification(for: batteryLevel)
-}.catch { error in
-    self.showErrorNotification(for: error)
 }.always {
     self.updateView()
 }
@@ -157,11 +155,42 @@ public enum MyService: String, XYServiceCharacteristic {
 
 ## Operation Results
 
-The `XYBluetoothResult` class wraps the data received from a `get` call and allows data to be passed to a `get` service call. The `XYBluetoothResult` allows for access to the raw data, as well as the convenience methods `asInteger`, `asString` and `asByteArray`. Any error information is available in `error` as an `XYBluetoothError`.
+The `XYBluetoothResult` class wraps the data received from a `get` call and allows data to be passed to a `get` service call. The `XYBluetoothResult` allows for access to the raw data, as well as the convenience methods `asInteger`, `asString` and `asByteArray`. Any error information is available in `error` as an `XYFinderBluetoothError`.
+
+## Connecting And Disconnecting From Devices
+
+The `build` method of the `XYFinderDeviceFactory` does not make a connection to the specified device. Once the device is created by the factory, use the `connect` and `disconnect` methods. These calls use the `XYDeviceConnectionManager` under the hood to keep track of your connected devices.
+
+## Device Event Notifications
+
+When a connected device changes state or an operation is performed (such as pressing the button on an XY4+) a `XYFinderEvent` notification is sent out via the `XYFinderDeviceEventManager`. You can subscribe to these events as shown here:
+
+```swift
+self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed]) { event in
+    switch event {
+    case .buttonPressed(let device, _):
+        guard let currentDevice = self.selectedDevice, currentDevice == device else { return }
+        self.buttonPressed(on: device)
+    default:
+        break
+    }
+}
+```
+
+The result of the `subscribe` call is a subscription UUID that you can use to unsubscribe from further notifcations:
+
+```swift
+XYFinderDeviceEventManager.unsubscribe(to: [.buttonPressed], referenceKey: self.subscriptionUuid)
+```
+
+
+## Smart Scan
+
+The `XYSmartScan` singleton can be used to range and monitor for XY Finder devices. It will range for devices in a particular XY Finder device family when put into foreground mode using `switchToForeground`, and use lower power monitoring when placed into backgound mode with `switchToBackground`.
 
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first. This project is a simple XY locator scanner, allowing you to view the characteristics of the devices various services.
+To run the example project, clone the repo, and run `pod install` from the Example directory first. This project is a simple XY locator scanner, allowing you to view the characteristics of the device's various services.
 
 ## Author
 
