@@ -1,8 +1,9 @@
 //
 //  XYFinderDeviceBase.swift
-//  Pods-XyBleSdk_Example
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 10/18/18.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -34,7 +35,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     fileprivate static let buttonTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceButtonTimerQueue")
     fileprivate var buttonTimer: DispatchSourceTimer?
 
-    fileprivate static let monitorTimeout: DispatchTimeInterval = .seconds(10)
+    fileprivate static let monitorTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let monitorTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceMonitorTimerQueue")
     fileprivate var monitorTimer: DispatchSourceTimer?
 

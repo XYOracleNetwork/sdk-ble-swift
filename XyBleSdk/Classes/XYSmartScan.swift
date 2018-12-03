@@ -1,9 +1,9 @@
 //
 //  XYSmartScan.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/10/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -129,8 +129,6 @@ fileprivate extension XYSmartScan {
 extension XYSmartScan {
 
     public func updateStatus() {
-        guard self.isActive else { return }
-
         var newStatus = XYSmartScanStatus.enabled
         let central = XYCentral.instance
         if !XYLocation.instance.locationServicesEnabled {

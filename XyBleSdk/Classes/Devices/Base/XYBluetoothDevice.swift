@@ -1,9 +1,9 @@
 //
 //  XYBluetoothDevice.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/25/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreBluetooth
@@ -119,20 +119,20 @@ public extension XYBluetoothDevice {
 //            return Promise<Void>(XYBluetoothError.deviceNotInRange)
 //        }
 
-        // Process the queue, adding the connections agent if needed
+        // Process the queue, adding the connections agents if needed
         return Promise<Void>(on: XYBluetoothDeviceBase.workQueue) {
             print("STEP 2: Trying to lock for \(self.id.shortId)...")
             self.lock()
 
             // If we don't have a powered on central, we'll see if we can't get that running
             if XYCentral.instance.state != .poweredOn {
+                print("STEP 2a: Trying to power on Central for \(self.id.shortId)...")
                 try await(XYCentralAgent().powerOn())
             }
 
-            print("STEP 3: Trying to connect for \(self.id.shortId)...")
-
             // If we are no connected, use the agent to handle that before running the operations block
             if self.peripheral?.state != .connected {
+                print("STEP 3: Trying to connect for \(self.id.shortId)...")
                 try await(XYConnectionAgent(for: self).connect())
             }
 
@@ -143,11 +143,11 @@ public extension XYBluetoothDevice {
 
         }.then(on: XYBluetoothDeviceBase.workQueue) {
             self.unlock()
-            print("STEP 5: All done for \(self.id.shortId)...")
+            print("STEP 5: All done for \(self.id.shortId)")
 
         }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
             self.unlock()
-            print("STEP 6: All done for \((error as! XYBluetoothError).toString)")
+            print("STEP 6: ERROR for \((error as! XYBluetoothError).toString)")
 
         }.always(on:XYBluetoothDeviceBase.workQueue) {
             self.unlock()
