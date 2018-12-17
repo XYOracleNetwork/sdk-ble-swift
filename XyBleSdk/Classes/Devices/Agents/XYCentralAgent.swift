@@ -11,18 +11,18 @@ import CoreBluetooth
 
 // An agent that allows for adding connecting to the Central in an XYBluetoothDevice connection block
 // or any other Promises chain
-internal final class XYCentralAgent: XYCentralDelegate {
+public final class XYCentralAgent: XYCentralDelegate {
     private let
     central = XYCentral.instance,
     delegateKey: String
 
     private lazy var promise = Promise<Void>.pending()
 
-    init() {
+    public init() {
         self.delegateKey = "XYCentralAgent:\(UUID.init().uuidString)"
     }
 
-    @discardableResult func powerOn() -> Promise<Void> {
+    @discardableResult public func powerOn() -> Promise<Void> {
         guard self.central.state != .poweredOn else { return Promise(()) }
 
         self.central.setDelegate(self, key: self.delegateKey)
@@ -33,16 +33,16 @@ internal final class XYCentralAgent: XYCentralDelegate {
         }
     }
 
-    func stateChanged(newState: CBManagerState) {
+    public func stateChanged(newState: CBManagerState) {
         newState == .poweredOn ?
             promise.fulfill(()) :
             promise.reject(XYBluetoothError.couldNotPowerOnCentral)
     }
 
     // Unused
-    func located(peripheral: XYPeripheral) {}
-    func connected(peripheral: XYPeripheral) {}
-    func timeout() {}
-    func couldNotConnect(peripheral: XYPeripheral) {}
-    func disconnected(periperhal: XYPeripheral) {}
+    public func located(peripheral: XYPeripheral) {}
+    public func connected(peripheral: XYPeripheral) {}
+    public func timeout() {}
+    public func couldNotConnect(peripheral: XYPeripheral) {}
+    public func disconnected(periperhal: XYPeripheral) {}
 }

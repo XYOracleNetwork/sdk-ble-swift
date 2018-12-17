@@ -18,6 +18,7 @@ public enum XYServiceCharacteristicType {
 
 // Protocol which defines a service and a characteristic, implemented as enumerations in the various *Service files
 public protocol XYServiceCharacteristic {
+    var serviceDisplayName: String { get }
     var serviceUuid: CBUUID { get }
     var characteristicUuid: CBUUID { get }
     var characteristicType: XYServiceCharacteristicType { get }

@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum PrimaryService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Primary" }
     public var serviceUuid: CBUUID { return PrimaryService.serviceUuid }
 
     case stayAwake
@@ -43,9 +44,9 @@ public enum PrimaryService: String, XYServiceCharacteristic {
 
     public var characteristicType: XYServiceCharacteristicType {
         switch self {
-        case .stayAwake, .major, .minor, .buttonState, .buzzer, .lastError, .uptime, .reset, .selfTest, .debug, .leftBehind:
+        case .major, .minor, .buttonState, .buzzer, .lastError, .uptime, .reset, .selfTest, .debug, .leftBehind:
             return .integer
-        case .unlock, .lock, .uuid, .buzzerConfig, .adConfig, .buttonConfig, .eddystoneUID, .eddystoneURL, .eddystoneEID, .color, .hardwareCreateDate:
+        case .stayAwake, .unlock, .lock, .uuid, .buzzerConfig, .adConfig, .buttonConfig, .eddystoneUID, .eddystoneURL, .eddystoneEID, .color, .hardwareCreateDate:
             return .byte
         }
     }

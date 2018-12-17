@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum BasicConfigService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Basic Config" }
     public var serviceUuid: CBUUID { return BasicConfigService.serviceUuid }
 
     case lockStatus

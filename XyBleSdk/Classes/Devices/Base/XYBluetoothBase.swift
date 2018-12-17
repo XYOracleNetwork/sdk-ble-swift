@@ -9,7 +9,7 @@
 import CoreBluetooth
 
 // Basic protocol for all BLE devices 
-public protocol XYBluetoothBase {
+public protocol XYBluetoothBase: class {
     var rssi: Int { get set }
     var powerLevel: UInt8 { get set }
     var name: String { get }
@@ -21,10 +21,14 @@ public protocol XYBluetoothBase {
 
     var proximity: XYDeviceProximity { get }
 
+    var rssiRange: (min: Int, max: Int) { get }
+
     func update(_ rssi: Int, powerLevel: UInt8)
     func resetRssi()
 
     var supportedServices: [CBUUID] { get }
+
+    var deviceBleQueue: DispatchQueue { get }
 }
 
 public extension XYBluetoothBase {

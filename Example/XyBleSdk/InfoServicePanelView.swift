@@ -20,6 +20,8 @@ final class InfoServicePanelView: UIView {
     @IBOutlet weak var minorLabel: UILabel!
     @IBOutlet weak var pulsesLabel: UILabel!
     @IBOutlet weak var rssiLabel: UILabel!
+    @IBOutlet weak var idLabel: UILabel!
+    @IBOutlet weak var beaconUuid: UILabel!
 
     fileprivate weak var parent: DeviceDetailViewController?
 
@@ -58,6 +60,8 @@ final class InfoServicePanelView: UIView {
         self.minorLabel.text = String(format:"0x%02X", device.iBeacon?.minor ?? 0)
         self.pulsesLabel.text = String(device.totalPulseCount)
         self.rssiLabel.text = String(device.rssi)
+        self.idLabel.text = device.id.shortId
+        self.beaconUuid.text = device.family.uuid.uuidString
         updateStayAwakeAndConnectionButtonStates()
     }
 
@@ -71,14 +75,18 @@ final class InfoServicePanelView: UIView {
         self.stayAwakeButton.isEnabled = false
         self.fallAsleepButton.isEnabled = false
 
+        var isAwake: XYBluetoothResult?
         device.connection {
-            let data = device.isAwake()
-            var value = 0
-            if let intVal = data.asInteger {
-                value = intVal
+            let name = __dispatch_queue_get_label(nil)
+            print(" Checking isAwake on queue \(String(cString: name, encoding: .utf8) ?? "<unknown>")")
+            isAwake = device.isAwake()
+        }.then {
+            var value: [UInt8] = [0x00]
+            if let byteVal = isAwake?.asByteArray {
+                value = byteVal
             }
             DispatchQueue.main.async {
-                if value == 1 {
+                if value.count > 0 && value[0] != 0x00 {
                     self.stayAwakeButton.isEnabled = false
                     self.fallAsleepButton.isEnabled = true
                     self.connectionButton.isEnabled = false
@@ -93,13 +101,21 @@ final class InfoServicePanelView: UIView {
         }.always {
             self.parent?.showRefreshControl()
         }
+
+//        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+//            let name = __dispatch_queue_get_label(nil)
+//            print(" @ @ @ @ I'm tapping the button!!! on queue \(String(cString: name, encoding: .utf8) ?? "<unknown>")")
+//            device.connection {
+//                device.find(.findIt)
+//            }
+//        })
     }
 
 }
 
 extension InfoServicePanelView {
 
-    private func wrapper(_ button: CommonButton, operation: @escaping () -> XYBluetoothResult, completion: (() -> Void)? = nil) {
+    private func wrapper(_ button: CommonButton, unlock: Bool, operation: @escaping () -> XYBluetoothResult, completion: (() -> Void)? = nil) {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
@@ -108,8 +124,13 @@ extension InfoServicePanelView {
         button.isEnabled = false
 
         var result: XYBluetoothResult?
+        print(" -------------- BOOF" )
         device.connection {
-            result = operation()
+            if unlock && device.unlock().hasError == false {
+                result = operation()
+            } else {
+                result = operation()
+            }
         }.then {
             if let error = result?.error {
                 self.parent?.showErrorAlert(for: error)
@@ -127,8 +148,17 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender, operation: {
+        wrapper(sender, unlock: true, operation: {
             device.find(.findIt)
+        })
+    }
+
+    @IBAction func stopFindTapped(_ sender: CommonButton) {
+        guard
+            let device = self.rangedDevicesManager.selectedDevice
+            else { return }
+        wrapper(sender, unlock: true, operation: {
+            device.find(.off)
         })
     }
 
@@ -136,7 +166,7 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender, operation: {
+        wrapper(sender, unlock: true, operation: {
             device.stayAwake()
         }, completion: {
             self.updateStayAwakeAndConnectionButtonStates()
@@ -147,7 +177,7 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender, operation: {
+        wrapper(sender, unlock: true, operation: {
             device.fallAsleep()
         }, completion: {
             self.updateStayAwakeAndConnectionButtonStates()
@@ -158,7 +188,7 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender, operation: {
+        wrapper(sender, unlock: true, operation: {
             device.lock()
         })
     }
@@ -167,7 +197,7 @@ extension InfoServicePanelView {
         guard
             let device = self.rangedDevicesManager.selectedDevice
             else { return }
-        wrapper(sender, operation: {
+        wrapper(sender, unlock: false, operation: {
             device.unlock()
         })
     }

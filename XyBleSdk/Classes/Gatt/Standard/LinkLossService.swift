@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum LinkLossService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Link Loss" }
     public var serviceUuid: CBUUID { return LinkLossService.serviceUuid }
 
     case alertLevel

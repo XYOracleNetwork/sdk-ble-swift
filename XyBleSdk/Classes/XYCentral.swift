@@ -69,6 +69,10 @@ public class XYCentral: NSObject {
 
     fileprivate var restoredPeripherals = Set<XYPeripheral>()
 
+    fileprivate var scannerCount = 0
+
+    fileprivate var stopOnNoDelegates: Bool = false
+
     // All BLE operations should be done on this queue
     internal static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYCentralWorkQueue")
 
@@ -116,14 +120,20 @@ public class XYCentral: NSObject {
     }
 
     // Ask for devices with the requested/all services until requested to stop()
-    public func scan(for services: [XYServiceCharacteristic]? = nil) {
+    public func scan(for services: [XYServiceCharacteristic]? = nil, stopOnNoDelegates: Bool = false) {
         guard state == .poweredOn else { return }
-        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
+        self.stopOnNoDelegates = stopOnNoDelegates
+        self.cbManager?.scanForPeripherals(
+            withServices: services?.map { $0.serviceUuid },
+            options:[CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true])
     }
 
     // Cancel a scan request from scan() above
     public func stopScan() {
+        if stopOnNoDelegates && delegates.count > 0  { return }
+        print(" ()()() Now Stopping Scan")
         self.cbManager?.stopScan()
+        self.stopOnNoDelegates = false
     }
 
     public func setDelegate(_ delegate: XYCentralDelegate, key: String) {
@@ -177,10 +187,13 @@ extension XYCentral: CBCentralManagerDelegate {
     // If the periperhal disconnects, we will reset the RSSI and report
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
-            if let marked = device.markedForDeletion, marked == true { return }
+            print(" ******* OH NO: Disconnect for \(device.id.shortId) - error: \(error?.localizedDescription ?? "<none>")")
+
+            XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
+            guard device.markedForDeletion == false else { return }
+
             device.resetRssi()
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
-            XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
         }
     }
 }

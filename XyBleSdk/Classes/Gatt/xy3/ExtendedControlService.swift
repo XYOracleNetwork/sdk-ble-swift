@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum ExtendedControlService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Extended Control" }
     public var serviceUuid: CBUUID { return ExtendedControlService.serviceUuid }
 
     case simStatus

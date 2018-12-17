@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum AlertNotificationService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Alert Notification" }
     public var serviceUuid: CBUUID { return AlertNotificationService.serviceUuid }
 
     case controlPoint

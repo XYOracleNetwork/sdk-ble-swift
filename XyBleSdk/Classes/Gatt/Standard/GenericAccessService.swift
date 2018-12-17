@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum GenericAccessService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Generic Access" }
     public var serviceUuid: CBUUID { return GenericAccessService.serviceUuid }
 
     case deviceName

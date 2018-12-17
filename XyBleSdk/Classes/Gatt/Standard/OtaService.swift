@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum OtaService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "OTA" }
     public var serviceUuid: CBUUID { return OtaService.serviceUuid }
 
     case memDev

@@ -22,6 +22,10 @@ public class XYFinderDeviceFactory {
         deviceCache.removeAll()
     }
 
+    internal static func remove(device: XYFinderDevice) {
+        self.deviceCache.remove(at: device.id)
+    }
+
     // Used to update all cached, in range device locations to the current user's location
     public static func updateDeviceLocations(_ newLocation: XYLocationCoordinate2D) {
         devices.filter { $0.inRange }.forEach { $0.updateLocation(newLocation) }

@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum CurrentTimeService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Current Time" }
     public var serviceUuid: CBUUID { return CurrentTimeService.serviceUuid }
 
     case currentTime

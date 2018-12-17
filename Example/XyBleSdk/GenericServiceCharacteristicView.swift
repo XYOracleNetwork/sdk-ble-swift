@@ -8,18 +8,24 @@
 
 import UIKit
 import XyBleSdk
+import CoreBluetooth
 
 class GenericServiceCharacteristicView: UIView {
-    fileprivate lazy var serviceCharacteristics = [XYServiceCharacteristic]()
+    fileprivate lazy var serviceCharacteristics = [GattCharacteristicDescriptor]()
     fileprivate lazy var characteristicLabels = [CommonLabel]()
     
     fileprivate let rangedDevicesManager = RangedDevicesManager.instance
     fileprivate weak var parent: DeviceDetailViewController?
 
-    convenience init(for service: GenericServiceCharacteristicRegistry, frame: CGRect, parent: DeviceDetailViewController) {
+    let scrollView: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        return scroll
+    }()
+
+    convenience init(for characteristics: [GattCharacteristicDescriptor], frame: CGRect, parent: DeviceDetailViewController) {
         self.init(frame: frame)
-        guard let device = rangedDevicesManager.selectedDevice else { return }
-        self.serviceCharacteristics = service.characteristics(for: device.family)
+        self.serviceCharacteristics = characteristics
         self.parent = parent
         buildView()
         getValues()
@@ -38,7 +44,10 @@ class GenericServiceCharacteristicView: UIView {
         var values = [XYBluetoothResult]()
         self.parent?.showRefreshing()
         device.connection {
-            values = self.serviceCharacteristics.map { device.get($0, timeout: .seconds(5)) }
+            values = self.serviceCharacteristics
+                .filter { $0.properties.contains([.read]) }
+                .compactMap { $0.service }
+                .map { device.get($0, timeout: .seconds(5)) }
         }.then {
             for (index, value) in values.enumerated() {
                 guard
@@ -49,7 +58,7 @@ class GenericServiceCharacteristicView: UIView {
                 if let error = value.error {
                     label.text = error.toString
                 } else {
-                    label.text = value.display(for: characteristic)
+                    label.text = value.display(for: characteristic.service!)
                 }
             }
         }.always {
@@ -73,7 +82,8 @@ extension XYBluetoothResult {
     func display(for serviceCharacteristic: XYServiceCharacteristic) -> String? {
         switch serviceCharacteristic.characteristicType {
         case .string:
-            return self.asString
+            guard let strVal = self.asString else { return "n/a" }
+            return "\(strVal)"
         case .integer:
             guard let intVal = self.asInteger else { return "n/a" }
             return "\(intVal)"
@@ -87,11 +97,16 @@ extension XYBluetoothResult {
 private extension GenericServiceCharacteristicView {
 
     func buildView() {
+        self.addSubview(scrollView)
+        scrollView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 8.0).isActive = true
+        scrollView.topAnchor.constraint(equalTo: self.topAnchor, constant: 8.0).isActive = true
+        scrollView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -8.0).isActive = true
+        scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -8.0).isActive = true
+
         var labels = [UIStackView]()
 
-        serviceCharacteristics.forEach { characteristic in
-            labels.append(self.buildRow(for: characteristic))
-        }
+        serviceCharacteristics
+            .forEach { labels.append(self.buildRow(for: $0)) }
 
         let characteristicStack = UIStackView(arrangedSubviews: labels)
         characteristicStack.axis = .vertical
@@ -99,30 +114,57 @@ private extension GenericServiceCharacteristicView {
         characteristicStack.alignment = .leading
         characteristicStack.spacing = 8
         characteristicStack.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(characteristicStack)
+        scrollView.addSubview(characteristicStack)
 
-        let margins = self.layoutMarginsGuide
-        characteristicStack.topAnchor.constraint(equalTo: margins.topAnchor, constant: 8).isActive = true
-        characteristicStack.leftAnchor.constraint(equalTo: margins.leftAnchor, constant: 8).isActive = true
+        characteristicStack.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 8).isActive = true
+        characteristicStack.leftAnchor.constraint(equalTo: scrollView.leftAnchor, constant: 8).isActive = true
+        characteristicStack.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -8).isActive = true
+        characteristicStack.rightAnchor.constraint(equalTo: scrollView.rightAnchor, constant: -8).isActive = true
     }
 
-    func buildRow(for characteristic: XYServiceCharacteristic) -> UIStackView {
+    func buildRow(for characteristic: GattCharacteristicDescriptor) -> UIStackView {
         let label = CommonLabel()
-        label.text = characteristic.displayName + ":"
+        label.text = characteristic.service?.displayName ?? "<unknown>" + ":"
 
         let value = CommonLabel().color(CommonLabel.xyGray)
         value.text = "n/a"
         self.characteristicLabels.append(value)
 
-        let stack = UIStackView(arrangedSubviews: [label, value])
+        let keyValueStack = UIStackView(arrangedSubviews: [label, value])
+        keyValueStack.axis = .vertical
+        keyValueStack.distribution = .equalSpacing
+        keyValueStack.spacing = 8
+        keyValueStack.alignment = .leading
+        keyValueStack.translatesAutoresizingMaskIntoConstraints = false
 
+        let propertyStack = UIStackView(arrangedSubviews: characteristic.labels)
+        propertyStack.axis = .horizontal
+        propertyStack.distribution = .fillEqually
+        propertyStack.spacing = 12
+        propertyStack.alignment = .center
+        propertyStack.translatesAutoresizingMaskIntoConstraints = false
+
+        let stack = UIStackView(arrangedSubviews: [keyValueStack, propertyStack])
         stack.axis = .horizontal
-        stack.distribution = .equalSpacing
-        stack.spacing = 8
-        stack.alignment = .leading
+        stack.distribution = .fill
+        stack.spacing = 12
+        stack.alignment = .top
         stack.translatesAutoresizingMaskIntoConstraints = false
 
         return stack
+    }
+
+}
+
+private extension GattCharacteristicDescriptor {
+
+    var labels: [CharacteristicPropertyLabel] {
+        var labels = [CharacteristicPropertyLabel]()
+        if self.properties.contains(.read) { labels.append(CharacteristicPropertyLabel().text("R")) }
+        if self.properties.contains(.write) { labels.append(CharacteristicPropertyLabel().text("W")) }
+        if self.properties.contains(.writeWithoutResponse) { labels.append(CharacteristicPropertyLabel().text("M")) }
+        if self.properties.contains(.notify) { labels.append(CharacteristicPropertyLabel().text("N")) }
+        return labels
     }
 
 }

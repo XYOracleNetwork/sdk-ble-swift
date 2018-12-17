@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum ControlService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Control" }
     public var serviceUuid: CBUUID { return ControlService.serviceUuid }
 
     case buzzer

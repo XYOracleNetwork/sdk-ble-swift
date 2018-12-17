@@ -26,9 +26,6 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func connect()
     func disconnect()
 
-    func lock()
-    func unlock()
-
     func verifyExit(_ callback:((_ exited: Bool) -> Void)?)
 
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void>
@@ -83,46 +80,29 @@ public extension XYBluetoothDevice {
         }
     }
 
+    func inquire(_ timeout: DispatchTimeInterval? = nil, callback: @escaping (GattDeviceDescriptor) -> Void) -> XYBluetoothResult {
+        do {
+            _ = try await(GattInquisitor(timeout).inquire(for: self).then { callback($0) })
+            return XYBluetoothResult(data: nil)
+        } catch {
+            return XYBluetoothResult(error: error as? XYBluetoothError)
+        }
+    }
+
 }
 
 // MARK: Connecting to a device in order to complete a block of operations defined above, as well as disconnect from the peripheral
 public extension XYBluetoothDevice {
 
-    @discardableResult func queueDisconnected(_ operations: @escaping () throws -> Void) -> Promise<Void> {
-        // Process the queue, adding the connections agent if needed
-        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue) {
-            self.lock()
-
-            // If we don't have a powered on central, we'll see if we can't get that running
-            if XYCentral.instance.state != .poweredOn {
-                try await(XYCentralAgent().powerOn())
-            }
-
-            // If we are no connected, use the agent to handle that before running the operations block
-            if self.peripheral?.state != .connected {
-                try await(XYConnectionAgent(for: self).connect())
-            }
-
-            // Run the requested Gatt operations
-            try operations()
-
-        }.always(on: XYBluetoothDeviceBase.workQueue) {
-            self.unlock()
-        }.catch { error in
-            print((error as! XYBluetoothError).toString)
-        }
-    }
-
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
-//        // Check range before running operations block
-//        guard self.proximity != .outOfRange && self.proximity != .none else {
-//            return Promise<Void>(XYBluetoothError.deviceNotInRange)
-//        }
+        // Check range before running operations block
+        guard self.inRange else {
+            return Promise<Void>(XYBluetoothError.deviceNotInRange)
+        }
 
         // Process the queue, adding the connections agents if needed
-        return Promise<Void>(on: XYBluetoothDeviceBase.workQueue) {
+        return Promise<Void>(on: self.deviceBleQueue) {
             print("STEP 2: Trying to lock for \(self.id.shortId)...")
-            self.lock()
 
             // If we don't have a powered on central, we'll see if we can't get that running
             if XYCentral.instance.state != .poweredOn {
@@ -132,7 +112,7 @@ public extension XYBluetoothDevice {
 
             // If we are no connected, use the agent to handle that before running the operations block
             if self.peripheral?.state != .connected {
-                print("STEP 3: Trying to connect for \(self.id.shortId)...")
+                print("STEP 3: Trying to connect for \(self.id.shortId)... STATE is \(self.peripheral?.state.rawValue ?? -1)")
                 try await(XYConnectionAgent(for: self).connect())
             }
 
@@ -141,17 +121,10 @@ public extension XYBluetoothDevice {
             // Run the requested Gatt operations
             try operations()
 
-        }.then(on: XYBluetoothDeviceBase.workQueue) {
-            self.unlock()
+        }.then(on: self.deviceBleQueue) {
             print("STEP 5: All done for \(self.id.shortId)")
-
-        }.catch(on: XYBluetoothDeviceBase.workQueue) { error in
-            self.unlock()
-            print("STEP 6: ERROR for \((error as! XYBluetoothError).toString)")
-
-        }.always(on:XYBluetoothDeviceBase.workQueue) {
-            self.unlock()
         }
+
     }
 
 }

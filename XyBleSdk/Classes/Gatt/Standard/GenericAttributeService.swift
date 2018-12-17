@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum GenericAttributeService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Generic Attribute" }
     public var serviceUuid: CBUUID { return GenericAttributeService.serviceUuid }
 
     case serviceChanged

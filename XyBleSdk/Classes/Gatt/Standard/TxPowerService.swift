@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum TxPowerService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Tx Power" }
     public var serviceUuid: CBUUID { return TxPowerService.serviceUuid }
 
     case txPowerLevel

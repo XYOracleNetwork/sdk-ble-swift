@@ -176,6 +176,7 @@ extension XYLocation: CLLocationManagerDelegate {
 
     // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+//        print(" (Ranging) - Found \(beacons.count)")
         self.delegates.forEach { $1?.didRangeBeacons(
             beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) },
             for: region.family

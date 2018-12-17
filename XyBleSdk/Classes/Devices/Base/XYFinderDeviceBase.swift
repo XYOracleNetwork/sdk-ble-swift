@@ -127,11 +127,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         self.rssi = XYDeviceProximity.defaultProximity
         self.lastPulseTime = nil
 
-        // We will only report this when the app is in the foreground, as monitoring
-        // will handle the messaging while in the background
-        // if XYSmartScan.instance.mode == .foreground {
-            XYFinderDeviceEventManager.report(events: [.exited(device: self)])
-        // }
+        XYFinderDeviceEventManager.report(events: [.exited(device: self)])
 
         // We put the device in the wait queue so it auto-reconnects when it comes back
         // into range. This works only while the app is in the foreground/background

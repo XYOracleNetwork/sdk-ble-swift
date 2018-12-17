@@ -7,7 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3133889D21B6093400AF07E4 /* OptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3133889C21B6093400AF07E4 /* OptionsViewController.swift */; };
+		3133889F21B6FE1A00AF07E4 /* TableSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3133889E21B6FE1A00AF07E4 /* TableSection.swift */; };
+		313388A321B721E200AF07E4 /* SmartScanStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313388A221B721E200AF07E4 /* SmartScanStatus.swift */; };
 		314BAD7A21628AC6002B6058 /* CommonLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314BAD7921628AC6002B6058 /* CommonLabel.swift */; };
+		315D8C5721B9AEB6006785F9 /* CharacteristicPropertyLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 315D8C5621B9AEB6006785F9 /* CharacteristicPropertyLabel.swift */; };
 		316409C9215D41C5006DFAA2 /* DeviceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409C8215D41C5006DFAA2 /* DeviceDetailViewController.swift */; };
 		316409CF215D7092006DFAA2 /* RangedDevicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409CE215D7092006DFAA2 /* RangedDevicesManager.swift */; };
 		316409D1215D7D02006DFAA2 /* RangedDeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409D0215D7D02006DFAA2 /* RangedDeviceTableViewCell.swift */; };
@@ -15,7 +19,6 @@
 		316409D8215DA90F006DFAA2 /* InfoServicePanelView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 316409D7215DA90F006DFAA2 /* InfoServicePanelView.xib */; };
 		316409DF215E8F3C006DFAA2 /* CommonButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409DE215E8F3C006DFAA2 /* CommonButton.swift */; };
 		316409E3215EC534006DFAA2 /* GenericServiceCharacteristicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409E2215EC534006DFAA2 /* GenericServiceCharacteristicView.swift */; };
-		316409E5215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316409E4215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -39,7 +42,11 @@
 /* Begin PBXFileReference section */
 		08552D18E456D15CF467BA8D /* Pods-XyBleSdk_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-XyBleSdk_Example/Pods-XyBleSdk_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		1D96605625E3569A97C7004C /* Pods-XyBleSdk_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-XyBleSdk_Example/Pods-XyBleSdk_Example.release.xcconfig"; sourceTree = "<group>"; };
+		3133889C21B6093400AF07E4 /* OptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsViewController.swift; sourceTree = "<group>"; };
+		3133889E21B6FE1A00AF07E4 /* TableSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSection.swift; sourceTree = "<group>"; };
+		313388A221B721E200AF07E4 /* SmartScanStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartScanStatus.swift; sourceTree = "<group>"; };
 		314BAD7921628AC6002B6058 /* CommonLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonLabel.swift; sourceTree = "<group>"; };
+		315D8C5621B9AEB6006785F9 /* CharacteristicPropertyLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacteristicPropertyLabel.swift; sourceTree = "<group>"; };
 		316409C8215D41C5006DFAA2 /* DeviceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetailViewController.swift; sourceTree = "<group>"; };
 		316409CE215D7092006DFAA2 /* RangedDevicesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangedDevicesManager.swift; sourceTree = "<group>"; };
 		316409D0215D7D02006DFAA2 /* RangedDeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangedDeviceTableViewCell.swift; sourceTree = "<group>"; };
@@ -47,7 +54,6 @@
 		316409D7215DA90F006DFAA2 /* InfoServicePanelView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = InfoServicePanelView.xib; sourceTree = "<group>"; };
 		316409DE215E8F3C006DFAA2 /* CommonButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButton.swift; sourceTree = "<group>"; };
 		316409E2215EC534006DFAA2 /* GenericServiceCharacteristicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericServiceCharacteristicView.swift; sourceTree = "<group>"; };
-		316409E4215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericServiceCharacteristicRegistry.swift; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* XyBleSdk_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XyBleSdk_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -120,8 +126,11 @@
 		316409DD215E8F21006DFAA2 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				315D8C5621B9AEB6006785F9 /* CharacteristicPropertyLabel.swift */,
 				316409DE215E8F3C006DFAA2 /* CommonButton.swift */,
 				314BAD7921628AC6002B6058 /* CommonLabel.swift */,
+				313388A221B721E200AF07E4 /* SmartScanStatus.swift */,
+				3133889E21B6FE1A00AF07E4 /* TableSection.swift */,
 			);
 			name = Components;
 			sourceTree = "<group>";
@@ -131,16 +140,9 @@
 			children = (
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				316409C8215D41C5006DFAA2 /* DeviceDetailViewController.swift */,
+				3133889C21B6093400AF07E4 /* OptionsViewController.swift */,
 			);
 			name = Controllers;
-			sourceTree = "<group>";
-		};
-		31F9C9D82165410C0043529F /* Definitions */ = {
-			isa = PBXGroup;
-			children = (
-				316409E4215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift */,
-			);
-			name = Definitions;
 			sourceTree = "<group>";
 		};
 		31F9C9D92165412B0043529F /* Layout */ = {
@@ -184,7 +186,6 @@
 			isa = PBXGroup;
 			children = (
 				31F9C9DA2165413B0043529F /* Manager */,
-				31F9C9D82165410C0043529F /* Definitions */,
 				316409D2215D9294006DFAA2 /* Views */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -426,9 +427,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				316409DF215E8F3C006DFAA2 /* CommonButton.swift in Sources */,
+				3133889D21B6093400AF07E4 /* OptionsViewController.swift in Sources */,
+				3133889F21B6FE1A00AF07E4 /* TableSection.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
-				316409E5215ED7BB006DFAA2 /* GenericServiceCharacteristicRegistry.swift in Sources */,
+				315D8C5721B9AEB6006785F9 /* CharacteristicPropertyLabel.swift in Sources */,
+				313388A321B721E200AF07E4 /* SmartScanStatus.swift in Sources */,
 				316409E3215EC534006DFAA2 /* GenericServiceCharacteristicView.swift in Sources */,
 				314BAD7A21628AC6002B6058 /* CommonLabel.swift in Sources */,
 				316409D1215D7D02006DFAA2 /* RangedDeviceTableViewCell.swift in Sources */,
@@ -589,6 +593,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -606,6 +611,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

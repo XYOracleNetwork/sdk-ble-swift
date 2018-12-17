@@ -10,6 +10,7 @@ import CoreBluetooth
 
 public enum ExtendedConfigService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Extended Config" }
     public var serviceUuid: CBUUID { return ExtendedConfigService.serviceUuid }
 
     case virtualBeaconSettings
