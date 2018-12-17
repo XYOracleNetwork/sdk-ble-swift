@@ -32,8 +32,6 @@ final class GattRequest: NSObject {
     fileprivate lazy var writePromise = Promise<Void>.pending()
     fileprivate lazy var notifyPromise = Promise<Void>.pending()
 
-    fileprivate static let requestDelay: TimeInterval = 0.5
-
     fileprivate let serviceCharacteristic: XYServiceCharacteristic
 
     fileprivate var
@@ -223,10 +221,17 @@ internal extension GattRequest {
         print("START Discover Services: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         self.device = device
-
         device.subscribe(self, key: self.delegateKey(deviceUuid: peripheral.identifier))
-        self.status = .discoveringServices
-        peripheral.discoverServices([self.serviceCharacteristic.serviceUuid])
+
+        if  // Has this already been located and cached to the peripheral?
+            let service = self.device?.peripheral?.services?.first(where: { $0.uuid == self.serviceCharacteristic.serviceUuid }),
+            let characteristic = service.characteristics?.first(where: { $0.uuid == self.serviceCharacteristic.characteristicUuid }) {
+            self.characteristic = characteristic
+            self.characteristicPromise.fulfill(())
+        } else {
+            self.status = .discoveringServices
+            peripheral.discoverServices([self.serviceCharacteristic.serviceUuid])
+        }
 
         return self.characteristicPromise
     }
@@ -334,18 +339,8 @@ extension GattRequest: CBPeripheralDelegate {
 
             print("START Discover Characteristics: \(self.device?.id.shortId ?? "") for Service: \(self.serviceCharacteristic.displayName)")
 
-            if
-                let services = self.device?.peripheral?.services,
-                let service = services.first(where: { $0.uuid == self.serviceCharacteristic.serviceUuid }),
-                let characteristics = service.characteristics,
-                let characteristic = characteristics.first(where: { $0.uuid == self.serviceCharacteristic.characteristicUuid }) {
-                self.characteristic = characteristic
-                self.characteristicPromise.fulfill(())
-            } else {
-                self.status = .discoveringCharacteristics
-                peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
-            }
-
+            self.status = .discoveringCharacteristics
+            peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
         }
     }
 

@@ -9,7 +9,7 @@ import Foundation
 
 public class XYFirmwareLoader {
 
-    public class func locateLocalFirmware() -> [URL] {
+    public class func locateDocumentsFirmware() -> [URL] {
         // Get the document directory url
         guard let documentsUrl =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return [] }
 
@@ -24,6 +24,11 @@ public class XYFirmwareLoader {
         }
 
         return firmwareUrls
+    }
+
+    public class func locateBundleFirmware(for fileName: String, type: String) -> URL? {
+        let path: String? = Bundle.main.path(forResource: fileName, ofType: type)
+        return URL.init(fileURLWithPath: path!)
     }
 
     public class func getFirmwareData(from url: URL) -> Data? {

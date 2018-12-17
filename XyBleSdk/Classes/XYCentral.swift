@@ -123,6 +123,7 @@ public class XYCentral: NSObject {
     public func scan(for services: [XYServiceCharacteristic]? = nil, stopOnNoDelegates: Bool = false) {
         guard state == .poweredOn else { return }
         self.stopOnNoDelegates = stopOnNoDelegates
+        print("START: Scanning for devices")
         self.cbManager?.scanForPeripherals(
             withServices: services?.map { $0.serviceUuid },
             options:[CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true])
@@ -131,7 +132,7 @@ public class XYCentral: NSObject {
     // Cancel a scan request from scan() above
     public func stopScan() {
         if stopOnNoDelegates && delegates.count > 0  { return }
-        print(" ()()() Now Stopping Scan")
+        print("STOP: Scanning for devices")
         self.cbManager?.stopScan()
         self.stopOnNoDelegates = false
     }

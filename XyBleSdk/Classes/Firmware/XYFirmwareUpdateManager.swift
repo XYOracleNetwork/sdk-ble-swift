@@ -7,7 +7,7 @@
 //
 //  Ported from Dialog Obj-C SPOTA Demo
 
-public  struct XYFirmwareUpdateParameters {
+public struct XYFirmwareUpdateParameters {
     let
     spiMISOAddress: Int32,
     spiMOSIAddress: Int32,
@@ -17,6 +17,10 @@ public  struct XYFirmwareUpdateParameters {
     public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(spiMISOAddress: 0x05, spiMOSIAddress: 0x06, spiCSAddress: 0x07, spiSCKAddress: 0x00)
     }
+}
+
+public protocol XYFirmwareUpdateManagerProgressDelegate: class {
+    func progressUpdated(value: Float, offset: Int32, count: Int32)
 }
 
 public class XYFirmwareUpdateManager {
@@ -53,16 +57,19 @@ public class XYFirmwareUpdateManager {
 
     fileprivate let parameters: XYFirmwareUpdateParameters
 
+    fileprivate weak var delegate: XYFirmwareUpdateManagerProgressDelegate?
+
     fileprivate var
     success: (() -> Void)?,
     failure: ((_ error: XYBluetoothError) -> Void)?
 
     var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SUOTA_SPI
 
-    public init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data) {
+    public init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
         self.device = device
         self.parameters = parameters
         self.firmwareData = firmwareData
+        self.delegate = delegate
     }
 
     public func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
@@ -168,6 +175,10 @@ private extension XYFirmwareUpdateManager {
 
                 print("- FIRMWARE Step: \(XYFirmwareUpdateStep.sendPatch.rawValue) - Sending bytes \(blockStartByte + chunkStartByte + 1) to \(blockStartByte + chunkStartByte + currChunkSize) (\(chunkStartByte + currChunkSize)/\(blockSize)) of \(dataLength)")
 
+                // Calcuate progress for display
+                let progress: Float = Float(blockStartByte + chunkStartByte + currChunkSize) / Float(dataLength)
+                self.delegate?.progressUpdated(value: progress, offset: (blockStartByte + chunkStartByte + 1), count: dataLength)
+
                 // Create an empty buffer of the current chunk size of bytes
                 var payload = [UInt8](repeating: 0, count: Int(currChunkSize))
 
@@ -252,7 +263,7 @@ private extension XYFirmwareUpdateManager {
     // Used for bulk udpating with no response needed
     func writeFirmware(to service: OtaService, values: [XYBluetoothResult]) {
         self.device.connection {
-            values.forEach { _ = self.device.set(service, value: $0, timeout: .seconds(120), withResponse: false) }
+            values.forEach { _ = self.device.set(service, value: $0, timeout: .seconds(15), withResponse: false) }
         }.then {
             self.doStep()
         }.catch { error in

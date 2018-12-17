@@ -130,8 +130,11 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         XYFinderDeviceEventManager.report(events: [.exited(device: self)])
 
         // We put the device in the wait queue so it auto-reconnects when it comes back
-        // into range. This works only while the app is in the foreground/background
-        XYDeviceConnectionManager.instance.wait(for: self)
+        // into range. This works only while the app is in the foreground/background, and
+        // we only do this when the app is in the background
+        if XYSmartScan.instance.mode == .background {
+            XYDeviceConnectionManager.instance.wait(for: self)
+        }
 
         // The call back is used for app logic uses only
         callback?(true)

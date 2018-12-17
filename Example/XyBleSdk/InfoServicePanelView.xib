@@ -13,9 +13,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InfoServicePanelView" customModule="XyBleSdk_Example" customModuleProvider="target">
             <connections>
                 <outlet property="beaconUuid" destination="TBZ-Xx-gR4" id="agD-83-lMD"/>
-                <outlet property="connectionButton" destination="sIA-AM-bnI" id="a0v-ia-7vf"/>
                 <outlet property="contentView" destination="iN0-l3-epB" id="Y77-l8-gCI"/>
-                <outlet property="disconnectionButton" destination="3cy-vg-dwb" id="N7Z-5H-Biu"/>
                 <outlet property="fallAsleepButton" destination="YCq-AZ-I9T" id="rxZ-t3-FI2"/>
                 <outlet property="familyLabel" destination="eGp-67-QGv" id="Xwg-f4-cKo"/>
                 <outlet property="idLabel" destination="03Z-XB-ot5" id="yze-OB-GUc"/>
@@ -200,7 +198,7 @@
                     </subviews>
                 </stackView>
                 <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" distribution="equalCentering" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="lUA-kJ-2ih">
-                    <rect key="frame" x="16" y="129" width="232" height="244"/>
+                    <rect key="frame" x="16" y="129" width="232" height="160"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="tkA-sA-YBV">
@@ -319,30 +317,6 @@
                                 </button>
                             </subviews>
                         </stackView>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sIA-AM-bnI" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="168" width="154" height="34"/>
-                            <state key="normal" title="Emulate Connection"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                    <real key="value" value="10"/>
-                                </userDefinedRuntimeAttribute>
-                            </userDefinedRuntimeAttributes>
-                            <connections>
-                                <action selector="emulateConnectTapped:" destination="-1" eventType="touchUpInside" id="Ai6-Yg-fI2"/>
-                            </connections>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3cy-vg-dwb" customClass="CommonButton" customModule="XyBleSdk_Example" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="210" width="174" height="34"/>
-                            <state key="normal" title="Emulate Disconnection"/>
-                            <userDefinedRuntimeAttributes>
-                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
-                                    <real key="value" value="10"/>
-                                </userDefinedRuntimeAttribute>
-                            </userDefinedRuntimeAttributes>
-                            <connections>
-                                <action selector="emulateDisconnectTapped:" destination="-1" eventType="touchUpInside" id="kMl-Dn-cPT"/>
-                            </connections>
-                        </button>
                     </subviews>
                 </stackView>
             </subviews>

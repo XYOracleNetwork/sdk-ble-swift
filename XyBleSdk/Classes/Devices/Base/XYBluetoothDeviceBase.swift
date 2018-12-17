@@ -61,7 +61,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
         self.rssi = rssi
         self.name = ""
         self.powerLevel = 0
-        self.deviceBleQueue = DispatchQueue(label: "DeviceDispatch\(id)")
+        self.deviceBleQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothBaseQueueFor\(id.shortId)")
         super.init()
     }
 
