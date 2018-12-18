@@ -53,7 +53,7 @@ class DeviceDetailViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        if self.isMovingFromParentViewController {
+        if self.isMovingFromParent {
             self.delegate = nil
             self.rangedDevicesManager.showAlerts = true
             self.currentPanelView?.removeFromSuperview()

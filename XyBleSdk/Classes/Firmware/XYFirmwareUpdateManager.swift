@@ -40,7 +40,7 @@ public class XYFirmwareUpdateManager {
     fileprivate var
     firmwareData: Data
 
-    private let notifyKey = "XYFirmwareUpdateManager"
+    fileprivate let notifyKey = "XYFirmwareUpdateManager"
 
     fileprivate var
     currentStep: XYFirmwareUpdateStep = .unstarted,

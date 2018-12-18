@@ -183,14 +183,14 @@ public extension XYSmartScan {
         }
     }
 
-    private func updateTracking() {
+    fileprivate func updateTracking() {
         self.mode == .foreground ?
             location.startRangning(for: self.trackedDevices.map { $1 } ) :
             location.startMonitoring(for: self.trackedDevices.map { $1 } )
     }
 
     // Another recursive method for checking exits of devices so we can alter the user
-    private func checkExits() {
+    fileprivate func checkExits() {
         XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_EXIT_CHECK_INTERVAL)) {
             guard self.isCheckingExits else {
                 return

@@ -76,7 +76,7 @@ private extension ViewController {
         rangedDevicesTableView.dataSource = self.rangedDevicesManager
         rangedDevicesTableView.delegate = self
         rangedDevicesTableView.register(RangedDeviceTableViewCell.self, forCellReuseIdentifier: "rangedDevicesCell")
-        rangedDevicesTableView.rowHeight = UITableViewAutomaticDimension
+        rangedDevicesTableView.rowHeight = UITableView.automaticDimension
         rangedDevicesTableView.estimatedRowHeight = 200.0
     }
 
