@@ -1,8 +1,9 @@
 //
 //  XYFinderDeviceBase.swift
-//  Pods-XyBleSdk_Example
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 10/18/18.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -126,15 +127,14 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         self.rssi = XYDeviceProximity.defaultProximity
         self.lastPulseTime = nil
 
-        // We will only report this when the app is in the foreground, as monitoring
-        // will handle the messaging while in the background
-        // if XYSmartScan.instance.mode == .foreground {
-            XYFinderDeviceEventManager.report(events: [.exited(device: self)])
-        // }
+        XYFinderDeviceEventManager.report(events: [.exited(device: self)])
 
         // We put the device in the wait queue so it auto-reconnects when it comes back
-        // into range. This works only while the app is in the foreground/background
-        XYDeviceConnectionManager.instance.wait(for: self)
+        // into range. This works only while the app is in the foreground/background, and
+        // we only do this when the app is in the background
+        if XYSmartScan.instance.mode == .background {
+            XYDeviceConnectionManager.instance.wait(for: self)
+        }
 
         // The call back is used for app logic uses only
         callback?(true)

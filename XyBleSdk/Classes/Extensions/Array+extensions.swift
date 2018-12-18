@@ -1,9 +1,9 @@
 //
 //  Array+extensions.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/7/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 public extension Collection {
@@ -16,7 +16,8 @@ public extension Collection {
 public extension String {
     var shortId: String {
         guard self.count > 0 else { return "" }
-        let index = self.index(self.endIndex, offsetBy: -10)
-        return String(self[index...])
+        var chunks = self.split(separator: ".")
+        chunks.removeFirst()
+        return chunks.joined(separator: ".")
     }
 }

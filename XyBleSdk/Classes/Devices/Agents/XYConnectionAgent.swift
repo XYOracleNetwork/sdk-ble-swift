@@ -1,16 +1,15 @@
 //
 //  XYConnectionAgent.swift
-//  Pods-XyBleSdk_Example
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 11/1/18.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Promises
 import CoreBluetooth
 
 // A helper to allow for adding connecting to a peripheral to a connection() operation closure
-// NOTE: The agent is not thread-safe, and should be used in conjunction with other locking mechanisms
-// such as those in the XYDeviceConnectionManager
 internal final class XYConnectionAgent: XYCentralDelegate {
     private let
     central = XYCentral.instance,
@@ -19,6 +18,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
 
     private static let callTimeout: DispatchTimeInterval = .seconds(30)
     private static let queue = DispatchQueue(label: "com.xyfindables.sdk.XYConnectionAgentTimeoutQueue")
+    private let connectionQueue: DispatchQueue!
     private var timer: DispatchSourceTimer?
 
     private lazy var promise = Promise<Void>.pending()
@@ -26,7 +26,8 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     // 1. Called to set the device to connect to
     init(for device: XYBluetoothDevice) {
         self.device = device
-        self.delegateKey = "XYConnectionAgent:\(device.id)"
+        self.delegateKey = "XYConnectionAgent:\(device.id.shortId)"
+        self.connectionQueue = DispatchQueue(label: "com.xyfindables.sdk.XYConnectionAgentConnectionQueueFor\(device.id.shortId)")
     }
 
     // 2. Create a connection, or fulfill the promise if the device already is connected
@@ -47,28 +48,33 @@ internal final class XYConnectionAgent: XYCentralDelegate {
 
         // If we have no peripheral, we'll need to scan for the device
         if device.peripheral == nil {
-            self.central.scan()
+            self.central.scan(stopOnNoDelegates: true)
         // Otherwise we can just try to connect
         } else {
             self.central.connect(to: device)
         }
 
         // Ensure we always stop scanning and remove the delegate so this object can get cleaned up
-        return promise.always(on: XYCentral.centralQueue) {
-            self.central.stopScan()
+        return promise.delay(0.04).always(on: connectionQueue) {
             self.central.removeDelegate(for: self.delegateKey)
+            self.central.stopScan()
         }
     }
 
     // 4: Delegate from central.connect(), meaning we have connected and are ready to set/get characteristics
     func connected(peripheral: XYPeripheral) {
-        promise.fulfill(())
+        connectionQueue.async {
+            guard peripheral.peripheral == self.device.peripheral else { return }
+            self.promise.fulfill(())
+        }
     }
 
     // 3a. Delegate called from scan(), we found the device and now will connect
     func located(peripheral: XYPeripheral) {
-        if self.device.attachPeripheral(peripheral) {
-            self.central.connect(to: device)
+        connectionQueue.async {
+            if self.device.attachPeripheral(peripheral) {
+                self.central.connect(to: self.device)
+            }
         }
     }
 

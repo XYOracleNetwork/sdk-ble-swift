@@ -1,9 +1,9 @@
 //
 //  XYSmartScan.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/10/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -27,7 +27,7 @@ public enum XYSmartScanStatus: Int {
     case locationDisabled
 }
 
-public enum XYSmartScan2Mode {
+public enum XYSmartScanMode {
     case foreground
     case background
 }
@@ -46,7 +46,7 @@ public class XYSmartScan {
     public fileprivate(set) var currentStatus = XYSmartScanStatus.none
     fileprivate var isActive: Bool = false
 
-    public fileprivate(set) var mode: XYSmartScan2Mode = .background
+    public fileprivate(set) var mode: XYSmartScanMode = .background
 
     fileprivate var isCheckingExits: Bool = false
 
@@ -56,7 +56,7 @@ public class XYSmartScan {
         self.location.setDelegate(self, key: "XYSmartScan")
     }
 
-    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScan2Mode) {
+    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScanMode) {
         if mode == self.mode { return }
 
         self.location.start()

@@ -1,9 +1,9 @@
 //
 //  Service.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/7/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreBluetooth
@@ -18,6 +18,7 @@ public enum XYServiceCharacteristicType {
 
 // Protocol which defines a service and a characteristic, implemented as enumerations in the various *Service files
 public protocol XYServiceCharacteristic {
+    var serviceDisplayName: String { get }
     var serviceUuid: CBUUID { get }
     var characteristicUuid: CBUUID { get }
     var characteristicType: XYServiceCharacteristicType { get }

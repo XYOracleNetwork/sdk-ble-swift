@@ -1,9 +1,9 @@
 //
 //  GattRequest.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/12/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -27,7 +27,7 @@ public enum GattRequestStatus: String {
 // that value (returned as a Data promise) or setting a value.
 final class GattRequest: NSObject {
     // Promises that resolve locating the characteristic and reading and writing data
-    fileprivate lazy var characteristicPromise = Promise<CBCharacteristic>.pending()
+    fileprivate lazy var characteristicPromise = Promise<Void>.pending()
     fileprivate lazy var readPromise = Promise<Data?>.pending()
     fileprivate lazy var writePromise = Promise<Void>.pending()
     fileprivate lazy var notifyPromise = Promise<Void>.pending()
@@ -40,7 +40,11 @@ final class GattRequest: NSObject {
     characteristic: CBCharacteristic?,
     specifiedTimeout: DispatchTimeInterval
 
+    fileprivate var disconnectSubKey: UUID? = nil
+
     public fileprivate(set) var status: GattRequestStatus = .disconnected
+
+    fileprivate let operationsQueue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestOperationsQueue")
 
     fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")
@@ -63,27 +67,41 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        print("START Get: \(device.id.shortId)")
+        // If we disconnect at any point in the request, we stop the timeout and reject the promise
+        self.disconnectSubKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected]) { [weak self] event in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self?.disconnectSubKey)
+            guard let device = self?.device as? XYFinderDevice, device == event.device else { return }
+            self?.timer = nil
+            self?.status = .disconnected
+            self?.readPromise.reject(XYBluetoothError.peripheralDisconected(state: device.peripheral?.state))
+            operationPromise.reject(XYBluetoothError.peripheralDisconected(state: device.peripheral?.state))
+        }
+
+        print("START Get: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
-            guard let s = self else { return }
-            print("TIMEOUT Get: \(device.id.shortId)")
-            s.timer = nil
-            s.status = .timedOut
-            operationPromise.reject(XYBluetoothError.timedOut)
+            guard let strong = self else { return }
+            print("TIMEOUT Get: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
+            if let device = self as? XYFinderDevice {
+                XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .getOperation)])
+            }
+            strong.timer = nil
+            strong.status = .timedOut
+            strong.readPromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
+        operationPromise = self.getCharacteristic(device).then(on: operationsQueue) { _ in
             self.read(device)
-        }.always(on: XYCentral.centralQueue) {
+        }.always(on: operationsQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-            print("ALWAYS Get: \(device.id.shortId)")
-        }.catch(on: XYCentral.centralQueue) { error in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self.disconnectSubKey)
+            print("ALWAYS Get: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
+        }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
         }
 
@@ -97,27 +115,41 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        print("START Set: \(device.id.shortId)")
+        // If we disconnect at any point in the request, we stop the timeout and reject the promise
+        self.disconnectSubKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected]) { [weak self] event in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self?.disconnectSubKey)
+            guard let device = self?.device as? XYFinderDevice, device == event.device else { return }
+            self?.timer = nil
+            self?.status = .disconnected
+            self?.writePromise.reject(XYBluetoothError.peripheralDisconected(state: device.peripheral?.state))
+            operationPromise.reject(XYBluetoothError.peripheralDisconected(state: device.peripheral?.state))
+        }
+
+        print("START Set: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
-            guard let s = self else { return }
-            print("TIMEOUT Set: \(device.id.shortId)")
-            s.timer = nil
-            s.status = .timedOut
-            operationPromise.reject(XYBluetoothError.timedOut)
+            guard let strong = self else { return }
+            print("TIMEOUT Set: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
+            if let device = self as? XYFinderDevice {
+                XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .setOperation)])
+            }
+            strong.timer = nil
+            strong.status = .timedOut
+            strong.writePromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
+        operationPromise = self.getCharacteristic(device).then(on: operationsQueue) { _ in
             self.write(device, data: valueObj, withResponse: withResponse)
-        }.always(on: XYCentral.centralQueue) {
+        }.always(on: operationsQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-            print("ALWAYS Set: \(device.id.shortId)")
-        }.catch(on: XYCentral.centralQueue) { error in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self.disconnectSubKey)
+            print("ALWAYS Set: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
+        }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
         }
 
@@ -131,27 +163,41 @@ final class GattRequest: NSObject {
             return operationPromise
         }
 
-        print("START Notify: \(device.id.shortId)")
+        // If we disconnect at any point in the request, we stop the timeout and reject the promise
+        self.disconnectSubKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected]) { [weak self] event in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self?.disconnectSubKey)
+            guard let device = self?.device as? XYFinderDevice, device == event.device else { return }
+            self?.timer = nil
+            self?.status = .disconnected
+            self?.notifyPromise.reject(XYBluetoothError.peripheralDisconected(state: device.peripheral?.state))
+            operationPromise.reject(XYBluetoothError.peripheralDisconected(state: device.peripheral?.state))
+        }
+
+        print("START Notify: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
         timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
-            guard let s = self else { return }
-            print("TIMEOUT Notify: \(device.id.shortId)")
-            s.timer = nil
-            s.status = .timedOut
-            operationPromise.reject(XYBluetoothError.timedOut)
+            guard let strong = self else { return }
+            print("TIMEOUT Notify: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
+            if let device = self as? XYFinderDevice {
+                XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .notifyOperation)])
+            }
+            strong.timer = nil
+            strong.status = .timedOut
+            strong.notifyPromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
         // request object is properly cleaned up by ARC. Catch errors and propagate them to the caller
-        operationPromise = self.getCharacteristic(device).then(on: XYCentral.centralQueue) { _ in
+        operationPromise = self.getCharacteristic(device).then(on: operationsQueue) { _ in
             self.setNotify(device, enabled: enabled)
-        }.always(on: XYCentral.centralQueue) {
+        }.always(on: operationsQueue) {
             device.unsubscribe(for: self.delegateKey(deviceUuid: peripheral.identifier))
             self.timer = nil
-            print("ALWAYS Notify: \(device.id.shortId)")
-        }.catch(on: XYCentral.centralQueue) { error in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self.disconnectSubKey)
+            print("ALWAYS Notify: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
+        }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
         }
 
@@ -162,7 +208,7 @@ final class GattRequest: NSObject {
 // MARK: Get service and characteristic
 internal extension GattRequest {
 
-    func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<CBCharacteristic> {
+    func getCharacteristic(_ device: XYBluetoothDevice) -> Promise<Void> {
         guard
             self.status != .timedOut,
             let peripheral = device.peripheral,
@@ -171,12 +217,22 @@ internal extension GattRequest {
                 self.characteristicPromise.reject(XYBluetoothError.notConnected)
                 return self.characteristicPromise
             }
-        
+
+        print("START Discover Services: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
+
         self.device = device
         device.subscribe(self, key: self.delegateKey(deviceUuid: peripheral.identifier))
-        self.status = .discoveringServices
-        peripheral.discoverServices(nil)
-        
+
+        if  // Has this already been located and cached to the peripheral?
+            let service = self.device?.peripheral?.services?.first(where: { $0.uuid == self.serviceCharacteristic.serviceUuid }),
+            let characteristic = service.characteristics?.first(where: { $0.uuid == self.serviceCharacteristic.characteristicUuid }) {
+            self.characteristic = characteristic
+            self.characteristicPromise.fulfill(())
+        } else {
+            self.status = .discoveringServices
+            peripheral.discoverServices([self.serviceCharacteristic.serviceUuid])
+        }
+
         return self.characteristicPromise
     }
 }
@@ -195,7 +251,7 @@ private extension GattRequest {
                 return self.readPromise
             }
 
-        print("Gatt(get): read")
+        print("GET: read")
 
         self.status = .reading
         peripheral.readValue(for: characteristic)
@@ -219,6 +275,11 @@ private extension GattRequest {
 
         self.status = .writing
         peripheral.writeValue(data, for: characteristic, type: withResponse ? .withResponse : .withoutResponse)
+
+        if !withResponse {
+            print("Gatt(set): set as no response, done")
+            writePromise.fulfill(())
+        }
 
         return self.writePromise
     }
@@ -266,112 +327,125 @@ extension GattRequest: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard serviceCharacteristicDelegateValidation(peripheral, error: error) else { return }
+        operationsQueue.async {
+            guard self.serviceCharacteristicDelegateValidation(peripheral, error: error) else { return }
 
-        guard
-            let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.serviceUuid }).first
-            else {
-                self.characteristicPromise.reject(XYBluetoothError.serviceNotFound)
-                return
+            guard
+                let service = peripheral.services?.filter({ $0.uuid == self.serviceCharacteristic.serviceUuid }).first
+                else {
+                    self.characteristicPromise.reject(XYBluetoothError.serviceNotFound)
+                    return
             }
 
-        self.status = .discoveringCharacteristics
-        peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
+            print("START Discover Characteristics: \(self.device?.id.shortId ?? "") for Service: \(self.serviceCharacteristic.displayName)")
+
+            self.status = .discoveringCharacteristics
+            peripheral.discoverCharacteristics([self.serviceCharacteristic.characteristicUuid], for: service)
+        }
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        guard serviceCharacteristicDelegateValidation(peripheral, error: error) else { return }
+        operationsQueue.async {
+            guard self.serviceCharacteristicDelegateValidation(peripheral, error: error) else { return }
 
-        guard
-            let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristicUuid }).first
-            else {
-                self.characteristicPromise.reject(XYBluetoothError.characteristicNotFound)
-                return
-            }
+            guard
+                let characteristic = service.characteristics?.filter({ $0.uuid == self.serviceCharacteristic.characteristicUuid }).first
+                else {
+                    self.characteristicPromise.reject(XYBluetoothError.characteristicNotFound)
+                    return
+                }
 
-        self.characteristic = characteristic
+            print("START Characteristics Discovered: \(self.device?.id.shortId ?? "") for Service: \(self.serviceCharacteristic.displayName)")
 
-        self.characteristicPromise.fulfill(characteristic)
+            self.characteristic = characteristic
+            self.characteristicPromise.fulfill(())
+        }
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+        operationsQueue.async {
+            guard self.status != .disconnected || self.status != .timedOut else { return }
 
-        guard error == nil else {
-            self.readPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
-            return
+            guard error == nil else {
+                self.readPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
+                return
+            }
+
+            guard
+                self.device?.peripheral == peripheral
+                else {
+                    self.readPromise.reject(XYBluetoothError.mismatchedPeripheral)
+                    return
+                }
+
+            guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
+                else {
+                    self.readPromise.reject(XYBluetoothError.characteristicNotFound)
+                    return
+                }
+
+            guard
+                let data = characteristic.value
+                else {
+                    self.readPromise.reject(XYBluetoothError.dataNotPresent)
+                    return
+                }
+
+            print("Gatt(get): read delegate called, done \(self.device?.id.shortId ?? "") for Service: \(self.serviceCharacteristic.displayName)")
+
+            self.status = .completed
+            self.readPromise.fulfill(data)
         }
-
-        guard
-            self.device?.peripheral == peripheral
-            else {
-                self.readPromise.reject(XYBluetoothError.mismatchedPeripheral)
-                return
-            }
-
-        guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
-            else {
-                self.readPromise.reject(XYBluetoothError.characteristicNotFound)
-                return
-            }
-
-        guard
-            let data = characteristic.value
-            else {
-                self.readPromise.reject(XYBluetoothError.dataNotPresent)
-                return
-            }
-
-        print("Gatt(get): read delegate called, done")
-
-        self.status = .completed
-        readPromise.fulfill(data)
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+        operationsQueue.async {
+            guard self.status != .disconnected || self.status != .timedOut else { return }
 
-        guard error == nil else {
-            self.writePromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
-            return
+            guard error == nil else {
+                self.writePromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
+                return
+            }
+
+            guard
+                self.device?.peripheral == peripheral
+                else {
+                    self.writePromise.reject(XYBluetoothError.mismatchedPeripheral)
+                    return
+                }
+
+            guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
+                else {
+                    self.writePromise.reject(XYBluetoothError.characteristicNotFound)
+                    return
+                }
+
+            print("Gatt(set): write delegate called, done \(self.device?.id.shortId ?? "") for Service: \(self.serviceCharacteristic.displayName)")
+
+            self.writePromise.fulfill(())
         }
-
-        guard
-            self.device?.peripheral == peripheral
-            else {
-                self.writePromise.reject(XYBluetoothError.mismatchedPeripheral)
-                return
-            }
-
-        guard characteristic.uuid == self.serviceCharacteristic.characteristicUuid
-            else {
-                self.writePromise.reject(XYBluetoothError.characteristicNotFound)
-                return
-            }
-
-        print("Gatt(set): write delegate called, done")
-
-        writePromise.fulfill(())
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        guard self.status != .disconnected || self.status != .timedOut else { return }
+        operationsQueue.async {
+            guard self.status != .disconnected || self.status != .timedOut else { return }
 
-        guard error == nil else {
-            self.notifyPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
-            return
-        }
-
-        guard
-            self.device?.peripheral == peripheral
-            else {
-                self.notifyPromise.reject(XYBluetoothError.mismatchedPeripheral)
+            guard error == nil else {
+                self.notifyPromise.reject(XYBluetoothError.cbPeripheralDelegateError(error!))
                 return
             }
 
-        print("Gatt(notify): notify delegate called, done")
+            guard
+                self.device?.peripheral == peripheral
+                else {
+                    self.notifyPromise.reject(XYBluetoothError.mismatchedPeripheral)
+                    return
+                }
 
-        notifyPromise.fulfill(())
+            print("Gatt(notify): notify delegate called, done  \(self.device?.id.shortId ?? "") for Service: \(self.serviceCharacteristic.displayName)")
+
+            self.notifyPromise.fulfill(())
+        }
     }
 
 }

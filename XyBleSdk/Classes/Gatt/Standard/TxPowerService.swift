@@ -1,15 +1,16 @@
 //
 //  TxPowerService.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/19/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreBluetooth
 
 public enum TxPowerService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Tx Power" }
     public var serviceUuid: CBUUID { return TxPowerService.serviceUuid }
 
     case txPowerLevel

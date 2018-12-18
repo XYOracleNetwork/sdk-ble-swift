@@ -1,15 +1,16 @@
 //
 //  LinkLossService.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/25/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreBluetooth
 
 public enum LinkLossService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Link Loss" }
     public var serviceUuid: CBUUID { return LinkLossService.serviceUuid }
 
     case alertLevel

@@ -1,9 +1,9 @@
 //
 //  XYBluetoothError.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/24/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -25,6 +25,7 @@ public enum XYBluetoothError: Error {
     case couldNotPowerOnCentral
     case deviceNotInRange
     case couldNotUnlock
+    case unableToUpdateFirmware
 
     public var toString: String {
         switch self {
@@ -56,6 +57,8 @@ public enum XYBluetoothError: Error {
             return "Could not power on Central"
         case .deviceNotInRange:
             return "Device not in range"
+        case .unableToUpdateFirmware:
+            return "Unable to update firmware"
         }
     }
 }

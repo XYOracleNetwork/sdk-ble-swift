@@ -1,9 +1,9 @@
 //
 //  XYCentral.swift
-//  XYSdk
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/6/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -69,6 +69,10 @@ public class XYCentral: NSObject {
 
     fileprivate var restoredPeripherals = Set<XYPeripheral>()
 
+    fileprivate var scannerCount = 0
+
+    fileprivate var stopOnNoDelegates: Bool = false
+
     // All BLE operations should be done on this queue
     internal static let centralQueue = DispatchQueue(label:"com.xyfindables.sdk.XYCentralWorkQueue")
 
@@ -116,14 +120,21 @@ public class XYCentral: NSObject {
     }
 
     // Ask for devices with the requested/all services until requested to stop()
-    public func scan(for services: [XYServiceCharacteristic]? = nil) {
+    public func scan(for services: [XYServiceCharacteristic]? = nil, stopOnNoDelegates: Bool = false) {
         guard state == .poweredOn else { return }
-        self.cbManager?.scanForPeripherals(withServices: services?.map { $0.serviceUuid }, options: nil)
+        self.stopOnNoDelegates = stopOnNoDelegates
+        print("START: Scanning for devices")
+        self.cbManager?.scanForPeripherals(
+            withServices: services?.map { $0.serviceUuid },
+            options:[CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true])
     }
 
     // Cancel a scan request from scan() above
     public func stopScan() {
+        if stopOnNoDelegates && delegates.count > 0  { return }
+        print("STOP: Scanning for devices")
         self.cbManager?.stopScan()
+        self.stopOnNoDelegates = false
     }
 
     public func setDelegate(_ delegate: XYCentralDelegate, key: String) {
@@ -144,6 +155,7 @@ extension XYCentral: CBCentralManagerDelegate {
 
         guard central.state == .poweredOn else { return }
 
+        // Disconnected any previously connected peripherals
         self.restoredPeripherals.filter { $0.markedForDisconnect }.forEach {
             self.cbManager?.cancelPeripheralConnection($0.peripheral)
         }
@@ -165,22 +177,24 @@ extension XYCentral: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
-        // dict[CBCentralManagerRestoredStateScanServicesKey] as? [CBUUID]
-        // dict[CBCentralManagerRestoredStateScanOptionsKey] as? [String : Any]
-
         guard let peripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral] else { return }
 
+        // Mark any peripherals still connected from the application being closed to be deleted
         peripherals.forEach { peripheral in
             self.restoredPeripherals.insert(XYPeripheral(peripheral, markedForDisconnect: true))
         }
     }
 
+    // If the periperhal disconnects, we will reset the RSSI and report
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if let device = XYFinderDeviceFactory.build(from: peripheral) {
-            if let marked = device.markedForDeletion, marked == true { return }
+            print(" ******* OH NO: Disconnect for \(device.id.shortId) - error: \(error?.localizedDescription ?? "<none>")")
+
+            XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
+            guard device.markedForDeletion == false else { return }
+
             device.resetRssi()
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
-            XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
         }
     }
 }

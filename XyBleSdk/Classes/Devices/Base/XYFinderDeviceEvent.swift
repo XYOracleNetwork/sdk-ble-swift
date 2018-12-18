@@ -1,28 +1,41 @@
 //
 //  XYFinderDeviceEvent.swift
-//  Pods-XyBleSdk_Example
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 10/11/18.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
 
 public enum XYFinderEvent: Int {
-    case connected = 0
-    case alreadyConnected
-    case reconnected
-    case disconnected
-    case buttonPressed
-    case detected
-    case entered
-    case exiting
-    case exited
-    case updated
+    case
+    connected = 0,
+    alreadyConnected,
+    connectionError,
+    reconnected,
+    disconnected,
+    buttonPressed,
+    detected,
+    entered,
+    exiting,
+    exited,
+    updated,
+    timedOut
+}
+
+public enum XYFinderTimeoutEvent: Int {
+    case
+    connection,
+    getOperation,
+    setOperation,
+    notifyOperation
 }
 
 public enum XYFinderEventNotification {
     case connected(device: XYFinderDevice)
     case alreadyConnected(device: XYFinderDevice)
+    case connectionError(device: XYFinderDevice, error: XYBluetoothError?)
     case reconnected(device: XYFinderDevice)
     case disconnected(device: XYFinderDevice)
     case buttonPressed(device: XYFinderDevice, type: XYButtonType2)
@@ -31,6 +44,7 @@ public enum XYFinderEventNotification {
     case exiting(device: XYFinderDevice)
     case exited(device: XYFinderDevice)
     case updated(device: XYFinderDevice)
+    case timedOut(device: XYFinderDevice, type: XYFinderTimeoutEvent)
 
     // Silly but allows for readble conditionals based on the event's reporting device, as well
     // as simplified switch case statements
@@ -38,6 +52,7 @@ public enum XYFinderEventNotification {
         switch self {
         case .connected(let device): return device
         case .alreadyConnected(let device): return device
+        case .connectionError(let device, _): return device
         case .reconnected(let device): return device
         case .disconnected(let device): return device
         case .buttonPressed(let device, _): return device
@@ -46,6 +61,7 @@ public enum XYFinderEventNotification {
         case .exiting(let device): return device
         case .exited(let device): return device
         case .updated(let device): return device
+        case .timedOut(let device, _): return device
         }
     }
 
@@ -54,6 +70,7 @@ public enum XYFinderEventNotification {
         switch self {
         case .connected: return .connected
         case .alreadyConnected: return .alreadyConnected
+        case .connectionError: return .connectionError
         case .reconnected: return .reconnected
         case .disconnected: return .disconnected
         case .buttonPressed: return .buttonPressed
@@ -62,6 +79,7 @@ public enum XYFinderEventNotification {
         case .exiting: return .exiting
         case .exited: return .exited
         case .updated: return .updated
+        case .timedOut: return .timedOut
         }
     }
 }

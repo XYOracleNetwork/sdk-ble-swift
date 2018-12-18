@@ -1,9 +1,9 @@
 //
 //  XYFinderDeviceFactory.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/7/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import Foundation
@@ -20,6 +20,10 @@ public class XYFinderDeviceFactory {
 
     internal static func invalidateCache() {
         deviceCache.removeAll()
+    }
+
+    internal static func remove(device: XYFinderDevice) {
+        self.deviceCache.remove(at: device.id)
     }
 
     // Used to update all cached, in range device locations to the current user's location

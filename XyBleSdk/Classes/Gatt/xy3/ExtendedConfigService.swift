@@ -1,14 +1,16 @@
 //
 //  ExtendedConfigService.swift
-//  Pods-XyBleSdk_Example
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 10/2/18.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreBluetooth
 
 public enum ExtendedConfigService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Extended Config" }
     public var serviceUuid: CBUUID { return ExtendedConfigService.serviceUuid }
 
     case virtualBeaconSettings

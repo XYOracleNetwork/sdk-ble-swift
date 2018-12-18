@@ -1,9 +1,9 @@
 //
 //  XYLocation.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/7/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreLocation
@@ -176,6 +176,7 @@ extension XYLocation: CLLocationManagerDelegate {
 
     // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+//        print(" (Ranging) - Found \(beacons.count)")
         self.delegates.forEach { $1?.didRangeBeacons(
             beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) },
             for: region.family

@@ -9,32 +9,14 @@
 import Foundation
 import CoreBluetooth
 import XyBleSdk
+import Promises
 
 protocol RangedDevicesManagerDelegate: class {
     func reloadTableView()
     func showDetails()
     func buttonPressed(on device: XYFinderDevice)
-}
-
-class MockRangedDevicesManager: NSObject, UITableViewDataSource {
-    var rangedDevices = [XYFinderDevice]()
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell(frame: CGRect.zero)
-    }
-
-    func startRanging() {}
-    func stopRanging() {}
-
-    func scan(for deviceIndex: NSInteger) {}
-
-    func disconnect() {}
-
-    func setDelegate(_ delegate: RangedDevicesManagerDelegate) {}
+    func stateChanged(_ newState: CBManagerState)
+    func deviceDisconnected(device: XYFinderDevice)
 }
 
 class RangedDevicesManager: NSObject {
@@ -42,25 +24,40 @@ class RangedDevicesManager: NSObject {
     fileprivate let central = XYCentral.instance
     fileprivate let scanner = XYSmartScan.instance
 
-    fileprivate(set) var rangedDevices = [XYFinderDevice]()
+    fileprivate(set) var rangedDevices = [TableSection: [XYFinderDevice]]()
     fileprivate(set) var selectedDevice: XYFinderDevice?
 
     fileprivate weak var delegate: RangedDevicesManagerDelegate?
 
     fileprivate(set) var subscriptionUuid: UUID?
 
+    fileprivate(set) var xyFinderFamilyFilter: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange
+
+    public var
+    rssiRangeToDisplay: Int = -95,
+    showAlerts: Bool = true
+
+    public var testDevices = [String: Bool]()
+
     static let instance = RangedDevicesManager()
 
     private override init() {
         super.init()
-        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected, .alreadyConnected]) { event in
+        self.scanner.setDelegate(self, key: "RangedDevicesManager")
+
+        // Subscribe to various events
+        self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected, .connectionError, .disconnected]) { event in
+            guard let currentDevice = self.selectedDevice, currentDevice == event.device else { return }
             switch event {
-            case .buttonPressed(let device, _):
-                guard let currentDevice = self.selectedDevice, currentDevice == device else { return }
-                self.delegate?.buttonPressed(on: device)
-            case .connected, .alreadyConnected:
+            case .buttonPressed:
+                self.delegate?.buttonPressed(on: currentDevice)
+            case .connected:
                 DispatchQueue.main.async {
                     self.delegate?.showDetails()
+                }
+            case .disconnected, .connectionError:
+                DispatchQueue.main.async {
+                    self.delegate?.deviceDisconnected(device: currentDevice)
                 }
             default:
                 break
@@ -77,43 +74,81 @@ class RangedDevicesManager: NSObject {
             central.setDelegate(self, key: "RangedDevicesManager")
             central.enable()
         } else {
-            scanner.start(mode: .foreground)
+            self.scanner.start(for: self.xyFinderFamilyFilter, mode: .foreground)
         }
     }
 
     func stopRanging() {
         guard central.state == .poweredOn else { return }
+        rangedDevices.removeAll()
+        self.delegate?.reloadTableView()
         scanner.stop()
     }
 
-    func scan(for deviceIndex: NSInteger) {
+    func startMonitoring() {
+        if central.state != .poweredOn {
+            central.setDelegate(self, key: "RangedDevicesManager")
+            central.enable()
+        } else {
+            self.scanner.start(for: self.xyFinderFamilyFilter, mode: .background)
+        }
+    }
+
+    func stopMonitoring() {
+        guard central.state == .poweredOn else { return }
+        scanner.stop()
+    }
+
+    func connect(for section: TableSection?, deviceIndex: NSInteger) {
         guard
-            let device = self.rangedDevices[safe: deviceIndex]
+            let section = section,
+            let device = self.rangedDevices[section]?[safe: deviceIndex]
             else { return }
 
         self.selectedDevice = device
-        self.selectedDevice?.connect()
+        device.connect()
     }
 
     func disconnect() {
         guard let device = selectedDevice else { return }
         device.disconnect()
+        self.selectedDevice = nil
     }
+}
+
+extension RangedDevicesManager {
+
+    func toggleFamilyFilter(for family: XYFinderDeviceFamily) {
+        if self.xyFinderFamilyFilter.contains(family) {
+            self.xyFinderFamilyFilter.removeAll(where: { $0 == family })
+        } else {
+            self.xyFinderFamilyFilter.append(family)
+        }
+    }
+
 }
 
 extension RangedDevicesManager: UITableViewDataSource {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return TableSection.values.count
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return rangedDevices.count
+        guard
+            let tableSection = TableSection(rawValue: section),
+            let devices = self.rangedDevices[tableSection] else { return 0 }
+
+        return devices.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "rangedDeviceCell") as! RangedDeviceTableViewCell
-        let device = rangedDevices[indexPath.row]
+
+        guard
+            let section = TableSection(rawValue: indexPath.section),
+            let device = rangedDevices[section]?[indexPath.row]
+            else { return cell }
 
         let directive = RangedDeviceCellDirective(
             name:  device.family.familyName,
@@ -122,7 +157,9 @@ extension RangedDevicesManager: UITableViewDataSource {
             uuid: device.uuid,
             connected: false,
             minor: device.iBeacon?.minor ?? 0,
-            pulses: device.totalPulseCount)
+            pulses: device.totalPulseCount,
+            minRssi: device.rssiRange.min,
+            maxRssi: device.rssiRange.max)
 
         cell.populate(from: directive)
         cell.accessoryType = device.powerLevel == UInt(8) ? .checkmark : .none
@@ -139,8 +176,11 @@ extension RangedDevicesManager: XYCentralDelegate {
 
     func stateChanged(newState: CBManagerState) {
         if newState == .poweredOn {
-            self.scanner.start(mode: .foreground)
-            self.scanner.setDelegate(self, key: "RangedDevicesManager")
+            self.scanner.start(for: self.xyFinderFamilyFilter, mode: .foreground)
+        }
+
+        DispatchQueue.main.async {
+            self.delegate?.stateChanged(newState)
         }
     }
 }
@@ -149,22 +189,24 @@ extension RangedDevicesManager: XYSmartScanDelegate {
 
     func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily) {
         DispatchQueue.main.async {
-            var rangedWithoutCurrent = self.rangedDevices.filter { $0.family != family }
-
-            devices.forEach { device in
-                // Only show those in range
-                if device.rssi != 0 && device.rssi > -95 {
-                    rangedWithoutCurrent.append(device)
-                }
+            // Filter out devices not in the specified range and sort by rssi
+            var inRange = devices
+            if self.rssiRangeToDisplay != 0 {
+                inRange = devices.filter { $0.rssi >= self.rssiRangeToDisplay && $0.rssi != 0 }
             }
+            inRange = inRange.sorted(by: { ($0.powerLevel, $0.rssi) > ($1.powerLevel, $1.rssi) } )
 
-            self.rangedDevices = rangedWithoutCurrent.sorted(by: { ($0.powerLevel, $0.rssi, $0.id) > ($1.powerLevel, $1.rssi, $1.id) } )
-            self.delegate?.reloadTableView()
+            // Group up the values into the appropriate table section and reload the view
+            let group = Dictionary(grouping: inRange, by: { $0.family.toTableSection! })
+            if let family = group.keys.first {
+                group.count > 0 ? self.rangedDevices[family] = group[family] : self.rangedDevices[family]?.removeAll()
+                self.delegate?.reloadTableView()
+            }
         }
     }
 
-    func smartScan(entered device: XYFinderDevice) {}
     func smartScan(status: XYSmartScanStatus) {}
+    func smartScan(entered device: XYFinderDevice) {}
     func smartScan(exiting device: XYBluetoothDevice) {}
     func smartScan(location: XYLocationCoordinate2D) {}
     func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}

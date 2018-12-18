@@ -1,15 +1,16 @@
 //
 //  PrimaryService.swift
-//  XYSdkSample
+//  XYBleSdk
 //
 //  Created by Darren Sutherland on 9/7/18.
-//  Copyright © 2018 Darren Sutherland. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreBluetooth
 
 public enum PrimaryService: String, XYServiceCharacteristic {
 
+    public var serviceDisplayName: String { return "Primary" }
     public var serviceUuid: CBUUID { return PrimaryService.serviceUuid }
 
     case stayAwake
@@ -43,9 +44,9 @@ public enum PrimaryService: String, XYServiceCharacteristic {
 
     public var characteristicType: XYServiceCharacteristicType {
         switch self {
-        case .stayAwake, .major, .minor, .buttonState, .buzzer, .lastError, .uptime, .reset, .selfTest, .debug, .leftBehind:
+        case .major, .minor, .buttonState, .buzzer, .lastError, .uptime, .reset, .selfTest, .debug, .leftBehind:
             return .integer
-        case .unlock, .lock, .uuid, .buzzerConfig, .adConfig, .buttonConfig, .eddystoneUID, .eddystoneURL, .eddystoneEID, .color, .hardwareCreateDate:
+        case .stayAwake, .unlock, .lock, .uuid, .buzzerConfig, .adConfig, .buttonConfig, .eddystoneUID, .eddystoneURL, .eddystoneEID, .color, .hardwareCreateDate:
             return .byte
         }
     }

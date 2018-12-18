@@ -1,9 +1,9 @@
 //
 //  XYLocationCoordinate2D.swift
-//  XYSdk
+//  XYBleSdk
 //
 //  Created by Arie Trouw on 4/20/17.
-//  Copyright © 2017 XY - The Findables Company. All rights reserved.
+//  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
 import CoreLocation

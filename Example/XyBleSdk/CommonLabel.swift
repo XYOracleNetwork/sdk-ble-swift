@@ -32,16 +32,3 @@ class CommonLabel: UILabel {
     }
 
 }
-
-extension CommonLabel {
-
-    @discardableResult func color(_ value: UIColor) -> Self {
-        self.textColor = value
-        return self
-    }
-
-    @discardableResult func size(_ value: CGFloat) -> Self {
-        self.font = font.withSize(value)
-        return self
-    }
-}
