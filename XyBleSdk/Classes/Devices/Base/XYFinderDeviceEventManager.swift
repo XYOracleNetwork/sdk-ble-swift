@@ -50,9 +50,10 @@ public class XYFinderDeviceEventManager {
 
     public static func unsubscribe(to events: [XYFinderEvent], referenceKey: UUID?) {
         guard let key = referenceKey else { return }
-        events.forEach { event in
-            let updatedArray = handlerRegistry[event]?.filter { $0.referenceKey != key }
-            handlerRegistry[event] = updatedArray
+        for event in events {
+            guard let eventsInRegistry = handlerRegistry[event] else { continue }
+            let updatedArray = eventsInRegistry.filter { $0.referenceKey != key }
+            self.handlerRegistry[event] = updatedArray
         }
     }
 
