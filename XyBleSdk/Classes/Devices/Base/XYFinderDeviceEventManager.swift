@@ -17,10 +17,11 @@ internal struct XYFinderDeviceEventDirective {
     device: XYFinderDevice?
 }
 
-// TODO Make Threadsafe
 public class XYFinderDeviceEventManager {
 
     fileprivate static var handlerRegistry = [XYFinderEvent: [XYFinderDeviceEventDirective]]()
+
+    fileprivate static let managerQueue = DispatchQueue(label: "com.xyfindables.sdk.XYFinderDeviceEventManagerQueue")
 
     // Notify those directives that want all events and those that subscribe to the event's device
     public static func report(events: [XYFinderEventNotification]) {
@@ -49,11 +50,13 @@ public class XYFinderDeviceEventManager {
     }
 
     public static func unsubscribe(to events: [XYFinderEvent], referenceKey: UUID?) {
-        guard let key = referenceKey else { return }
-        for event in events {
-            guard let eventsInRegistry = handlerRegistry[event] else { continue }
-            let updatedArray = eventsInRegistry.filter { $0.referenceKey != key }
-            self.handlerRegistry[event] = updatedArray
+        managerQueue.sync {
+            guard let key = referenceKey else { return }
+            for event in events {
+                guard let eventsInRegistry = handlerRegistry[event] else { continue }
+                let updatedArray = eventsInRegistry.filter { $0.referenceKey != key }
+                self.handlerRegistry[event] = updatedArray
+            }
         }
     }
 

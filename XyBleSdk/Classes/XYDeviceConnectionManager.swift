@@ -133,17 +133,19 @@ private extension XYDeviceConnectionManager {
     // start the readRSSI recursive loop. Use a 0-based sempahore to ensure only once device
     // can be in the connection state at one time
     func connect(to device: XYBluetoothDevice) {
-        print("STEP 1: Trying to connect to \(device.id.shortId)...")
+        let deviceId = device.id
+
+        print("STEP 1: Trying to connect to \(deviceId.shortId)...")
 
         // If we disconnect at any point in the connection, we remove the device so it can be tried again and unlock the connection semaphore
         // We also try to run the disconnect call in case we are watching the notifications
-        self.disconnectSubKeys[device.id] = XYFinderDeviceEventManager.subscribe(to: [.disconnected]) { [weak self] event in
-            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self?.disconnectSubKeys[device.id])
+        self.disconnectSubKeys[deviceId] = XYFinderDeviceEventManager.subscribe(to: [.disconnected]) { [weak self] event in
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self?.disconnectSubKeys[deviceId])
             guard let finder = device as? XYFinderDevice, finder == event.device else { return }
             self?.devices[finder.id] = nil
         }
 
-        let connectionQueue = DispatchQueue(label: "com.xyfindables.sdk.ConnectionManagerQueueFor\(device.id)")
+        let connectionQueue = DispatchQueue(label: "com.xyfindables.sdk.ConnectionManagerQueueFor\(deviceId.shortId)")
 
         device.connection {
             // If we have an XY Finder device, we report this, subscribe to the button and kick off the RSSI read loop
@@ -164,8 +166,8 @@ private extension XYDeviceConnectionManager {
                 XYFinderDeviceEventManager.report(events: [.connected(device: xyDevice)])
             }
 
-            if self.waitingDeviceIds.contains(device.id) {
-                self.waitingDeviceIds.removeAll(where: { $0 == device.id })
+            if self.waitingDeviceIds.contains(deviceId) {
+                self.waitingDeviceIds.removeAll(where: { $0 == deviceId })
             }
 
         }.catch(on: connectionQueue) { error in
@@ -177,16 +179,16 @@ private extension XYDeviceConnectionManager {
                 XYFinderDeviceEventManager.report(events: [.connectionError(device: xyDevice, error: xyError)])
             }
 
-            print("STEP 6: ERROR for \((error as! XYBluetoothError).toString) for device \(device.id)")
+            print("STEP 6: ERROR for \((error as! XYBluetoothError).toString) for device \(deviceId)")
 
             // Completely disconnect so we can retry if there is any connection issue
             XYCentral.instance.disconnect(from: device)
             XYFinderDeviceFactory.remove(device: xyDevice)
-            self.devices.removeValue(forKey: device.id)
-            self.waitingDeviceIds.removeAll(where: { $0 == device.id })
+            self.devices.removeValue(forKey: deviceId)
+            self.waitingDeviceIds.removeAll(where: { $0 == deviceId })
 
         }.always(on: connectionQueue) {
-            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self.disconnectSubKeys[device.id])
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected], referenceKey: self.disconnectSubKeys[deviceId])
         }
     }
 
