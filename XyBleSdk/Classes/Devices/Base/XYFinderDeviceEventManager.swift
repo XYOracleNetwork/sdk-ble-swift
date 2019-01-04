@@ -50,7 +50,7 @@ public class XYFinderDeviceEventManager {
     }
 
     public static func unsubscribe(to events: [XYFinderEvent], referenceKey: UUID?) {
-        managerQueue.sync {
+        managerQueue.async {
             guard let key = referenceKey else { return }
             for event in events {
                 guard let eventsInRegistry = handlerRegistry[event] else { continue }

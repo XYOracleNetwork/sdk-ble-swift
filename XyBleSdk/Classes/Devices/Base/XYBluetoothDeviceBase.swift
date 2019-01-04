@@ -18,7 +18,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public internal(set) var
     totalPulseCount = 0,
-    markedForDeletion: Bool? = nil,
+    markedForDeletion: Bool? = false,
     queuedForConnection: Bool = false
 
     fileprivate var deviceLock = GenericLock(3)

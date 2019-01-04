@@ -118,7 +118,6 @@ fileprivate extension XYSmartScan {
         self.mode = .background
         self.location.clearRanging()
         self.isCheckingExits = false
-        self.location.startMonitoring(for: families)
         self.updateTracking()
         self.updateStatus()
     }
@@ -157,7 +156,7 @@ extension XYSmartScan {
 
         if self.currentStatus != newStatus {
             self.currentStatus = newStatus
-            // Currently used only by the app for displaying BLE status
+            // Currently used only by the app for displaying BLE/Location status
             self.delegates.map { $1 }.forEach { $0?.smartScan(status: self.currentStatus)}
         }
     }
@@ -167,6 +166,7 @@ extension XYSmartScan {
 // MARK: Tracking wranglers for known devices
 public extension XYSmartScan {
 
+    // Called from the application code, used to track a device that is assigne to the user
     func startTracking(for device: XYFinderDevice) {
         XYSmartScan.queue.sync {
             guard trackedDevices[device.id] == nil else { return }
@@ -183,6 +183,7 @@ public extension XYSmartScan {
         }
     }
 
+    // Start ranging/monitoring for devices that are assinged to the user
     private func updateTracking() {
         self.mode == .foreground ?
             location.startRangning(for: self.trackedDevices.map { $1 } ) :
