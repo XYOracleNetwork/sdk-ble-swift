@@ -202,6 +202,7 @@ public extension XYSmartScan {
                 guard
                     let xyDevice = device as? XYFinderDevice,
                     let lastPulseTime = device.lastPulseTime,
+                    device.isUpdatingFirmware == true,
                     fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
                     else { continue }
 

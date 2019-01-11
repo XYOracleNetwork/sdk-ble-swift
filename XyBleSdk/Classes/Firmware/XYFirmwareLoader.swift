@@ -85,6 +85,7 @@ public class XYFirmwareRemoteVersionLoader {
 internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
 
     private let url: URL
+    private var backgroundSession: URLSession?
 
     private var
     success: ((Data?) -> Void)?,
@@ -103,14 +104,19 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
         self.progress = progress
         
         let sessionConfig = URLSessionConfiguration.background(withIdentifier: self.url.absoluteString)
-        let session = Foundation.URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
-        let task = session.downloadTask(with: self.url)
+        self.backgroundSession = Foundation.URLSession(configuration: sessionConfig, delegate: self, delegateQueue: nil)
+        guard let task = self.backgroundSession?.downloadTask(with: self.url) else {
+            self.backgroundSession?.finishTasksAndInvalidate()
+            self.error?(XYBluetoothError.unableToUpdateFirmware)
+            return
+        }
         task.resume()
     }
 
     // Download is done
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let data = try? Data(contentsOf: location)
+        self.backgroundSession?.finishTasksAndInvalidate()
         self.success?(data)
     }
 
@@ -122,6 +128,7 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
 
     // Something bad happened
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        self.backgroundSession?.finishTasksAndInvalidate()
         self.error?(error)
     }
 

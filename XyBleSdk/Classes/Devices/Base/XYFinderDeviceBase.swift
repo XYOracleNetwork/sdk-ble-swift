@@ -91,6 +91,8 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     }
 
     public func detected() {
+        guard self.isUpdatingFirmware == false else { return }
+
         var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
 
         // If the button has been pressed on a compatible devices, we add the appropriate event

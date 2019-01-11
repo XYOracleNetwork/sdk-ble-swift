@@ -44,12 +44,24 @@ public final class XYDeviceConnectionManager {
     }
 
     // Remove the devices from the dictionary of tracked, connected devices, and let central know to disconnect
-    func remove(for id: String, disconnect: Bool) {
+    internal func remove(for id: String, disconnect: Bool) {
         guard let device = self.devices[id] else { return }
         self.devices.removeValue(forKey: device.id)
         self.waitingDeviceIds.removeAll(where: { $0 == device.id })
         if disconnect && (device.state != .disconnected || device.state != .disconnecting) {
             self.disconnect(from: device)
+        }
+    }
+
+    // Like above, but this is a hard reset for the device, removing the peripheral so it can be rediscovered
+    // Used by the firmware update
+    internal func remove(device: XYBluetoothDevice) {
+        guard self.devices[device.id] != nil else { return }
+        self.devices.removeValue(forKey: device.id)
+        self.waitingDeviceIds.removeAll(where: { $0 == device.id })
+        if device.state != .disconnected || device.state != .disconnecting {
+            XYCentral.instance.disconnect(from: device)
+            device.detachPeripheral()
         }
     }
 
@@ -211,6 +223,7 @@ private extension XYDeviceConnectionManager {
         }.always(on: disconnectQueue) {
             print("STEP 2: Always on DISCONNECT from \(device.id.shortId)")
             XYCentral.instance.disconnect(from: device)
+            device.detachPeripheral()
             if let xyDevice = device as? XYFinderDevice {
                 XYFinderDeviceFactory.remove(device: xyDevice)
             }

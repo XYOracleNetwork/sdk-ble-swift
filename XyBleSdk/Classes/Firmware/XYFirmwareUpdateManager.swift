@@ -21,6 +21,8 @@ public struct XYFirmwareUpdateParameters {
 
 public protocol XYFirmwareUpdateManagerProgressDelegate: class {
     func progressUpdated(value: Float, offset: Int32, count: Int32)
+    func disconnected()
+    func rebootStarted()
 }
 
 public class XYFirmwareUpdateManager {
@@ -35,12 +37,14 @@ public class XYFirmwareUpdateManager {
     }
 
     fileprivate let
-    device: XYBluetoothDevice
+    device: XYFinderDevice
 
     fileprivate var
     firmwareData: Data
 
     private let notifyKey = "XYFirmwareUpdateManager"
+
+    fileprivate var subscribeKey: UUID?
 
     fileprivate var
     currentStep: XYFirmwareUpdateStep = .unstarted,
@@ -65,26 +69,71 @@ public class XYFirmwareUpdateManager {
 
     var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SUOTA_SPI
 
-    public init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
+    public init(for device: XYFinderDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
         self.device = device
         self.parameters = parameters
         self.firmwareData = firmwareData
         self.delegate = delegate
     }
 
+    public func cancel() {
+        self.nextStep = .unstarted
+        self.currentStep = .unstarted
+    }
+
     public func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
         self.success = success
         self.failure = failure
 
+        self.subscribeKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected, .connected], for: self.device) { event in
+            switch event {
+            case .disconnected where self.currentStep == .completed:
+                // The finder disconnects once it reboots, so we catch that and reconnect
+                self.completeUpdate()
+            case .disconnected where self.currentStep != .completed:
+                // The update bombed out at some point, so let the user know to retry
+                self.delegate?.disconnected()
+            case .connected:
+                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.completed.rawValue)")
+
+                // All done, so unsubscribe from the ota service and the events, and then return success
+                self.device.connection {
+                    _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
+                    for _ in 1...10 {
+                        if self.device.stayAwake().hasError == false {
+                            break
+                        }
+                    }
+                }.always {
+                    XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
+                    self.success?()
+                }
+
+            default:
+                break
+            }
+        }
+
+        self.device.updatingFirmware(true)
+
         // Set notifications on for the update service
         self.device.connection {
             if self.device.subscribe(to: OtaService.servStatus, delegate: (key: self.notifyKey, delegate: self)).hasError {
+                self.device.updatingFirmware(false)
                 self.failure?(XYBluetoothError.unableToUpdateFirmware)
             } else {
                 self.currentStep = .setMemoryType
                 self.doStep()
             }
         }
+    }
+
+    fileprivate func completeUpdate() {
+        self.delegate?.rebootStarted()
+
+        // Remove the device and the peripheral in order to reconnect
+        XYDeviceConnectionManager.instance.remove(device: self.device)
+        self.device.connect()
     }
 }
 
@@ -235,15 +284,7 @@ private extension XYFirmwareUpdateManager {
             self.writeValue(to: .memDev, value: parameter)
 
         case .completed:
-
-            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.completed.rawValue)")
-
-            self.device.connection {
-                _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
-            }.always {
-                self.device.disconnect()
-                self.success?()
-            }
+            break
 
         }
     }
@@ -308,6 +349,7 @@ private extension XYFirmwareUpdateManager {
             expectedValue = 0
             self.doStep()
         } else {
+            self.device.updatingFirmware(false)
             self.failure?(XYBluetoothError.unableToUpdateFirmware)
         }
     }
