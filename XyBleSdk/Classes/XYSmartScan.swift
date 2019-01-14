@@ -95,6 +95,10 @@ public class XYSmartScan {
         XYDeviceConnectionManager.instance.invalidate()
         XYFinderDeviceFactory.invalidateCache()
     }
+
+    public var trackDevicesCount: Int {
+        return self.trackedDevices.count
+    }
 }
 
 // MARK: Change monitoring state based on start/stop

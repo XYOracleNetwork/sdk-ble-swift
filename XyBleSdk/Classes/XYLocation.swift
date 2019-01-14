@@ -33,6 +33,10 @@ public class XYLocation: NSObject {
     public func setDelegate(_ delegate: XYLocationDelegate, key: String) {
         self.delegates[key] = delegate
     }
+
+    public var userLocation: CLLocationCoordinate2D? {
+        return self.manager.location?.coordinate
+    }
 }
 
 // MARK: Start and stop
