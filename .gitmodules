@@ -1,0 +1,3 @@
+[submodule "Carthage/Checkouts/promises"]
+	path = Carthage/Checkouts/promises
+	url = https://github.com/google/promises.git

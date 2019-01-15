@@ -8,6 +8,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 ## Requirements
 
 - iOS 11.0+
+- MacOS 10.13+
 - Xcode 9.3+
 - Swift 3.1+
 
@@ -40,6 +41,25 @@ Then, run the following command:
 ```bash
 $ pod install
 ```
+
+### Carthage
+
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
+
+```bash
+$ brew update
+$ brew install carthage
+```
+
+To integrate into your Xcode project using Carthage, specify it in your `Cartfile`:
+
+```ogdl
+github "XYOracleNetwork/sdk-ble-swift" ~> 0.1.0
+```
+
+Run `carthage update --use-submodules` to build the framework and drag the built `XyBleSdk.framework`, `FBLPromises.framework` and `Promises.framework` into your Xcode project.
 
 ## Overview
 Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral`, with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Bluetooth devices are often not predictable in their reponse times due to firmware and environmental conditions, which can make them tricky to deal with, especially if the application requires multiple, disparate devices connected to operate properly.
