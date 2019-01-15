@@ -28,12 +28,12 @@
 	<string>Location Services is used to track the whereabouts of your XY Finders without opening the XY app.</string>
 	<key>UIBackgroundModes</key>
 	<array>
-        <string>audio</string>
-        <string>bluetooth-central</string>
-        <string>bluetooth-peripheral</string>
-        <string>fetch</string>
-        <string>location</string>
-        <string>remote-notification</string>
+		<string>audio</string>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
