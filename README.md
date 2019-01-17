@@ -16,6 +16,8 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 
 ### CocoaPods
 
+> Note that CocoaPods support is only for iOS currently
+
 [CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
 
 ```bash
@@ -213,18 +215,13 @@ The result of the `subscribe` call is a subscription UUID that you can use to un
 XYFinderDeviceEventManager.unsubscribe(to: [.buttonPressed], referenceKey: self.subscriptionUuid)
 ```
 
-
 ## Smart Scan
 
-The `XYSmartScan` singleton can be used to range and monitor for XY Finder devices. It will range for devices in a particular XY Finder device family when put into foreground mode using `switchToForeground`, and use lower power monitoring when placed into backgound mode with `switchToBackground`.
+The `XYSmartScan` singleton can be used to range and monitor for XY Finder devices. When using the library in an iOS application, it will range for devices in a particular XY Finder device family when put into foreground mode using `switchToForeground`, and use lower power monitoring when placed into backgound mode with `switchToBackground`. The macOS library will locate devices using the `CBCentralManager.scanForPeripherals` method.
 
-## Example
+## Samples
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first. This project is a simple XY locator scanner, allowing you to view the characteristics of the device's various services.
-
-## Author
-
-Darren Sutherland, darren@xyo.network
+The library comes with two sample projects, one for macOS and one for iOS. The macOS sample requires you to run `carthage update` in the project directory. The iOS sample requires either `pod install` or `carthage update` to be run. 
 
 ## License
 
