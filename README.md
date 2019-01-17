@@ -10,7 +10,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 - iOS 11.0+
 - MacOS 10.13+
 - Xcode 9.3+
-- Swift 3.1+
+- Swift 4.2+
 
 ## Installation
 
@@ -22,7 +22,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 $ gem install cocoapods
 ```
 
-> CocoaPods 1.1+ is required.
+> CocoaPods 1.6.0.beta.2+ is required.
 
 To integrate into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
@@ -59,7 +59,21 @@ To integrate into your Xcode project using Carthage, specify it in your `Cartfil
 github "XYOracleNetwork/sdk-ble-swift" ~> 0.1.0
 ```
 
-Run `carthage update --use-submodules` to build the framework and drag the built `XyBleSdk.framework`, `FBLPromises.framework` and `Promises.framework` into your Xcode project.
+Run `carthage update --use-submodules` to build the framework and drag the built `XyBleSdk.framework`, `FBLPromises.framework` and `Promises.framework` to the _Linked Frameworks and Libraries_ of your Xcode project. Then switch to the _Build Phases_ tab and add a _New run script phase_. Expand _Run Script_ and add the following to the _Shell_ text field:
+
+```
+/usr/local/bin/carthage copy-frameworks
+```
+
+Click the + button under _Input Files_ and add:
+
+```
+$(SRCROOT)/Carthage/Build/<target platform>/Promises.framework
+$(SRCROOT)/Carthage/Build/<target platform>/FBLPromises.framework
+$(SRCROOT)/Carthage/Build/<target platform>/XyBleSdk.framework
+```
+
+Finally, you will need to add a _New Copy Files Phase_, selecting _Frameworks_ for the _Destination_ and adding the three frameworks, ensuring the _Code Sign On Copy_ boxes are checked.
 
 ## Overview
 Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral`, with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Bluetooth devices are often not predictable in their reponse times due to firmware and environmental conditions, which can make them tricky to deal with, especially if the application requires multiple, disparate devices connected to operate properly.
