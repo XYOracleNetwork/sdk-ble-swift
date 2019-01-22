@@ -60,7 +60,7 @@ public struct XYIBeaconDefinition {
             parts[safe: 0] == "xy"
             else { return nil }
 
-        if parts[safe: 1] == "ibeacon" || parts[safe: 1] == "gps" || parts[safe: 1] == "mobiledevice" {
+        if parts[safe: 1] == "ibeacon" || parts[safe: 1] == "gps" || parts[safe: 1] == "mobiledevice" || parts[safe: 1] == "mobile" {
             guard
                 let ids = parts[safe: 2]?.components(separatedBy: "."),
                 let first = ids[safe: 0], let second = ids[safe: 1], let third = ids[safe: 2],
