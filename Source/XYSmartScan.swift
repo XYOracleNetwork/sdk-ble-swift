@@ -124,6 +124,10 @@ public class XYSmartScan {
         XYDeviceConnectionManager.instance.invalidate()
         XYFinderDeviceFactory.invalidateCache()
     }
+
+    public var trackDevicesCount: Int {
+        return self.trackedDevices.count
+    }
 }
 
 // MARK: Change monitoring state based on start/stop
@@ -195,7 +199,7 @@ extension XYSmartScan {
 
         if self.currentStatus != newStatus {
             self.currentStatus = newStatus
-            // Currently used only by the app for displaying BLE status
+            // Currently used only by the app for displaying BLE/Location status
             self.delegates.map { $1 }.forEach { $0?.smartScan(status: self.currentStatus)}
         }
         #endif
@@ -206,6 +210,7 @@ extension XYSmartScan {
 // MARK: Tracking wranglers for known devices
 public extension XYSmartScan {
 
+    // Called from the application code, used to track a device that is assigne to the user
     func startTracking(for device: XYFinderDevice) {
         XYSmartScan.queue.sync {
             guard trackedDevices[device.id] == nil else { return }
@@ -242,6 +247,7 @@ public extension XYSmartScan {
                 guard
                     let xyDevice = device as? XYFinderDevice,
                     let lastPulseTime = device.lastPulseTime,
+                    device.isUpdatingFirmware == false,
                     fabs(lastPulseTime.timeIntervalSinceNow) > XYConstants.DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXITING
                     else { continue }
 

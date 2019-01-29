@@ -35,6 +35,10 @@ public class XYLocation: NSObject {
     public func setDelegate(_ delegate: XYLocationDelegate, key: String) {
         self.delegates[key] = delegate
     }
+
+    public var userLocation: CLLocationCoordinate2D? {
+        return self.manager.location?.coordinate
+    }
 }
 
 // MARK: Start and stop
@@ -142,7 +146,9 @@ public extension XYLocation {
             .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
 
         // Remove devices from monitored that are not on the list
-        monitoredDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach { self.stopMonitoring(for: $0) }
+        monitoredDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach {
+            self.stopMonitoring(for: $0)
+        }
 
         // Add unmonitored devices
         devices.filter { device in !monitoredDevices.contains(where: { $0.id == device.id }) }.forEach {
@@ -181,8 +187,11 @@ extension XYLocation: CLLocationManagerDelegate {
 
     // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+<<<<<<< HEAD:Source/XYLocation.swift
         let processedBeacons = beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
         
+=======
+>>>>>>> hotfix/3.94:XyBleSdk/Classes/XYLocation.swift
         self.delegates.forEach { $1?.didRangeBeacons(
             processedBeacons,
             for: region.family

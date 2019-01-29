@@ -17,10 +17,20 @@ internal struct XYFinderDeviceEventDirective {
     device: XYFinderDevice?
 }
 
-// TODO Make Threadsafe
 public class XYFinderDeviceEventManager {
 
     fileprivate static var handlerRegistry = [XYFinderEvent: [XYFinderDeviceEventDirective]]()
+//    {
+//        didSet {
+//            let count = handlerRegistry.reduce(0) { $0 + $1.value.count }
+//            self.handlerRegistry.forEach { key, value in
+//                print("\(key.rawValue) - \(value.count)")
+//            }
+//            print("I got set and my new count is \(count)")
+//        }
+//    }
+
+    fileprivate static let managerQueue = DispatchQueue(label: "com.xyfindables.sdk.XYFinderDeviceEventManagerQueue")
 
     // Notify those directives that want all events and those that subscribe to the event's device
     public static func report(events: [XYFinderEventNotification]) {
@@ -39,20 +49,25 @@ public class XYFinderDeviceEventManager {
     // Subscribe to a single device's events. This will simply filter when it comes to reporting to the handlers
     public static func subscribe(to events: [XYFinderEvent], for device: XYFinderDevice?, handler: @escaping XYFinderDeviceEventNotifier) -> UUID {
         let directive = XYFinderDeviceEventDirective(handler: handler, device: device)
-        events.forEach { event in
-            handlerRegistry[event] == nil ?
-                handlerRegistry[event] = [directive] :
-                handlerRegistry[event]?.append(directive)
+        managerQueue.async {
+            events.forEach { event in
+                handlerRegistry[event] == nil ?
+                    handlerRegistry[event] = [directive] :
+                    handlerRegistry[event]?.append(directive)
+            }
         }
 
         return directive.referenceKey
     }
 
     public static func unsubscribe(to events: [XYFinderEvent], referenceKey: UUID?) {
-        guard let key = referenceKey else { return }
-        events.forEach { event in
-            let updatedArray = handlerRegistry[event]?.filter { $0.referenceKey != key }
-            handlerRegistry[event] = updatedArray
+        managerQueue.async {
+            guard let key = referenceKey else { return }
+            for event in events {
+                guard let eventsInRegistry = handlerRegistry[event] else { continue }
+                let updatedArray = eventsInRegistry.filter { $0.referenceKey != key }
+                self.handlerRegistry[event] = updatedArray
+            }
         }
     }
 

@@ -75,8 +75,9 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         if monitorTimer == nil {
             self.monitorTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.monitorTimeout, queue: XYFinderDeviceBase.monitorTimerQueue) { [weak self] in
                 guard let strong = self else { return }
-                print("MONITOR TIMER EXPIRE: Device \(strong.id)")
+                strong.monitorTimer = nil
                 if strong.iBeacon?.hasMajor ?? false && strong.iBeacon?.hasMinor ?? false {
+                    print("MONITOR TIMER EXPIRE: Device \(strong.id)")
                     strong.verifyExit()
                 }
             }
@@ -90,6 +91,8 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     }
 
     public func detected() {
+        guard self.isUpdatingFirmware == false else { return }
+
         var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
 
         // If the button has been pressed on a compatible devices, we add the appropriate event
@@ -130,8 +133,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         XYFinderDeviceEventManager.report(events: [.exited(device: self)])
 
         // We put the device in the wait queue so it auto-reconnects when it comes back
-        // into range. This works only while the app is in the foreground/background, and
-        // we only do this when the app is in the background
+        // into range. This works only while the app is in the background
         if XYSmartScan.instance.mode == .background {
             XYDeviceConnectionManager.instance.wait(for: self)
         }

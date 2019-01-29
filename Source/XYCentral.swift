@@ -237,8 +237,15 @@ extension XYCentral: CBCentralManagerDelegate {
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])
             guard device.markedForDeletion == false else { return }
 
+            // TODO: Make sure you yank the peripheral! (Maybe...)
+
             device.resetRssi()
             self.delegates.forEach { $1?.disconnected(periperhal: XYPeripheral(peripheral)) }
+
+            // Report exited if in background mode
+            if XYSmartScan.instance.mode == .background {
+                device.startMonitorTimer()
+            }
         }
     }
 }

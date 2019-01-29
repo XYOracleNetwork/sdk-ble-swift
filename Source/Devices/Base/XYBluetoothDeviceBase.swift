@@ -18,7 +18,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 
     public internal(set) var
     totalPulseCount = 0,
-    markedForDeletion: Bool? = nil,
+    markedForDeletion: Bool? = false,
     queuedForConnection: Bool = false
 
     fileprivate var deviceLock = GenericLock(3)
@@ -41,7 +41,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
             // connect when they are not in range yet. Once the device is in range, we check if
             // it was queued in stayConnected below and try our connection. This allows for not waiting
             // for timeouts on GATT operations when a device can't be found.
-            if self.queuedForConnection && self.inRange {
+            if self.queuedForConnection && self.isUpdatingFirmware == false && self.inRange {
                 self.stayConnected(true)
             }
         }
@@ -50,6 +50,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     public internal(set) var peripheral: CBPeripheral?
 
     internal var stayConnected: Bool = false
+    public fileprivate(set) var isUpdatingFirmware: Bool = false
 
     public fileprivate(set) lazy var supportedServices = [CBUUID]()
 
@@ -157,8 +158,20 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
         return true
     }
 
+
+    public func detachPeripheral() {
+        self.peripheral = nil
+    }
+
+    public func updatingFirmware(_ value: Bool) {
+        self.isUpdatingFirmware = value
+    }
+
     // Connects to the device if requested, and the device is both not trying to connect or already has connected
     public func stayConnected(_ value: Bool) {
+        // Do not try to connect/disconnect when the firmware is updating
+        guard self.isUpdatingFirmware == false else { return }
+
         self.stayConnected = value
         // Only try a connection when in range, otherwise queue this so when it does come into range
         // it will auto connect at that time

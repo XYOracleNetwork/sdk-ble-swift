@@ -20,8 +20,10 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     var inRange: Bool { get }
     var connected: Bool { get }
     var markedForDeletion: Bool? { get }
+    var isUpdatingFirmware: Bool { get }
 
     func stayConnected(_ value: Bool)
+    func updatingFirmware(_ value: Bool)
 
     func connect()
     func disconnect()
@@ -40,6 +42,8 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
     func unsubscribe(for key: String)
 
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
+    func detachPeripheral()
+
     var state: CBPeripheralState { get }
 }
 
