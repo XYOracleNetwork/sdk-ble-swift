@@ -31,7 +31,7 @@ class RangedDevicesManager: NSObject {
 
     fileprivate(set) var subscriptionUuid: UUID?
 
-    fileprivate(set) var xyFinderFamilyFilter: [XYDeviceFamily] = XYDeviceFamily.allFamlies()
+    fileprivate(set) var xyFinderFamilyFilter: [XYDeviceFamily]
 
     public var
     rssiRangeToDisplay: Int = -95,
@@ -42,8 +42,14 @@ class RangedDevicesManager: NSObject {
     static let instance = RangedDevicesManager()
 
     private override init() {
+        XY4BluetoothDeviceCreator.enable(enable: true)
+        XY4BluetoothDevice.family.enable()
+        self.xyFinderFamilyFilter = XYDeviceFamily.allFamlies()
+        
         super.init()
         self.scanner.setDelegate(self, key: "RangedDevicesManager")
+        
+        
 
         // Subscribe to various events
         self.subscriptionUuid = XYFinderDeviceEventManager.subscribe(to: [.buttonPressed, .connected, .connectionError, .disconnected]) { event in
@@ -208,10 +214,10 @@ extension RangedDevicesManager: XYSmartScanDelegate {
         }
     }
 
-    func smartScan(status: XYSmartScanStatus) {}
-    func smartScan(entered device: XYBluetoothDevice) {}
-    func smartScan(exiting device: XYBluetoothDevice) {}
-    func smartScan(location: XYLocationCoordinate2D) {}
-    func smartScan(detected device: XYBluetoothDevice, signalStrength: Int, family: XYDeviceFamily) {}
-    func smartScan(exited device: XYBluetoothDevice) {}
+    func smartScan(status: XYSmartScanStatus) {    }
+    func smartScan(entered device: XYBluetoothDevice) {    }
+    func smartScan(exiting device: XYBluetoothDevice) {    }
+    func smartScan(location: XYLocationCoordinate2D) {    }
+    func smartScan(detected device: XYBluetoothDevice, signalStrength: Int, family: XYDeviceFamily) {    }
+    func smartScan(exited device: XYBluetoothDevice) {    }
 }

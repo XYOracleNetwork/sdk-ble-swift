@@ -22,6 +22,14 @@ public struct XYDeviceFamily {
         self.id = id
     }
     
+    public func enable () {
+        XYDeviceFamily.famlies[self.uuid.uuidString.lowercased()] = self
+    }
+    
+    public func diable () {
+        XYDeviceFamily.famlies.removeValue(forKey: self.uuid.uuidString.lowercased())
+    }
+    
     public static func allFamlies () -> [XYDeviceFamily] {
         return famlies.values.map {
             $0

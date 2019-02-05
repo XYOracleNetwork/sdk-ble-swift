@@ -63,7 +63,7 @@ public class XYBluetoothDeviceFactory {
         if let foundDevice = deviceCache[iBeacon.xyId(from: family)] {
             device = foundDevice
         } else {
-            device = uuidToCreators[iBeacon.uuid.uuidString]?.createFromIBeacon(iBeacon: iBeacon, rssi: rssi)
+            device = uuidToCreators[iBeacon.uuid.uuidString.lowercased()]?.createFromIBeacon(iBeacon: iBeacon, rssi: rssi)
             
             if let device = device {
                 deviceCache[device.id] = device
@@ -81,6 +81,6 @@ public class XYBluetoothDeviceFactory {
     
     public class func build (from family: XYDeviceFamily) -> XYBluetoothDevice? {
         let id = [family.prefix, family.uuid.uuidString.lowercased()].joined(separator: ":")
-        return uuidToCreators[family.uuid.uuidString]?.createFromId(id: id)
+        return uuidToCreators[family.uuid.uuidString.lowercased()]?.createFromId(id: id)
     }
 }

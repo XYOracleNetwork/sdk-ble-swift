@@ -11,13 +11,13 @@ import Promises
 
 // The XY4-specific implementation
 public class XY4BluetoothDevice: XYFinderDeviceBase {
-    static let family = XYDeviceFamily.init(uuid: UUID(uuidString: XY4BluetoothDevice.uuid)!,
+    public static let family = XYDeviceFamily.init(uuid: UUID(uuidString: XY4BluetoothDevice.uuid)!,
                                                     prefix: XY4BluetoothDevice.prefix,
                                                     familyName: XY4BluetoothDevice.familyName,
                                                     id: XY4BluetoothDevice.id)
     
     public static let id = "XY4"
-    public static let uuid : String = "08885dd0-111b-11e4-9191-0800200c9a66"
+    public static let uuid : String = "a44eacf4-0104-0000-0000-5f784c9977b5"
     public static let familyName : String = "XY4 Finder"
     public static let prefix : String = "xy:ibeacon"
     

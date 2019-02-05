@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct XY3BluetoothDeviceCreator : XYDeviceCreator {
+public struct XY3BluetoothDeviceCreator : XYDeviceCreator {
     private init () {}
     
     public static let uuid : String = "08885dd0-111b-11e4-9191-0800200c9a66"
