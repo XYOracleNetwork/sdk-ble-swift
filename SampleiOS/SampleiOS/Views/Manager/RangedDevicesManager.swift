@@ -14,9 +14,9 @@ import Promises
 protocol RangedDevicesManagerDelegate: class {
     func reloadTableView()
     func showDetails()
-    func buttonPressed(on device: XYFinderDevice)
+    func buttonPressed(on device: XYBluetoothDevice)
     func stateChanged(_ newState: CBManagerState)
-    func deviceDisconnected(device: XYFinderDevice)
+    func deviceDisconnected(device: XYBluetoothDevice)
 }
 
 class RangedDevicesManager: NSObject {
@@ -24,14 +24,14 @@ class RangedDevicesManager: NSObject {
     fileprivate let central = XYCentral.instance
     fileprivate let scanner = XYSmartScan.instance
 
-    fileprivate(set) var rangedDevices = [TableSection: [XYFinderDevice]]()
+    fileprivate(set) var rangedDevices = [TableSection: [XYBluetoothDevice]]()
     fileprivate(set) var selectedDevice: XYFinderDevice?
 
     fileprivate weak var delegate: RangedDevicesManagerDelegate?
 
     fileprivate(set) var subscriptionUuid: UUID?
 
-    fileprivate(set) var xyFinderFamilyFilter: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange
+    fileprivate(set) var xyFinderFamilyFilter: [XYDeviceFamily] = XYDeviceFamily.allFamlies()
 
     public var
     rssiRangeToDisplay: Int = -95,
@@ -105,7 +105,8 @@ class RangedDevicesManager: NSObject {
             let device = self.rangedDevices[section]?[safe: deviceIndex]
             else { return }
 
-        self.selectedDevice = device
+        // todo
+        self.selectedDevice = device as! XYFinderDevice
         device.connect()
     }
 
@@ -118,9 +119,11 @@ class RangedDevicesManager: NSObject {
 
 extension RangedDevicesManager {
 
-    func toggleFamilyFilter(for family: XYFinderDeviceFamily) {
-        if self.xyFinderFamilyFilter.contains(family) {
-            self.xyFinderFamilyFilter.removeAll(where: { $0 == family })
+    func toggleFamilyFilter(for family: XYDeviceFamily) {
+        if xyFinderFamilyFilter.contains(where: { (XYDeviceFamily) -> Bool in
+            (XYDeviceFamily).familyName == family.familyName
+        }) {
+             self.xyFinderFamilyFilter.removeAll(where: { $0.familyName == family.familyName })
         } else {
             self.xyFinderFamilyFilter.append(family)
         }
@@ -154,7 +157,7 @@ extension RangedDevicesManager: UITableViewDataSource {
             name:  device.family.familyName,
             major: device.iBeacon?.major ?? 0,
             rssi: device.rssi,
-            uuid: device.uuid,
+            uuid: device.family.uuid,
             connected: false,
             minor: device.iBeacon?.minor ?? 0,
             pulses: device.totalPulseCount,
@@ -187,7 +190,7 @@ extension RangedDevicesManager: XYCentralDelegate {
 
 extension RangedDevicesManager: XYSmartScanDelegate {
 
-    func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily) {
+    func smartScan(detected devices: [XYBluetoothDevice], family: XYDeviceFamily) {
         DispatchQueue.main.async {
             // Filter out devices not in the specified range and sort by rssi
             var inRange = devices
@@ -206,9 +209,9 @@ extension RangedDevicesManager: XYSmartScanDelegate {
     }
 
     func smartScan(status: XYSmartScanStatus) {}
-    func smartScan(entered device: XYFinderDevice) {}
+    func smartScan(entered device: XYBluetoothDevice) {}
     func smartScan(exiting device: XYBluetoothDevice) {}
     func smartScan(location: XYLocationCoordinate2D) {}
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {}
-    func smartScan(exited device: XYFinderDevice) {}
+    func smartScan(detected device: XYBluetoothDevice, signalStrength: Int, family: XYDeviceFamily) {}
+    func smartScan(exited device: XYBluetoothDevice) {}
 }

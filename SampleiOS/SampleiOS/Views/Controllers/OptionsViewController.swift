@@ -49,7 +49,7 @@ private extension OptionsViewController {
 extension OptionsViewController: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let family = XYFinderDeviceFamily.valuesToRange[indexPath.row]
+        let family = XYDeviceFamily.allFamlies()[indexPath.row]
         self.manager.toggleFamilyFilter(for: family)
         self.xyFamilyFilterTableView.reloadData()
     }
@@ -63,14 +63,16 @@ extension OptionsViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return XYFinderDeviceFamily.valuesToRange.count
+        return XYDeviceFamily.allFamlies().count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "xyFinderFamilyFilterCell")!
-        let family = XYFinderDeviceFamily.valuesToRange[indexPath.row]
+        let family = XYDeviceFamily.allFamlies()[indexPath.row]
         cell.textLabel?.text = family.familyName
-        cell.accessoryType = manager.xyFinderFamilyFilter.contains(family) ? .checkmark : .none
+        cell.accessoryType = manager.xyFinderFamilyFilter.contains(where: { (XYDeviceFamily) -> Bool in
+            XYDeviceFamily.familyName == family.familyName
+        }) ? .checkmark : .none
         return cell
     }
 

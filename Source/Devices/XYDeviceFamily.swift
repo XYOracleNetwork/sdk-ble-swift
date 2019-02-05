@@ -10,10 +10,10 @@ import Foundation
 public struct XYDeviceFamily {
     static var famlies = [String : XYDeviceFamily]()
     
-    let uuid : UUID
-    let prefix : String
-    let familyName : String
-    let id : String
+    public let uuid : UUID
+    public let prefix : String
+    public let familyName : String
+    public let id : String
     
     init(uuid: UUID, prefix : String, familyName : String, id : String) {
         self.uuid = uuid
