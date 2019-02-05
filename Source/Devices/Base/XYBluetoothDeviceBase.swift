@@ -7,6 +7,8 @@
 //
 
 import CoreBluetooth
+import CoreLocation
+
 
 // A concrete base class to base any BLE device off of
 public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
@@ -33,7 +35,10 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     name: String,
     id: String
 
-    public let deviceBleQueue: DispatchQueue
+    public let
+    deviceBleQueue: DispatchQueue,
+    family : XYDeviceFamily,
+    iBeacon : XYIBeaconDefinition?
 
     public fileprivate(set) var rssiRange: (min: Int, max: Int) = (0, 0) {
         didSet {
@@ -57,12 +62,14 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
-    init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue) {
+    init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue, family : XYDeviceFamily, iBeacon : XYIBeaconDefinition?) {
         self.id = id
         self.rssi = rssi
         self.name = ""
         self.powerLevel = 0
         self.deviceBleQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothBaseQueueFor\(id.shortId)")
+        self.family = family
+        self.iBeacon = iBeacon
         super.init()
     }
 
@@ -99,8 +106,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
 }
 
 // MARK: XYBluetoothDevice protocol base implementations
-extension XYBluetoothDeviceBase: XYBluetoothDevice {
-
+extension XYBluetoothDeviceBase: XYBluetoothDevice {    
     public var inRange: Bool {
         if self.peripheral?.state == .connected { return true }
 
@@ -239,4 +245,38 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
             }
         }
     }
+}
+
+// MARK: Default implementations of protocol methods and variables
+public extension XYBluetoothDeviceBase {
+    
+
+    #if os(iOS)
+    func beaconRegion(slot: UInt16) -> CLBeaconRegion {
+        return beaconRegion(self.family.uuid, slot: slot)
+    }
+    
+    // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
+    func beaconRegion(_ uuid: UUID, slot: UInt16? = nil) -> CLBeaconRegion {
+        if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {
+            let computedMinor = slot == nil ? minor : ((minor & 0xfff0) | slot!)
+            return CLBeaconRegion(
+                proximityUUID: uuid,
+                major: major,
+                minor: computedMinor,
+                identifier: String(format:"%@:4", id))
+        }
+        
+        if iBeacon?.hasMajor ?? false, let major = iBeacon?.major {
+            return CLBeaconRegion(
+                proximityUUID: uuid,
+                major: major,
+                identifier: String(format:"%@:4", id))
+        }
+        
+        return CLBeaconRegion(
+            proximityUUID: uuid,
+            identifier: String(format:"%@:4", id))
+    }
+    #endif
 }

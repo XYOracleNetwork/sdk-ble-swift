@@ -8,10 +8,10 @@
 
 import CoreBluetooth
 
-public enum PrimaryService: String, XYServiceCharacteristic {
+public enum XYFinderPrimaryService: String, XYServiceCharacteristic {
 
     public var serviceDisplayName: String { return "Primary" }
-    public var serviceUuid: CBUUID { return PrimaryService.serviceUuid }
+    public var serviceUuid: CBUUID { return XYFinderPrimaryService.serviceUuid }
 
     case stayAwake
     case unlock
@@ -39,7 +39,7 @@ public enum PrimaryService: String, XYServiceCharacteristic {
     private static let serviceUuid = CBUUID(string: "a44eacf4-0104-0001-0000-5f784c9977b5")
 
     public var characteristicUuid: CBUUID {
-        return PrimaryService.uuids[self]!
+        return XYFinderPrimaryService.uuids[self]!
     }
 
     public var characteristicType: XYServiceCharacteristicType {
@@ -78,7 +78,7 @@ public enum PrimaryService: String, XYServiceCharacteristic {
         }
     }
 
-    private static let uuids: [PrimaryService: CBUUID] = [
+    private static let uuids: [XYFinderPrimaryService: CBUUID] = [
         .stayAwake          : CBUUID(string: "a44eacf4-0104-0001-0001-5f784c9977b5"),
         .unlock             : CBUUID(string: "a44eacf4-0104-0001-0002-5f784c9977b5"),
         .lock               : CBUUID(string: "a44eacf4-0104-0001-0003-5f784c9977b5"),

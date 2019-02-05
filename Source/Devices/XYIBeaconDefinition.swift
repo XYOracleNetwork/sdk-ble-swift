@@ -25,7 +25,7 @@ public struct XYIBeaconDefinition: Equatable {
     }
 
     // Filters out the power level to generate a consistent minor value
-    public func mainMinor(for family: XYFinderDeviceFamily, slot: UInt16? = nil) -> UInt16? {
+    public func mainMinor(for family: XYDeviceFamily, slot: UInt16? = nil) -> UInt16? {
         guard let minor = self.minor else { return nil }
         switch family {
         case .xy4, .xy3, .xy2, .xygps:
@@ -49,7 +49,7 @@ public struct XYIBeaconDefinition: Equatable {
     }
 
     // Builds the beacon definition based on the uuid, major and minor
-    public func xyId(from family: XYFinderDeviceFamily) -> String {
+    public func xyId(from family: XYDeviceFamily) -> String {
         var xyid = [family.prefix, family.uuid.uuidString.lowercased()].joined(separator: ":")
         if let minor = mainMinor(for: family), let major = self.major {
             xyid.append(String(format: ".%ld.%ld", major, minor))
@@ -111,7 +111,7 @@ extension CLBeacon {
             minor: self.minor as? UInt16)
     }
 
-    var family: XYFinderDeviceFamily? {
+    var family: XYDeviceFamily? {
         return XYFinderDeviceFamily.get(from: self.xyiBeaconDefinition)
     }
 }
@@ -125,8 +125,9 @@ extension CLBeaconRegion {
             minor: self.minor as? UInt16)
     }
 
-    var family: XYFinderDeviceFamily? {
+    var family: XYDeviceFamily? {
         return XYFinderDeviceFamily.get(from: self.xyiBeaconDefinition)
     }
 }
 #endif
+

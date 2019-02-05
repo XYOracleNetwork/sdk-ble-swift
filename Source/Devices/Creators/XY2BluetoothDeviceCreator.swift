@@ -1,0 +1,33 @@
+//
+//  XY2BluetoothDeviceCreator.swift
+//  Pods-SampleiOS
+//
+//  Created by Carter Harrison on 2/4/19.
+//
+
+import Foundation
+
+
+struct XY2BluetoothDeviceCreator : XYDeviceCreator {
+    private init () {}
+    
+    public static let uuid : String = "07775dd0-111b-11e4-9191-0800200c9a66"
+    public var familyName : String = "XY2 Finder"
+    public var prefix : String = "xy:ibeacon"
+    
+    public func createFromIBeacon (iBeacon: XYIBeaconDefinition, rssi: Int) -> XYBluetoothDevice? {
+        return XY2BluetoothDevice(iBeacon: iBeacon, rssi: rssi)
+    }
+    
+    public func createFromId(id: String) -> XYBluetoothDevice {
+        return XY2BluetoothDevice(id)
+    }
+    
+    public static func enable (enable : Bool) {
+        if (enable) {
+            XYBluetoothDeviceFactory.addCreator(uuid: XY2BluetoothDeviceCreator.uuid, creator: XY2BluetoothDeviceCreator())
+        } else {
+            XYBluetoothDeviceFactory.removeCreator(uuid: XY2BluetoothDeviceCreator.uuid)
+        }
+    }
+}

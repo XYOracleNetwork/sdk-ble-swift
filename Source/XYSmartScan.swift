@@ -56,7 +56,7 @@ public class XYSmartScan {
 
     internal static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
 
-    private init() {
+    private init() {        
         #if os(iOS)
         self.location.setDelegate(self, key: "XYSmartScan")
         #elseif os(macOS)
@@ -122,7 +122,7 @@ public class XYSmartScan {
 
     public func invalidateSession() {
         XYDeviceConnectionManager.instance.invalidate()
-        XYFinderDeviceFactory.invalidateCache()
+        XYBluetoothDeviceFactory.invalidateCache()
     }
 
     public var trackDevicesCount: Int {
@@ -271,7 +271,7 @@ extension XYSmartScan: XYLocationDelegate {
     public func locationsUpdated(_ locations: [XYLocationCoordinate2D]) {
         locations.forEach { location in
             self.delegates.forEach { $1?.smartScan(location: location) }
-            XYFinderDeviceFactory.updateDeviceLocations(location)
+            XYBluetoothDeviceFactory.updateDeviceLocations(location)
         }
     }
 

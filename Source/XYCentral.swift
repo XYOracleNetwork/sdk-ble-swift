@@ -231,7 +231,7 @@ extension XYCentral: CBCentralManagerDelegate {
 
     // If the periperhal disconnects, we will reset the RSSI and report
     public func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        if let device = XYFinderDeviceFactory.build(from: peripheral) {
+        if let device = XYBluetoothDeviceFactory.build(from: peripheral) as? XYFinderDevice {
             print(" ******* OH NO: Disconnect for \(device.id.shortId) - error: \(error?.localizedDescription ?? "<none>")")
 
             XYFinderDeviceEventManager.report(events: [.disconnected(device: device)])

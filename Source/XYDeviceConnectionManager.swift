@@ -195,7 +195,7 @@ private extension XYDeviceConnectionManager {
 
             // Completely disconnect so we can retry if there is any connection issue
             XYCentral.instance.disconnect(from: device)
-            XYFinderDeviceFactory.remove(device: xyDevice)
+            XYBluetoothDeviceFactory.remove(device: xyDevice)
             self.devices.removeValue(forKey: deviceId)
             self.waitingDeviceIds.removeAll(where: { $0 == deviceId })
 
@@ -211,7 +211,11 @@ private extension XYDeviceConnectionManager {
 
         device.connection {
             // If we have an XY Finder device of a particular family, we unsubscribe from the button press and disconnect
-            if let xyDevice = device as? XYFinderDevice, (xyDevice.family == .xy3 || xyDevice.family == .xy4 || xyDevice.family == .xygps) {
+            if let xyDevice = device as? XYFinderDevice, (
+                    xyDevice.family.id == XY3BluetoothDevice.id ||
+                    xyDevice.family.id == XY4BluetoothDevice.id ||
+                    xyDevice.family.id == XYGPSBluetoothDevice.id) {
+                
                 if xyDevice.unlock().hasError {
                     throw XYBluetoothError.couldNotConnect
                 }
@@ -220,12 +224,13 @@ private extension XYDeviceConnectionManager {
                     throw XYBluetoothError.couldNotConnect
                 }
             }
+            
         }.always(on: disconnectQueue) {
             print("STEP 2: Always on DISCONNECT from \(device.id.shortId)")
             XYCentral.instance.disconnect(from: device)
             device.detachPeripheral()
             if let xyDevice = device as? XYFinderDevice {
-                XYFinderDeviceFactory.remove(device: xyDevice)
+                XYBluetoothDeviceFactory.remove(device: xyDevice)
             }
         }
     }
