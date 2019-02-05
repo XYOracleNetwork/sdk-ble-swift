@@ -11,7 +11,7 @@ import Promises
 
 // The XYGPS-specific implementation
 public class XYGPSBluetoothDevice: XYFinderDeviceBase {
-    private static let family = XYDeviceFamily.init(uuid: UUID(uuidString: XYGPSBluetoothDevice.uuid)!,
+    static let family = XYDeviceFamily.init(uuid: UUID(uuidString: XYGPSBluetoothDevice.uuid)!,
                                                     prefix: XYGPSBluetoothDevice.prefix,
                                                     familyName: XYGPSBluetoothDevice.familyName,
                                                     id: XYGPSBluetoothDevice.id)
@@ -26,6 +26,10 @@ public class XYGPSBluetoothDevice: XYFinderDeviceBase {
     public init(_ id: String, iBeacon: XYIBeaconDefinition? = nil, rssi: Int = XYDeviceProximity.none.rawValue) {
         super.init(XYGPSBluetoothDevice.family, id: id, iBeacon: iBeacon, rssi: rssi)
         super.shouldCheckForButtonPressOnDetection = true
+    }
+    
+    public convenience init(iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.none.rawValue) {
+        self.init(iBeacon.xyId(from: XYGPSBluetoothDevice.family), iBeacon: iBeacon, rssi: rssi)
     }
 
     public override func subscribeToButtonPress() -> XYBluetoothResult {

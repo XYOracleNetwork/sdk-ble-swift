@@ -70,8 +70,8 @@ public enum XYFinderSong {
             switch device.id {
             case XY4BluetoothDevice.id:
                 return [0xff, 0x03]
-            case .xy1:
-                return [0x01]
+//            case .xy1:
+//                return [0x01]
             default:
                 return [0xff]
             }
@@ -81,8 +81,8 @@ public enum XYFinderSong {
                 return [0x0b, 0x03]
             case XY2BluetoothDevice.id:
                 return [0x01]
-            case .xy1:
-                return [0x01]
+//            case .xy1:
+//                return [0x01]
             default:
                 return [0x02]
             }

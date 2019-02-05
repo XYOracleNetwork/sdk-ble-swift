@@ -11,8 +11,7 @@ struct XY3BluetoothDeviceCreator : XYDeviceCreator {
     private init () {}
     
     public static let uuid : String = "08885dd0-111b-11e4-9191-0800200c9a66"
-    public var familyName : String = "XY3 Finder"
-    public var prefix : String = "xy:ibeacon"
+    public var family: XYDeviceFamily = XY3BluetoothDevice.family
     
     public func createFromIBeacon (iBeacon: XYIBeaconDefinition, rssi: Int) -> XYBluetoothDevice? {
         return XY3BluetoothDevice(iBeacon: iBeacon, rssi: rssi)

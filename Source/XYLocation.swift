@@ -102,7 +102,7 @@ extension XYLocation {
     }
 
     public func startRanging(for device: XYBluetoothDevice) {
-        let beaconRegion = CLBeaconRegion(proximityUUID: device.uuid, identifier: device.id)
+        let beaconRegion = CLBeaconRegion(proximityUUID: device.family.uuid, identifier: device.id)
         manager.startRangingBeacons(in: beaconRegion)
     }
 
@@ -113,9 +113,9 @@ extension XYLocation {
     }
 
     public func stopRanging(for device: XYBluetoothDevice) {
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 4))
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 7))
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 8))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 4))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 7))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 8))
     }
 }
 
@@ -178,9 +178,9 @@ public extension XYLocation {
     }
 
     public func stopMonitoring(for device: XYBluetoothDevice) {
-        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 4))
-        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 7))
-        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 8))
+        manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 4))
+        manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 7))
+        manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 8))
     }
 
 }

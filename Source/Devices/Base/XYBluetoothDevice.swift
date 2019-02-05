@@ -18,6 +18,8 @@ public protocol XYBluetoothDeviceNotifyDelegate {
 
 // A generic BLE device
 public protocol XYBluetoothDevice: XYBluetoothBase {
+    var family : XYDeviceFamily {get}
+    var iBeacon : XYIBeaconDefinition? {get}
     var peripheral: CBPeripheral? { get }
     var inRange: Bool { get }
     var connected: Bool { get }
@@ -134,4 +136,38 @@ public extension XYBluetoothDevice {
     }
     
 
+}
+
+// MARK: Default implementations of protocol methods and variables
+public extension XYBluetoothDevice {
+    
+    
+    #if os(iOS)
+    func beaconRegion(slot: UInt16) -> CLBeaconRegion {
+        return beaconRegion(self.family.uuid, slot: slot)
+    }
+    
+    // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
+    func beaconRegion(_ uuid: UUID, slot: UInt16? = nil) -> CLBeaconRegion {
+        if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {
+            let computedMinor = slot == nil ? minor : ((minor & 0xfff0) | slot!)
+            return CLBeaconRegion(
+                proximityUUID: uuid,
+                major: major,
+                minor: computedMinor,
+                identifier: String(format:"%@:4", id))
+        }
+        
+        if iBeacon?.hasMajor ?? false, let major = iBeacon?.major {
+            return CLBeaconRegion(
+                proximityUUID: uuid,
+                major: major,
+                identifier: String(format:"%@:4", id))
+        }
+        
+        return CLBeaconRegion(
+            proximityUUID: uuid,
+            identifier: String(format:"%@:4", id))
+    }
+    #endif
 }

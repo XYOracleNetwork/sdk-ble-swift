@@ -22,6 +22,12 @@ public struct XYDeviceFamily {
         self.id = id
     }
     
+    public static func allFamlies () -> [XYDeviceFamily] {
+        return famlies.values.map {
+            $0
+        }
+    }
+    
     public static func build(iBeacon : XYIBeaconDefinition) -> XYDeviceFamily? {
         return XYDeviceFamily.famlies[iBeacon.uuid.uuidString.lowercased()]
     }

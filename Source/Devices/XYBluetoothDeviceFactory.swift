@@ -46,6 +46,11 @@ public class XYBluetoothDeviceFactory {
         }.first
     }
     
+    public static func updateDeviceLocations(_ newLocation: XYLocationCoordinate2D) {
+        devices.filter { $0.inRange }.forEach {
+            ($0 as? XYFinderDevice)?.updateLocation(newLocation)
+        }
+    }
     
     // Create a device from an iBeacon definition, or update a cached device with the latest iBeacon/rssi data
     public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.defaultProximity, updateRssiAndPower: Bool = false) -> XYBluetoothDevice? {

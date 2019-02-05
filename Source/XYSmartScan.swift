@@ -12,11 +12,11 @@ import CoreBluetooth
 public protocol XYSmartScanDelegate {
     func smartScan(status: XYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D)
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
-    func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
-    func smartScan(entered device: XYFinderDevice)
+    func smartScan(detected device: XYBluetoothDevice, signalStrength: Int, family: XYDeviceFamily)
+    func smartScan(detected devices: [XYBluetoothDevice], family: XYDeviceFamily)
+    func smartScan(entered device: XYBluetoothDevice)
     func smartScan(exiting device:XYBluetoothDevice)
-    func smartScan(exited device: XYFinderDevice)
+    func smartScan(exited device: XYBluetoothDevice)
 }
 
 public enum XYSmartScanStatus: Int {
@@ -41,7 +41,7 @@ public class XYSmartScan {
 
     fileprivate var trackedDevices = [String: XYFinderDevice]()
 
-    fileprivate lazy var currentDiscoveryList = [XYFinderDeviceFamily]()
+    fileprivate lazy var currentDiscoveryList = [XYFinderDevice]()
 
     fileprivate let location = XYLocation.instance
     fileprivate let central = XYCentral.instance
@@ -64,7 +64,7 @@ public class XYSmartScan {
         #endif
     }
 
-    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScanMode) {
+    public func start(for families: [XYDeviceFamily] = XYDeviceFamily.allFamlies(), mode: XYSmartScanMode) {
         if mode == self.mode { return }
 
         // For iOS, we use the Location manager to range/monitor for iBeacon devices
@@ -133,7 +133,7 @@ public class XYSmartScan {
 // MARK: Change monitoring state based on start/stop
 fileprivate extension XYSmartScan {
 
-    func switchToForeground(_ families: [XYFinderDeviceFamily]) {
+    func switchToForeground(_ families: [XYDeviceFamily]) {
         guard self.mode == .background else { return }
 
         self.mode = .foreground
@@ -149,7 +149,7 @@ fileprivate extension XYSmartScan {
         self.updateStatus()
     }
 
-    func switchToBackground(_ families: [XYFinderDeviceFamily]) {
+    func switchToBackground(_ families: [XYDeviceFamily]) {
         guard self.mode == .foreground else { return }
 
         self.mode = .background
@@ -264,7 +264,7 @@ public extension XYSmartScan {
 #if os(iOS)
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
 extension XYSmartScan: XYLocationDelegate {
-    public func deviceExiting(_ device: XYFinderDevice) {
+    public func deviceExiting(_ device: XYBluetoothDevice) {
         self.delegates.forEach { $1?.smartScan(exiting: device) }
     }
 
@@ -275,7 +275,7 @@ extension XYSmartScan: XYLocationDelegate {
         }
     }
 
-    public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
+    public func didRangeBeacons(_ beacons: [XYBluetoothDevice], for family: XYDeviceFamily?) {
         guard let family = family else { return }
 
         // Get the unique buttons that got pressed
@@ -301,22 +301,24 @@ extension XYSmartScan: XYLocationDelegate {
             }
 
             // Handles button presses and other notifications
-            beacon.detected()
+            (beacon as? XYFinderDevice)?.detected()
         }
 
-        self.delegates.forEach { $1?.smartScan(detected: uniqueBeacons, family: family) }
+        self.delegates.forEach {
+            $1?.smartScan(detected: uniqueBeacons, family: family)
+        }
     }
 
-    public func deviceEntered(_ device: XYFinderDevice) {
+    public func deviceEntered(_ device: XYBluetoothDevice) {
         self.delegates.forEach { $1?.smartScan(entered: device) }
         print("MONITOR ENTER: Device \(device.id)")
-        device.cancelMonitorTimer()
+        (device as? XYFinderDevice)?.cancelMonitorTimer()
     }
 
-    public func deviceExited(_ device: XYFinderDevice) {
+    public func deviceExited(_ device: XYBluetoothDevice) {
         self.delegates.forEach { $1?.smartScan(exited: device) }
         print("MONITOR EXIT: Device \(device.id)")
-        device.startMonitorTimer()
+        (device as? XYFinderDevice)?.startMonitorTimer()
     }
     
 }

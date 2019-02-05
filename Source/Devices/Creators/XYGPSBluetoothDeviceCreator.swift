@@ -11,12 +11,11 @@ struct XYGPSBluetoothDeviceCreator : XYDeviceCreator {
     private init () {}
     
     public static let uuid : String = "9474f7c6-47a4-11e6-beb8-9e71128cae77"
-    public var familyName : String = "XY-GPS Finder"
-    public var prefix : String = "xy:gps"
+    public var family: XYDeviceFamily = XYGPSBluetoothDevice.family
 
     
     public func createFromIBeacon (iBeacon: XYIBeaconDefinition, rssi: Int) -> XYBluetoothDevice? {
-        return XYGPSBluetoothDevice(iBeacon: iBeacon : iBeacon, rssi: rssi)
+        return XYGPSBluetoothDevice(iBeacon: iBeacon, rssi: rssi)
     }
     
     public func createFromId(id: String) -> XYBluetoothDevice {

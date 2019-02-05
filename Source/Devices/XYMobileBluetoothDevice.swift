@@ -11,7 +11,7 @@ import Promises
 
 // The XY4-specific implementation
 public class XYMobileBluetoothDevice: XYFinderDeviceBase {
-    private static let family = XYDeviceFamily.init(uuid: UUID(uuidString: XYMobileBluetoothDevice.uuid)!,
+    static let family = XYDeviceFamily.init(uuid: UUID(uuidString: XYMobileBluetoothDevice.uuid)!,
                                                     prefix: XYMobileBluetoothDevice.prefix,
                                                     familyName: XYMobileBluetoothDevice.familyName,
                                                     id: XYMobileBluetoothDevice.id)

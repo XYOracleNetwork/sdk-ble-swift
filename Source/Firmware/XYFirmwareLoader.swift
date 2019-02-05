@@ -54,8 +54,8 @@ public struct XYRemoteVersionData: Decodable {
 // MARK: Fetches the version JSON and the path to the firmware
 public class XYFirmwareRemoteVersionLoader {
 
-    public init?(family: XYFinderDeviceFamily) {
-        guard family == .xy4 else { return nil }
+    public init?(family: XYDeviceFamily) {
+        guard family.id == XY4BluetoothDevice.id else { return nil }
     }
 
     public func get(from path: String = "https://xyfirmware.xyo.network/version.json") -> XYRemoteVersionData? {
