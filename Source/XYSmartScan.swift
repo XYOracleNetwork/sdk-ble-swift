@@ -230,7 +230,7 @@ public extension XYSmartScan {
     fileprivate func updateTracking() {
         #if os(iOS)
         self.mode == .foreground ?
-            location.startRangning(for: self.trackedDevices.map { $1 } ) :
+            location.startRangning(for: self.trackedDevices.map { $1 as XYBluetoothDevice } ) :
             location.startMonitoring(for: self.trackedDevices.map { $1 } )
         #endif
     }

@@ -33,7 +33,30 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     fileprivate static let monitorTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let monitorTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceMonitorTimerQueue")
     fileprivate var monitorTimer: DispatchSourceTimer?
-
+    
+    override public func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
+        guard
+            self.peripheral == nil,
+            let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
+            else { return false }
+        
+        guard
+            let connectableServices = (self as? XYFinderDevice)?.connectableServices,
+            connectableServices.count == 2,
+            services.contains(connectableServices[0]) || services.contains(connectableServices[1])
+            else { return false }
+        
+        // Set the peripheral and delegate to self
+        self.peripheral = peripheral.peripheral
+        self.peripheral?.delegate = self
+        
+        // Save off the services this device was found with for BG monitoring
+        self.supportedServices = services
+        
+        return true
+    }
+    
+    
     public var connectableServices: [CBUUID] {
         guard let major = iBeacon?.major else {
             return []
@@ -69,6 +92,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             }
         }
     }
+    
 
     // If while we are monitoring the device we detect it has exited, we start a timer as a device may have just
     // triggered the exit while still being close by. Once the timer expires before it enters, we fire the notification

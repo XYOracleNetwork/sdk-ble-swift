@@ -10,7 +10,7 @@ import Foundation
 public struct XYMobileBluetoothDeviceCreator : XYDeviceCreator {
     private init () {}
     
-    public static let uuid : String = "735344c9-e820-42ec-9da7-f43a2b6802b9"
+    public static let uuid : String = XYMobileBluetoothDevice.uuid
     public var family: XYDeviceFamily = XYMobileBluetoothDevice.family
     
     public func createFromIBeacon (iBeacon: XYIBeaconDefinition, rssi: Int) -> XYBluetoothDevice? {

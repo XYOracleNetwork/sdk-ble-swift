@@ -84,11 +84,11 @@ extension XYLocation {
 
     // Start ranging for a particular type of XY device
     public func startRangning(for family: XYDeviceFamily) {
-        guard let device = XYBluetoothDeviceFactory.build(from: family) as? XYFinderDevice else { return }
+        guard let device = XYBluetoothDeviceFactory.build(from: family) else { return }
         self.startRanging(for: device)
     }
 
-    public func startRangning(for devices: [XYFinderDevice]) {
+    public func startRangning(for devices: [XYBluetoothDevice]) {
         // Get the existing regions that location manager is looking for
         let rangedDevices = manager.rangedRegions
             .compactMap { $0 as? CLBeaconRegion }
@@ -144,7 +144,7 @@ public extension XYLocation {
         self.startMonitoring(for: device, isHighPriority: isHighPriority)
     }
 
-    func startMonitoring(for devices: [XYFinderDevice]) {
+    func startMonitoring(for devices: [XYBluetoothDevice]) {
         // Get the existing regions that location manager is looking for
         let monitoredDevices = manager.monitoredRegions
             .compactMap { $0 as? CLBeaconRegion }
@@ -193,8 +193,11 @@ extension XYLocation: CLLocationManagerDelegate {
 
     // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+//        for device in beacons {
+//            print(device.xyiBeaconDefinition)
+//        }
+//        
         let processedBeacons = beacons.compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
-
         self.delegates.forEach {
             $1?.didRangeBeacons(processedBeacons,for: region.family)
         }

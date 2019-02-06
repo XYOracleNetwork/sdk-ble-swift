@@ -10,7 +10,7 @@ import Foundation
 public struct XY4BluetoothDeviceCreator : XYDeviceCreator {
     private init () {}
     
-    public static let uuid : String = "a44eacf4-0104-0000-0000-5f784c9977b5"
+    public static let uuid : String = XY4BluetoothDevice.uuid
     public var family: XYDeviceFamily = XY4BluetoothDevice.family
     
     

@@ -41,35 +41,36 @@ internal extension XYPeripheral {
     var beaconDefinitionFromAdData: XYIBeaconDefinition? {
         guard
             let manufacturerData = self.advertisementData?[CBAdvertisementDataManufacturerDataKey] as? Data,
+            
             manufacturerData.count == 25
             else { return nil }
 
         var companyIdentifier: UInt8 = 0
         manufacturerData.copyBytes(to: &companyIdentifier, from: 0..<2)
         guard companyIdentifier == 0x4C else { return nil }
-
+        
         var dataType: UInt8 = 0
         manufacturerData.copyBytes(to: &dataType, from: 2..<3)
         guard dataType == 0x02 else { return nil }
-
+        
         var dataLength: UInt8 = 0
         manufacturerData.copyBytes(to: &dataLength, from: 3..<4)
         guard dataLength == 0x15 else { return nil }
-
+        
         var uuid = [UInt8](repeating: 0, count: 16)
         manufacturerData.copyBytes(to: &uuid, from: 4..<20)
         guard let foundUuid = UUID(uuidString: CBUUID(data: Data(bytes: uuid)).uuidString) else { return nil }
-
+        
         var major = [UInt8](repeating: 0, count: 2)
         manufacturerData.copyBytes(to: &major, from: 20..<22)
         let rawMajor = Data(bytes: major)
         let foundMajor = UInt16(bigEndian: rawMajor.withUnsafeBytes { $0.pointee })
-
+        
         var minor = [UInt8](repeating: 0, count: 2)
         manufacturerData.copyBytes(to: &minor, from: 22..<24)
         let rawMinor = Data(bytes: minor)
         let foundMinor = UInt16(bigEndian: rawMinor.withUnsafeBytes { $0.pointee })
-
+        
         var measuredPower: UInt8 = 0
         manufacturerData.copyBytes(to: &measuredPower, from: 24..<25)
 
@@ -169,7 +170,9 @@ public class XYCentral: NSObject {
         self.stopOnNoDelegates = stopOnNoDelegates
         print("START: Scanning for devices")
         self.cbManager?.scanForPeripherals(
-            withServices: services?.map { $0.serviceUuid },
+            withServices: services?.map {
+                return $0.serviceUuid
+            },
             options:[CBCentralManagerScanOptionAllowDuplicatesKey: false, CBCentralManagerOptionShowPowerAlertKey: true])
     }
 

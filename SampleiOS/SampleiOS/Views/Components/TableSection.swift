@@ -9,7 +9,7 @@
 import XyBleSdk
 
 enum TableSection: Int {
-    case xy1 = 0, xy2, xy3, xy4, xyMobile, xyGps
+    case xy1 = 0, xy2, xy3, xy4, xyo, xyMobile, xyGps
 
     var title: String {
         switch self {
@@ -19,6 +19,7 @@ enum TableSection: Int {
         case .xy4: return XY4BluetoothDevice.familyName
         case .xyMobile: return XYMobileBluetoothDevice.familyName
         case .xyGps: return XYGPSBluetoothDevice.familyName
+        case .xyo: return XYOBluetoothDevice.familyName
         }
     }
 
@@ -34,6 +35,7 @@ extension XYDeviceFamily {
         case XY4BluetoothDevice.id: return TableSection.xy4
         case XYMobileBluetoothDevice.id: return TableSection.xyMobile
         case XYGPSBluetoothDevice.id: return TableSection.xyGps
+        case XYOBluetoothDevice.id: return TableSection.xyo
         default: return nil
         }
     }

@@ -22,8 +22,12 @@ public struct XYDeviceFamily {
         self.id = id
     }
     
-    public func enable () {
-        XYDeviceFamily.famlies[self.uuid.uuidString.lowercased()] = self
+    public func enable (enable : Bool) {
+        if (enable) {
+             XYDeviceFamily.famlies[self.uuid.uuidString.lowercased()] = self
+        } else {
+            XYDeviceFamily.famlies.removeValue(forKey: self.uuid.uuidString.lowercased())
+        }
     }
     
     public func diable () {

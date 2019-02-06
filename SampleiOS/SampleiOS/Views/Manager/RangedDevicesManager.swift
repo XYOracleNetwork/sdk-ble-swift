@@ -42,13 +42,24 @@ class RangedDevicesManager: NSObject {
     static let instance = RangedDevicesManager()
 
     private override init() {
-        XY4BluetoothDeviceCreator.enable(enable: true)
-        XY4BluetoothDevice.family.enable()
+//        XY2BluetoothDeviceCreator.enable(enable: true)
+//        XY2BluetoothDevice.family.enable(enable: true)
+//        XY3BluetoothDeviceCreator.enable(enable: true)
+//        XY3BluetoothDevice.family.enable(enable: true)
+//        XY4BluetoothDeviceCreator.enable(enable: true)
+//        XY4BluetoothDevice.family.enable(enable: true)
+        XYGPSBluetoothDeviceCreator.enable(enable: true)
+        XYGPSBluetoothDevice.family.enable(enable: true)
+        XYMobileBluetoothDeviceCreator.enable(enable: true)
+        XYMobileBluetoothDevice.family.enable(enable: true)
+        XYOBluetoothDeviceCreator.enable(enable: true)
+        XYOBluetoothDevice.family.enable(enable: true)
+        
+        
         self.xyFinderFamilyFilter = XYDeviceFamily.allFamlies()
         
         super.init()
         self.scanner.setDelegate(self, key: "RangedDevicesManager")
-        
         
 
         // Subscribe to various events
@@ -106,14 +117,22 @@ class RangedDevicesManager: NSObject {
     }
 
     func connect(for section: TableSection?, deviceIndex: NSInteger) {
+        
         guard
             let section = section,
             let device = self.rangedDevices[section]?[safe: deviceIndex]
             else { return }
 
         // todo
-        self.selectedDevice = device as! XYFinderDevice
-        device.connect()
+        
+        self.selectedDevice = device as? XYFinderDevice
+        
+        
+        if (self.selectedDevice != nil) {
+            device.connect()
+        } else {
+            (device as! XYOBluetoothDevice).tryCreatePipe(catalogue: [0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x01])
+        }
     }
 
     func disconnect() {

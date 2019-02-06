@@ -69,7 +69,7 @@ class DeviceDetailViewController: UIViewController {
         guard  let device = rangedDevicesManager.selectedDevice else { return }
         gattRequestSpinner.startAnimating()
         device.connection {
-            device.inquire { result in
+            _ = device.inquire { result in
                 self.descriptor = result
                 self.pickerValues = ["Info"] + result.serviceCharacteristics.keys.map { $0.name ?? "Unknown Service" }
                 self.servicePicker.reloadAllComponents()

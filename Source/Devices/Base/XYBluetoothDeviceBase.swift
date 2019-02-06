@@ -11,7 +11,7 @@ import CoreLocation
 
 
 // A concrete base class to base any BLE device off of
-public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
+public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
 
     public var
     firstPulseTime: Date?,
@@ -57,7 +57,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     internal var stayConnected: Bool = false
     public fileprivate(set) var isUpdatingFirmware: Bool = false
 
-    public fileprivate(set) lazy var supportedServices = [CBUUID]()
+    public lazy var supportedServices = [CBUUID]()
 
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
@@ -101,83 +101,63 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase {
     public func resetRssi() {
         self.rssi = XYDeviceProximity.defaultProximity
     }
-
+    
     public func verifyExit(_ callback:((_ exited: Bool) -> Void)?) {}
-}
-
-// MARK: XYBluetoothDevice protocol base implementations
-extension XYBluetoothDeviceBase: XYBluetoothDevice {    
+    
     public var inRange: Bool {
         if self.peripheral?.state == .connected { return true }
-
+        
         let strength = XYDeviceProximity.fromSignalStrength(self.rssi)
         guard
             strength != .outOfRange && strength != .none
             else { return false }
-
+        
         return true
     }
-
+    
     public func subscribe(_ delegate: CBPeripheralDelegate, key: String) {
         guard self.delegates[key] == nil else { return }
         self.delegates[key] = delegate
     }
-
+    
     public func unsubscribe(for key: String) {
         self.delegates.removeValue(forKey: key)
     }
-
+    
     public func subscribe(to serviceCharacteristic: XYServiceCharacteristic, delegate: (key: String, delegate: XYBluetoothDeviceNotifyDelegate)) -> XYBluetoothResult {
         let result = self.notify(serviceCharacteristic, enabled: true)
-
+        
         if !result.hasError {
             self.notifyDelegates[delegate.key] = (serviceCharacteristic, delegate.delegate)
         }
-
+        
         return result
     }
-
+    
     public func unsubscribe(from serviceCharacteristic: XYServiceCharacteristic, key: String) -> XYBluetoothResult {
         self.notifyDelegates.removeValue(forKey: key)
         return self.notify(serviceCharacteristic, enabled: false)
     }
-
-    public func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
-        guard
-            self.peripheral == nil,
-            let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
-            else { return false }
-
-        guard
-            let connectableServices = (self as? XYFinderDevice)?.connectableServices,
-            connectableServices.count == 2,
-            services.contains(connectableServices[0]) || services.contains(connectableServices[1])
-            else { return false }
-
-        // Set the peripheral and delegate to self
-        self.peripheral = peripheral.peripheral
-        self.peripheral?.delegate = self
-
-        // Save off the services this device was found with for BG monitoring
-        self.supportedServices = services
-
-        return true
+    
+    open func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
+        
+        return false
     }
-
-
+    
+    
     public func detachPeripheral() {
         self.peripheral = nil
     }
-
+    
     public func updatingFirmware(_ value: Bool) {
         self.isUpdatingFirmware = value
     }
-
+    
     // Connects to the device if requested, and the device is both not trying to connect or already has connected
     public func stayConnected(_ value: Bool) {
         // Do not try to connect/disconnect when the firmware is updating
         guard self.isUpdatingFirmware == false else { return }
-
+        
         self.stayConnected = value
         // Only try a connection when in range, otherwise queue this so when it does come into range
         // it will auto connect at that time
@@ -188,11 +168,11 @@ extension XYBluetoothDeviceBase: XYBluetoothDevice {
             self.queuedForConnection = true
         }
     }
-
+    
     public func connect() {
         XYDeviceConnectionManager.instance.add(device: self)
     }
-
+    
     public func disconnect() {
         self.markedForDeletion = true
         XYDeviceConnectionManager.instance.remove(for: self.id, disconnect: true)
@@ -205,31 +185,31 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         guard peripheral == self.peripheral else { return }
         self.delegates.forEach { $1?.peripheral?(peripheral, didDiscoverServices: error) }
     }
-
+    
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard peripheral == self.peripheral else { return }
         self.delegates.forEach { $1?.peripheral?(peripheral, didDiscoverCharacteristicsFor: service, error: error) }
     }
-
+    
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         guard peripheral == self.peripheral else { return }
         self.notifyDelegates
             .filter { $0.value.serviceCharacteristic.characteristicUuid == characteristic.uuid }
             .forEach { $0.value.delegate?.update(for: $0.value.serviceCharacteristic, value: XYBluetoothResult(data: characteristic.value))}
-
+        
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateValueFor: characteristic, error: error) }
     }
-
+    
     public func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         guard peripheral == self.peripheral else { return }
         self.delegates.forEach { $1?.peripheral?(peripheral, didWriteValueFor: characteristic, error: error) }
     }
-
+    
     public func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         guard peripheral == self.peripheral else { return }
         self.delegates.forEach { $1?.peripheral?(peripheral, didUpdateNotificationStateFor: characteristic, error: error) }
     }
-
+    
     // We "recursively" call this method, updating the latest rssi value, and also calling detected if it is an XYFinder device
     // This is the driver for the distance meters in the primary application
     public func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
@@ -237,7 +217,7 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         self.update(Int(truncating: RSSI), powerLevel: 0x4)
         self.delegates.forEach { $1?.peripheral?(peripheral, didReadRSSI: RSSI, error: error) }
         (self as? XYFinderDevice)?.detected()
-
+        
         // TOOD Not sure this is the right place for this...
         DispatchQueue.global().asyncAfter(deadline: .now() + TimeInterval(XYConstants.DEVICE_TUNING_SECONDS_INTERVAL_CONNECTED_RSSI_READ)) {
             if (peripheral.state == .connected) {
@@ -246,3 +226,4 @@ extension XYBluetoothDeviceBase: CBPeripheralDelegate {
         }
     }
 }
+
