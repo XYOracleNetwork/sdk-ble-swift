@@ -42,18 +42,16 @@ class RangedDevicesManager: NSObject {
     static let instance = RangedDevicesManager()
 
     private override init() {
-//        XY2BluetoothDeviceCreator.enable(enable: true)
-//        XY2BluetoothDevice.family.enable(enable: true)
-//        XY3BluetoothDeviceCreator.enable(enable: true)
-//        XY3BluetoothDevice.family.enable(enable: true)
-//        XY4BluetoothDeviceCreator.enable(enable: true)
-//        XY4BluetoothDevice.family.enable(enable: true)
+        XY2BluetoothDeviceCreator.enable(enable: true)
+        XY2BluetoothDevice.family.enable(enable: true)
+        XY3BluetoothDeviceCreator.enable(enable: true)
+        XY3BluetoothDevice.family.enable(enable: true)
+        XY4BluetoothDeviceCreator.enable(enable: true)
+        XY4BluetoothDevice.family.enable(enable: true)
         XYGPSBluetoothDeviceCreator.enable(enable: true)
         XYGPSBluetoothDevice.family.enable(enable: true)
         XYMobileBluetoothDeviceCreator.enable(enable: true)
         XYMobileBluetoothDevice.family.enable(enable: true)
-        XYOBluetoothDeviceCreator.enable(enable: true)
-        XYOBluetoothDevice.family.enable(enable: true)
         
         
         self.xyFinderFamilyFilter = XYDeviceFamily.allFamlies()
@@ -130,8 +128,6 @@ class RangedDevicesManager: NSObject {
         
         if (self.selectedDevice != nil) {
             device.connect()
-        } else {
-            (device as! XYOBluetoothDevice).tryCreatePipe(catalogue: [0x00, 0x00, 0x00, 0x09, 0x04, 0x00, 0x00, 0x00, 0x01])
         }
     }
 
