@@ -20,7 +20,7 @@ public protocol XYBluetoothDeviceNotifyDelegate {
 public protocol XYBluetoothDevice: XYBluetoothBase {
     var family : XYDeviceFamily {get}
     var iBeacon : XYIBeaconDefinition? {get}
-    var peripheral: CBPeripheral? { get }
+    var peripheral: CBPeripheral? { get set }
     var inRange: Bool { get }
     var connected: Bool { get }
     var markedForDeletion: Bool? { get }

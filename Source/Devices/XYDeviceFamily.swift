@@ -15,7 +15,7 @@ public struct XYDeviceFamily {
     public let familyName : String
     public let id : String
     
-    init(uuid: UUID, prefix : String, familyName : String, id : String) {
+    public init(uuid: UUID, prefix : String, familyName : String, id : String) {
         self.uuid = uuid
         self.prefix = prefix
         self.familyName = familyName

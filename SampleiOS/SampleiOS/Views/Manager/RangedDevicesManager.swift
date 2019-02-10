@@ -131,7 +131,7 @@ class RangedDevicesManager: NSObject {
         if (self.selectedDevice != nil) {
             device.connect()
         } else {
-            (device as! XYOBluetoothDevice).tryCreatePipe(catalogue: [0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x01])
+            (device as! XYOBluetoothDevice).tryCreatePipe(catalogue: [0x00, 0x00, 0x00, 0x09, 0x04, 0x00, 0x00, 0x00, 0x01])
         }
     }
 

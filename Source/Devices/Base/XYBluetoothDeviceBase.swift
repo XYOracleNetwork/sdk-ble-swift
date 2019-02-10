@@ -11,7 +11,7 @@ import CoreLocation
 
 
 // A concrete base class to base any BLE device off of
-public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
+open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
 
     public var
     firstPulseTime: Date?,
@@ -52,7 +52,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice
         }
     }
 
-    public internal(set) var peripheral: CBPeripheral?
+    public var peripheral: CBPeripheral?
 
     internal var stayConnected: Bool = false
     public fileprivate(set) var isUpdatingFirmware: Bool = false
@@ -62,7 +62,7 @@ public class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice
     fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
     fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
 
-    init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue, family : XYDeviceFamily, iBeacon : XYIBeaconDefinition?) {
+    public init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue, family : XYDeviceFamily, iBeacon : XYIBeaconDefinition?) {
         self.id = id
         self.rssi = rssi
         self.name = ""

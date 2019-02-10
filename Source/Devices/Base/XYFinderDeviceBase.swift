@@ -40,8 +40,9 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
             else { return false }
         
+         let connectableServices = self.connectableServices
+        
         guard
-            let connectableServices = (self as? XYFinderDevice)?.connectableServices,
             connectableServices.count == 2,
             services.contains(connectableServices[0]) || services.contains(connectableServices[1])
             else { return false }
