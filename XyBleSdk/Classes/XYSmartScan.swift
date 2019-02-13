@@ -202,7 +202,8 @@ public extension XYSmartScan {
             }
 
             // Loop through known devices that are connected
-            for device in XYDeviceConnectionManager.instance.connectedDevices {
+            let connectedDevices = XYDeviceConnectionManager.instance.connectedDevices
+            for device in connectedDevices {
                 guard
                     let xyDevice = device as? XYFinderDevice,
                     let lastPulseTime = device.lastPulseTime,
