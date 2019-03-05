@@ -81,6 +81,7 @@ public class XYBluetoothDeviceFactory {
     
     public class func build (from family: XYDeviceFamily) -> XYBluetoothDevice? {
         let id = [family.prefix, family.uuid.uuidString.lowercased()].joined(separator: ":")
-        return uuidToCreators[family.uuid.uuidString.lowercased()]?.createFromId(id: id)
+        let device =  uuidToCreators[family.uuid.uuidString.lowercased()]?.createFromId(id: id)
+        return device
     }
 }
