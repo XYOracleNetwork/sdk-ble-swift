@@ -278,17 +278,9 @@ extension XYSmartScan: XYLocationDelegate {
     public func didRangeBeacons(_ beacons: [XYBluetoothDevice], for family: XYDeviceFamily?) {
         guard let family = family else { return }
 
-        // Get the unique buttons that got pressed
-        let buttonPressedBeacons = beacons.filter { $0.powerLevel == 8 }.reduce([], { initial, beacon in
+        let uniqueBeacons = beacons.reduce([], { initial, beacon in
             initial.contains(where: { $0.id == beacon.id }) ? initial : initial + [beacon]
         })
-
-        // Get the unique buttons that didn't get pressed
-        let buttonNotPressedBeacons = beacons.filter { $0.powerLevel != 8 }.reduce([], { initial, beacon in
-            initial.contains(where: { $0.id == beacon.id }) ? initial : initial + [beacon]
-        })
-
-        let uniqueBeacons = buttonPressedBeacons + buttonNotPressedBeacons
 
         uniqueBeacons.forEach { beacon in
             if !beacon.inRange {
@@ -301,7 +293,7 @@ extension XYSmartScan: XYLocationDelegate {
             }
 
             // Handles button presses and other notifications
-            (beacon as? XYFinderDevice)?.detected()
+            beacon.detected()
         }
 
         self.delegates.forEach {

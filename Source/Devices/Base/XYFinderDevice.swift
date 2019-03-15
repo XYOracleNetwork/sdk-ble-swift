@@ -29,9 +29,6 @@ public protocol XYFinderDevice: XYBluetoothDevice {
     // Updates to battery level
     func updateBatteryLevel(_ newLevel: Int)
 
-    // Handles when detected from the location manager
-    func detected()
-
     // Updates the state of the device's isRegistered flag
     // I'm unsure as to what this is used for
     func getRegistrationFlag()

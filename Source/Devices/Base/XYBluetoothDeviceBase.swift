@@ -12,7 +12,6 @@ import CoreLocation
 
 // A concrete base class to base any BLE device off of
 open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
-
     public var
     firstPulseTime: Date?,
     lastPulseTime: Date?,
@@ -72,6 +71,8 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
         self.iBeacon = iBeacon
         super.init()
     }
+    
+    open func detected() {}
 
     public func update(_ rssi: Int, powerLevel: UInt8) {
         if rssi != XYDeviceProximity.defaultProximity {

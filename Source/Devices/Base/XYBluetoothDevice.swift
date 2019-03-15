@@ -47,6 +47,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
 
     func attachPeripheral(_ peripheral: XYPeripheral) -> Bool
     func detachPeripheral()
+    func detected ()
 
     var state: CBPeripheralState { get }
 }

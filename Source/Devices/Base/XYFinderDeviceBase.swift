@@ -116,7 +116,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         XYFinderDeviceEventManager.report(events: [.entered(device: self)])
     }
     
-    public func detected() {
+    public override func detected() {
         guard self.isUpdatingFirmware == false else { return }
 
         var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
