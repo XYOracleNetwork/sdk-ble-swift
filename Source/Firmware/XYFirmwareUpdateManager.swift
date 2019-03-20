@@ -14,10 +14,34 @@ public struct XYFirmwareUpdateParameters {
     spiMISOAddress: Int32,
     spiMOSIAddress: Int32,
     spiCSAddress: Int32,
-    spiSCKAddress: Int32
+    spiSCKAddress: Int32,
+    patchBaseAddress: Int32
 
     public static var xy4: XYFirmwareUpdateParameters {
-        return XYFirmwareUpdateParameters(spiMISOAddress: 0x05, spiMOSIAddress: 0x06, spiCSAddress: 0x07, spiSCKAddress: 0x00)
+        return XYFirmwareUpdateParameters(
+            spiMISOAddress: 0x05,
+            spiMOSIAddress: 0x06,
+            spiCSAddress: 0x07,
+            spiSCKAddress: 0x00,
+            patchBaseAddress: 0)
+    }
+
+    public static var convertXy4ToSentinelXBank0: XYFirmwareUpdateParameters {
+        return XYFirmwareUpdateParameters(
+            spiMISOAddress: 0x05,
+            spiMOSIAddress: 0x06,
+            spiCSAddress: 0x07,
+            spiSCKAddress: 0x00,
+            patchBaseAddress: 0)
+    }
+
+    public static var convertXy4ToSentinelXBank1: XYFirmwareUpdateParameters {
+        return XYFirmwareUpdateParameters(
+            spiMISOAddress: 0x05,
+            spiMOSIAddress: 0x06,
+            spiCSAddress: 0x07,
+            spiSCKAddress: 0x00,
+            patchBaseAddress: 1)
     }
 }
 
@@ -29,7 +53,7 @@ public protocol XYFirmwareUpdateManagerProgressDelegate: class {
 
 public class XYFirmwareUpdateManager {
 
-    enum XYFirmwareUpdateMemoryType: Int32 {
+    public enum UpdateMemoryType: Int32 {
         case SUOTA_I2C = 0x12
         case SUOTA_SPI = 0x13
         case SPOTA_SYSTEM_RAM = 0x00
@@ -69,13 +93,14 @@ public class XYFirmwareUpdateManager {
     success: (() -> Void)?,
     failure: ((_ error: XYBluetoothError) -> Void)?
 
-    var memoryType: XYFirmwareUpdateMemoryType = XYFirmwareUpdateMemoryType.SUOTA_SPI
+    let memoryType: XYFirmwareUpdateManager.UpdateMemoryType = .SUOTA_SPI
 
     public init(for device: XYFinderDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
         self.device = device
         self.parameters = parameters
         self.firmwareData = firmwareData
         self.delegate = delegate
+        self.patchBaseAddress = parameters.patchBaseAddress
     }
 
     public func cancel() {
@@ -96,7 +121,7 @@ public class XYFirmwareUpdateManager {
                 // The update bombed out at some point, so let the user know to retry
                 self.delegate?.disconnected()
             case .connected:
-                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.completed.rawValue)")
+                print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
 
                 // All done, so unsubscribe from the ota service and the events, and then return success
                 self.device.connection {
@@ -135,6 +160,8 @@ public class XYFirmwareUpdateManager {
 
         // Remove the device and the peripheral in order to reconnect
         XYDeviceConnectionManager.instance.remove(device: self.device)
+        sleep(15)
+        print("----- I AM STARTING TO CONNECT ----")
         self.device.connect()
     }
 }
@@ -173,8 +200,8 @@ private extension XYFirmwareUpdateManager {
             self.writeValue(to: .memDev, value: parameter)
 
         case .setMemoryParameters:
-            // NOTE: Only supporting SUOTA_SPI for now
-            if self.memoryType == XYFirmwareUpdateMemoryType.SUOTA_SPI {
+            // NOTE: Only supporting SUOTA_SPI for now, and SPOTA_SYSTEM_RAM for upgrade
+            if self.memoryType == UpdateMemoryType.SUOTA_SPI {
                 var memInfoData: Int32 =
                     (self.parameters.spiMISOAddress << 24) |
                     (self.parameters.spiMOSIAddress << 16) |
