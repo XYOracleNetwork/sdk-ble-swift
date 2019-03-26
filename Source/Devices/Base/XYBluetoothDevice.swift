@@ -105,9 +105,9 @@ public extension XYBluetoothDevice {
 
     @discardableResult func connection(_ operations: @escaping () throws -> Void) -> Promise<Void> {
         // Check range before running operations block
-        guard self.inRange else {
-            return Promise<Void>(XYBluetoothError.deviceNotInRange)
-        }
+//        guard self.inRange else {
+//            return Promise<Void>(XYBluetoothError.deviceNotInRange)
+//        }
 
         // Process the queue, adding the connections agents if needed
         return Promise<Void>(on: self.deviceBleQueue) {
