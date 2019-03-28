@@ -51,6 +51,23 @@ public struct XYRemoteVersionData: Decodable {
     public var version: String, path: String
 }
 
+public struct XYRemoteVersionData2: Decodable {
+    struct SentinelX: Decodable {
+        var version: String, path: String, type: String, bank: Int
+    }
+
+    struct Firmware: Decodable {
+        public var version: String, path: String, type: String, priority: Int, bank: Int
+    }
+
+    struct Xy4: Decodable {
+        var firmware: [Firmware]
+    }
+
+    var sentinelX: SentinelX
+    var xy4: Xy4
+}
+
 // MARK: Fetches the version JSON and the path to the firmware
 public class XYFirmwareRemoteVersionLoader {
 
@@ -58,7 +75,7 @@ public class XYFirmwareRemoteVersionLoader {
         guard family.id == XY4BluetoothDevice.id else { return nil }
     }
 
-    public func get(from path: String = "https://xyfirmware.xyo.network/version.json") -> XYRemoteVersionData? {
+    public func get(from path: String = "https://s3.amazonaws.com/xyfirmware.xyo.network/sentinelx/version.json") -> XYRemoteVersionData? {
         guard
             let url = URL(string: path),
             let versionData = self.loadJson(from: url) else {
@@ -73,6 +90,32 @@ public class XYFirmwareRemoteVersionLoader {
             let data = try Data(contentsOf: url)
             let decoder = JSONDecoder()
             let jsonData = try decoder.decode(XYRemoteVersionData.self, from: data)
+            return jsonData
+        } catch {}
+
+        return nil
+    }
+
+}
+
+// MARK: Fetches the version JSON and the path to the firmware
+public class XYSentinelFirmwareRemoteVersionLoader {
+
+    public class func get(from path: String = "https://s3.amazonaws.com/xyfirmware.xyo.network/sentinelx/version.json") -> XYRemoteVersionData2? {
+        guard
+            let url = URL(string: path),
+            let versionData = self.loadJson(from: url) else {
+                return nil
+        }
+
+        return versionData
+    }
+
+    private class func loadJson(from url: URL) -> XYRemoteVersionData2? {
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let jsonData = try decoder.decode(XYRemoteVersionData2.self, from: data)
             return jsonData
         } catch {}
 
