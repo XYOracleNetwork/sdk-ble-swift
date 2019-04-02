@@ -15,7 +15,8 @@ public struct XYFirmwareUpdateParameters {
     spiMOSIAddress: Int32,
     spiCSAddress: Int32,
     spiSCKAddress: Int32,
-    patchBaseAddress: Int32
+    patchBaseAddress: Int32,
+    shouldReconnect: Bool
 
     public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
@@ -23,7 +24,8 @@ public struct XYFirmwareUpdateParameters {
             spiMOSIAddress: 0x06,
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
-            patchBaseAddress: 0)
+            patchBaseAddress: 0,
+            shouldReconnect: true)
     }
 
     public static var convertXy4ToSentinelXBank0: XYFirmwareUpdateParameters {
@@ -32,7 +34,8 @@ public struct XYFirmwareUpdateParameters {
             spiMOSIAddress: 0x06,
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
-            patchBaseAddress: 0)
+            patchBaseAddress: 0,
+            shouldReconnect: false)
     }
 
     public static var convertXy4ToSentinelXBank1: XYFirmwareUpdateParameters {
@@ -41,7 +44,8 @@ public struct XYFirmwareUpdateParameters {
             spiMOSIAddress: 0x06,
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
-            patchBaseAddress: 1)
+            patchBaseAddress: 1,
+            shouldReconnect: false)
     }
 }
 
@@ -112,17 +116,31 @@ public class XYFirmwareUpdateManager {
         self.success = success
         self.failure = failure
 
+        func cleanup() {
+            print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
+            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
+            self.success?()
+        }
+
+        // Watch for various events to properly handle the OTA
         self.subscribeKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected, .connected], for: self.device) { event in
             switch event {
             case .disconnected where self.currentStep == .completed:
-                // The finder disconnects once it reboots, so we catch that and reconnect
-                self.completeUpdate()
+                // The finder disconnects once it reboots, so we catch that and reconnect if requested
+                if self.parameters.shouldReconnect {
+                    self.completeUpdate()
+                } else {
+                    // We don't need to reconnect, so remove, cleanup and return success
+                    XYCentral.instance.disconnect(from: self.device)
+                    self.device.detachPeripheral()
+                    cleanup()
+                }
             case .disconnected where self.currentStep != .completed:
-                // The update bombed out at some point, so let the user know to retry
+                // The update bombed out at some point, so remove the peripheral and let the user know to retry
+                XYCentral.instance.disconnect(from: self.device)
+                self.device.detachPeripheral()
                 self.delegate?.disconnected()
             case .connected:
-                print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
-
                 // All done, so unsubscribe from the ota service and the events, and then return success
                 self.device.connection {
                     _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
@@ -132,8 +150,7 @@ public class XYFirmwareUpdateManager {
                         }
                     }
                 }.always {
-                    XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
-                    self.success?()
+                    cleanup()
                 }
 
             default:
@@ -152,6 +169,8 @@ public class XYFirmwareUpdateManager {
                 self.currentStep = .setMemoryType
                 self.doStep()
             }
+        }.catch { error in
+            self.failure?(XYBluetoothError.timedOut)
         }
     }
 
@@ -160,8 +179,6 @@ public class XYFirmwareUpdateManager {
 
         // Remove the device and the peripheral in order to reconnect
         XYDeviceConnectionManager.instance.remove(device: self.device)
-        sleep(15)
-        print("----- I AM STARTING TO CONNECT ----")
         self.device.connect()
     }
 }
@@ -370,7 +387,8 @@ private extension XYFirmwareUpdateManager {
             let data = value.asInteger else { return }
 
         // Debug output
-        self.handleResponse(for: data)
+        let message = self.handleResponse(for: data)
+        print(message)
 
         // If the service gives us a good response, reset expected and do the next step
         if self.expectedValue != 0, data == self.expectedValue {
@@ -379,7 +397,11 @@ private extension XYFirmwareUpdateManager {
             self.doStep()
         } else {
             self.device.updatingFirmware(false)
-            self.failure?(XYBluetoothError.unableToUpdateFirmware)
+            if data == XYFirmwareStatusValues.SPOTAR_SAME_IMG_ERR.rawValue {
+                self.failure?(XYBluetoothError.sameImage)
+            } else {
+                self.failure?(XYBluetoothError.unableToUpdateFirmware)
+            }
         }
     }
 
@@ -408,12 +430,11 @@ private extension XYFirmwareUpdateManager {
         case SPOTAR_EXT_MEM_READ_ERR  = 0x16     // Failed to read from external memory device
     }
 
-    func handleResponse(for responseValue: Int) {
+    @discardableResult func handleResponse(for responseValue: Int) -> String {
         var message: String
 
         guard let errorEnum = XYFirmwareStatusValues(rawValue: responseValue) else {
-            print("Unhandled status code \(responseValue)")
-            return
+            return "Unhandled status code \(responseValue)"
         }
 
         switch errorEnum {
@@ -451,7 +472,7 @@ private extension XYFirmwareUpdateManager {
             message = "Failed to read from external memory device"
         }
 
-        print(message)
+        return message
     }
 
 }

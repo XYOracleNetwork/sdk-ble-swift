@@ -35,8 +35,8 @@ public class XYFirmwareLoader {
         return try? Data(contentsOf: url)
     }
 
-    public class func getFirmwareData(for versionData: XYRemoteVersionData, success: @escaping (Data?) -> Void, error: @escaping (Error?) -> Void, progress: @escaping (Float) -> Void) {
-        guard let loader = XYFirmwareRemoteLoader(path: versionData.path) else {
+    public class func getFirmwareData(for path: String, success: @escaping (Data?) -> Void, error: @escaping (Error?) -> Void, progress: @escaping (Float) -> Void) {
+        guard let loader = XYFirmwareRemoteLoader(path: path) else {
             error(XYBluetoothError.unableToUpdateFirmware)
             return
         }
@@ -52,20 +52,20 @@ public struct XYRemoteVersionData: Decodable {
 }
 
 public struct XYRemoteVersionData2: Decodable {
-    struct SentinelX: Decodable {
-        var version: String, path: String, type: String, bank: Int
+    public struct SentinelX: Decodable {
+        public var version: String, path: String, type: String, bank: Int
     }
 
-    struct Firmware: Decodable {
+    public struct Firmware: Decodable {
         public var version: String, path: String, type: String, priority: Int, bank: Int
     }
 
-    struct Xy4: Decodable {
-        var firmware: [Firmware]
+    public struct Xy4: Decodable {
+        public var firmware: [Firmware]
     }
 
-    var sentinelX: SentinelX
-    var xy4: Xy4
+    public var sentinelX: SentinelX
+    public var xy4: Xy4
 }
 
 // MARK: Fetches the version JSON and the path to the firmware
@@ -130,6 +130,8 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
     private let url: URL
     private var backgroundSession: URLSession?
 
+    private var isComplete: Bool = false
+
     private var
     success: ((Data?) -> Void)?,
     error: ((Error?) -> Void)?,
@@ -160,6 +162,7 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let data = try? Data(contentsOf: location)
         self.backgroundSession?.finishTasksAndInvalidate()
+        self.isComplete = true
         self.success?(data)
     }
 
@@ -171,8 +174,10 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
 
     // Something bad happened
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.backgroundSession?.finishTasksAndInvalidate()
-        self.error?(error)
+        if !isComplete {
+            self.backgroundSession?.finishTasksAndInvalidate()
+            self.error?(error)
+        }
     }
 
 }
