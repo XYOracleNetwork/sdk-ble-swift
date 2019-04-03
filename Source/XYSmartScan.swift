@@ -12,11 +12,11 @@ import CoreBluetooth
 public protocol XYSmartScanDelegate {
     func smartScan(status: XYSmartScanStatus)
     func smartScan(location: XYLocationCoordinate2D)
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily)
-    func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily)
-    func smartScan(entered device: XYFinderDevice)
+    func smartScan(detected device: XYBluetoothDevice, signalStrength: Int, family: XYDeviceFamily)
+    func smartScan(detected devices: [XYBluetoothDevice], family: XYDeviceFamily)
+    func smartScan(entered device: XYBluetoothDevice)
     func smartScan(exiting device:XYBluetoothDevice)
-    func smartScan(exited device: XYFinderDevice)
+    func smartScan(exited device: XYBluetoothDevice)
 }
 
 public enum XYSmartScanStatus: Int {
@@ -41,7 +41,7 @@ public class XYSmartScan {
 
     fileprivate var trackedDevices = [String: XYFinderDevice]()
 
-    fileprivate lazy var currentDiscoveryList = [XYFinderDeviceFamily]()
+    fileprivate lazy var currentDiscoveryList = [XYDeviceFamily]()
 
     fileprivate let location = XYLocation.instance
     fileprivate let central = XYCentral.instance
@@ -56,7 +56,7 @@ public class XYSmartScan {
 
     internal static let queue = DispatchQueue(label: String(format: "com.xyfindables.sdk.XYSmartScan"))
 
-    private init() {
+    private init() {        
         #if os(iOS)
         self.location.setDelegate(self, key: "XYSmartScan")
         #elseif os(macOS)
@@ -64,7 +64,7 @@ public class XYSmartScan {
         #endif
     }
 
-    public func start(for families: [XYFinderDeviceFamily] = XYFinderDeviceFamily.valuesToRange, mode: XYSmartScanMode) {
+    public func start(for families: [XYDeviceFamily] = XYDeviceFamily.allFamlies(), mode: XYSmartScanMode) {
         if mode == self.mode { return }
 
         // For iOS, we use the Location manager to range/monitor for iBeacon devices
@@ -122,7 +122,7 @@ public class XYSmartScan {
 
     public func invalidateSession() {
         XYDeviceConnectionManager.instance.invalidate()
-        XYFinderDeviceFactory.invalidateCache()
+        XYBluetoothDeviceFactory.invalidateCache()
     }
 
     public var trackDevicesCount: Int {
@@ -133,7 +133,7 @@ public class XYSmartScan {
 // MARK: Change monitoring state based on start/stop
 fileprivate extension XYSmartScan {
 
-    func switchToForeground(_ families: [XYFinderDeviceFamily]) {
+    func switchToForeground(_ families: [XYDeviceFamily]) {
         guard self.mode == .background else { return }
 
         self.mode = .foreground
@@ -149,7 +149,7 @@ fileprivate extension XYSmartScan {
         self.updateStatus()
     }
 
-    func switchToBackground(_ families: [XYFinderDeviceFamily]) {
+    func switchToBackground(_ families: [XYDeviceFamily]) {
         guard self.mode == .foreground else { return }
 
         self.mode = .background
@@ -230,7 +230,7 @@ public extension XYSmartScan {
     fileprivate func updateTracking() {
         #if os(iOS)
         self.mode == .foreground ?
-            location.startRangning(for: self.trackedDevices.map { $1 } ) :
+            location.startRangning(for: self.trackedDevices.map { $1 as XYBluetoothDevice } ) :
             location.startMonitoring(for: self.trackedDevices.map { $1 } )
         #endif
     }
@@ -265,31 +265,23 @@ public extension XYSmartScan {
 #if os(iOS)
 // MARK: BLELocationDelegate - Location monitoring and ranging delegates
 extension XYSmartScan: XYLocationDelegate {
-    public func deviceExiting(_ device: XYFinderDevice) {
+    public func deviceExiting(_ device: XYBluetoothDevice) {
         self.delegates.forEach { $1?.smartScan(exiting: device) }
     }
 
     public func locationsUpdated(_ locations: [XYLocationCoordinate2D]) {
         locations.forEach { location in
             self.delegates.forEach { $1?.smartScan(location: location) }
-            XYFinderDeviceFactory.updateDeviceLocations(location)
+            XYBluetoothDeviceFactory.updateDeviceLocations(location)
         }
     }
 
-    public func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?) {
+    public func didRangeBeacons(_ beacons: [XYBluetoothDevice], for family: XYDeviceFamily?) {
         guard let family = family else { return }
 
-        // Get the unique buttons that got pressed
-        let buttonPressedBeacons = beacons.filter { $0.powerLevel == 8 }.reduce([], { initial, beacon in
+        let uniqueBeacons = beacons.reduce([], { initial, beacon in
             initial.contains(where: { $0.id == beacon.id }) ? initial : initial + [beacon]
         })
-
-        // Get the unique buttons that didn't get pressed
-        let buttonNotPressedBeacons = beacons.filter { $0.powerLevel != 8 }.reduce([], { initial, beacon in
-            initial.contains(where: { $0.id == beacon.id }) ? initial : initial + [beacon]
-        })
-
-        let uniqueBeacons = buttonPressedBeacons + buttonNotPressedBeacons
 
         uniqueBeacons.forEach { beacon in
             if !beacon.inRange {
@@ -305,19 +297,21 @@ extension XYSmartScan: XYLocationDelegate {
             beacon.detected()
         }
 
-        self.delegates.forEach { $1?.smartScan(detected: uniqueBeacons, family: family) }
+        self.delegates.forEach {
+            $1?.smartScan(detected: uniqueBeacons, family: family)
+        }
     }
 
-    public func deviceEntered(_ device: XYFinderDevice) {
+    public func deviceEntered(_ device: XYBluetoothDevice) {
         self.delegates.forEach { $1?.smartScan(entered: device) }
         print("MONITOR ENTER: Device \(device.id)")
-        device.cancelMonitorTimer()
+        (device as? XYFinderDevice)?.cancelMonitorTimer()
     }
 
-    public func deviceExited(_ device: XYFinderDevice) {
+    public func deviceExited(_ device: XYBluetoothDevice) {
         self.delegates.forEach { $1?.smartScan(exited: device) }
         print("MONITOR EXIT: Device \(device.id)")
-        device.startMonitorTimer()
+        (device as? XYFinderDevice)?.startMonitorTimer()
     }
     
 }
@@ -335,7 +329,7 @@ extension XYSmartScan: XYCentralDelegate {
         guard
             let beacon = peripheral.beaconDefinitionFromAdData,
             let rssi = peripheral.rssi,
-            let device = XYFinderDeviceFactory.build(from: beacon, rssi: Int(truncating: rssi), updateRssiAndPower: true)
+            let device = XYBluetoothDeviceFactory.build(from: beacon, rssi: Int(truncating: rssi), updateRssiAndPower: true)
             else { return }
 
         let family = device.family

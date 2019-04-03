@@ -26,6 +26,7 @@ public enum XYBluetoothError: Error {
     case deviceNotInRange
     case couldNotUnlock
     case unableToUpdateFirmware
+    case sameImage
 
     public var toString: String {
         switch self {
@@ -59,6 +60,8 @@ public enum XYBluetoothError: Error {
             return "Device not in range"
         case .unableToUpdateFirmware:
             return "Unable to update firmware"
+        case .sameImage:
+            return "Same Image Error"
         }
     }
 }

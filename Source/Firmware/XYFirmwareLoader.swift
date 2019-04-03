@@ -35,8 +35,8 @@ public class XYFirmwareLoader {
         return try? Data(contentsOf: url)
     }
 
-    public class func getFirmwareData(for versionData: XYRemoteVersionData, success: @escaping (Data?) -> Void, error: @escaping (Error?) -> Void, progress: @escaping (Float) -> Void) {
-        guard let loader = XYFirmwareRemoteLoader(path: versionData.path) else {
+    public class func getFirmwareData(for path: String, success: @escaping (Data?) -> Void, error: @escaping (Error?) -> Void, progress: @escaping (Float) -> Void) {
+        guard let loader = XYFirmwareRemoteLoader(path: path) else {
             error(XYBluetoothError.unableToUpdateFirmware)
             return
         }
@@ -51,14 +51,31 @@ public struct XYRemoteVersionData: Decodable {
     public var version: String, path: String
 }
 
+public struct XYRemoteVersionData2: Decodable {
+    public struct SentinelX: Decodable {
+        public var version: String, path: String, type: String, bank: Int
+    }
+
+    public struct Firmware: Decodable {
+        public var version: String, path: String, type: String, priority: Int, bank: Int
+    }
+
+    public struct Xy4: Decodable {
+        public var firmware: [Firmware]
+    }
+
+    public var sentinelX: SentinelX
+    public var xy4: Xy4
+}
+
 // MARK: Fetches the version JSON and the path to the firmware
 public class XYFirmwareRemoteVersionLoader {
 
-    public init?(family: XYFinderDeviceFamily) {
-        guard family == .xy4 else { return nil }
+    public init?(family: XYDeviceFamily) {
+        guard family.id == XY4BluetoothDevice.id else { return nil }
     }
 
-    public func get(from path: String = "https://xyfirmware.xyo.network/version.json") -> XYRemoteVersionData? {
+    public func get(from path: String = "https://s3.amazonaws.com/xyfirmware.xyo.network/sentinelx/version.json") -> XYRemoteVersionData? {
         guard
             let url = URL(string: path),
             let versionData = self.loadJson(from: url) else {
@@ -81,11 +98,39 @@ public class XYFirmwareRemoteVersionLoader {
 
 }
 
+// MARK: Fetches the version JSON and the path to the firmware
+public class XYSentinelFirmwareRemoteVersionLoader {
+
+    public class func get(from path: String = "https://s3.amazonaws.com/xyfirmware.xyo.network/sentinelx/version.json") -> XYRemoteVersionData2? {
+        guard
+            let url = URL(string: path),
+            let versionData = self.loadJson(from: url) else {
+                return nil
+        }
+
+        return versionData
+    }
+
+    private class func loadJson(from url: URL) -> XYRemoteVersionData2? {
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            let jsonData = try decoder.decode(XYRemoteVersionData2.self, from: data)
+            return jsonData
+        } catch {}
+
+        return nil
+    }
+
+}
+
 // MARK: Used for grabbing the binary firmware from a remote server, allows for background download
 internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
 
     private let url: URL
     private var backgroundSession: URLSession?
+
+    private var isComplete: Bool = false
 
     private var
     success: ((Data?) -> Void)?,
@@ -117,6 +162,7 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         let data = try? Data(contentsOf: location)
         self.backgroundSession?.finishTasksAndInvalidate()
+        self.isComplete = true
         self.success?(data)
     }
 
@@ -128,8 +174,10 @@ internal class XYFirmwareRemoteLoader: NSObject, URLSessionDownloadDelegate {
 
     // Something bad happened
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.backgroundSession?.finishTasksAndInvalidate()
-        self.error?(error)
+        if !isComplete {
+            self.backgroundSession?.finishTasksAndInvalidate()
+            self.error?(error)
+        }
     }
 
 }

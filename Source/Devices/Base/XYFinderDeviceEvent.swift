@@ -33,22 +33,22 @@ public enum XYFinderTimeoutEvent: Int {
 }
 
 public enum XYFinderEventNotification {
-    case connected(device: XYFinderDevice)
-    case alreadyConnected(device: XYFinderDevice)
-    case connectionError(device: XYFinderDevice, error: XYBluetoothError?)
-    case reconnected(device: XYFinderDevice)
-    case disconnected(device: XYFinderDevice)
-    case buttonPressed(device: XYFinderDevice, type: XYButtonType2)
-    case detected(device: XYFinderDevice, powerLevel: Int, signalStrength: Int, distance: Double)
-    case entered(device: XYFinderDevice)
-    case exiting(device: XYFinderDevice)
-    case exited(device: XYFinderDevice)
-    case updated(device: XYFinderDevice)
-    case timedOut(device: XYFinderDevice, type: XYFinderTimeoutEvent)
+    case connected(device: XYBluetoothDevice)
+    case alreadyConnected(device: XYBluetoothDevice)
+    case connectionError(device: XYBluetoothDevice, error: XYBluetoothError?)
+    case reconnected(device: XYBluetoothDevice)
+    case disconnected(device: XYBluetoothDevice)
+    case buttonPressed(device: XYBluetoothDevice, type: XYButtonType2)
+    case detected(device: XYBluetoothDevice, powerLevel: Int, signalStrength: Int, distance: Double)
+    case entered(device: XYBluetoothDevice)
+    case exiting(device: XYBluetoothDevice)
+    case exited(device: XYBluetoothDevice)
+    case updated(device: XYBluetoothDevice)
+    case timedOut(device: XYBluetoothDevice, type: XYFinderTimeoutEvent)
 
     // Silly but allows for readble conditionals based on the event's reporting device, as well
     // as simplified switch case statements
-    public var device: XYFinderDevice {
+    public var device: XYBluetoothDevice {
         switch self {
         case .connected(let device): return device
         case .alreadyConnected(let device): return device

@@ -17,6 +17,14 @@ internal struct XYConstants {
     static let DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXIT_GAP_SIZE = 2.0
     static let DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXIT_WINDOW_COUNT = 3
     static let DEVICE_TUNING_SECONDS_WITHOUT_SIGNAL_FOR_EXIT_WINDOW_SIZE = 2.5
+    
+    static let DEVICE_POWER_LOW: UInt8 = 0x04
+    static let DEVICE_POWER_HIGH: UInt8 = 0x08
+    static let DEVICE_LOCK_DEFAULT = Data([0x2f, 0xbe, 0xa2, 0x07, 0x52, 0xfe, 0xbf, 0x31, 0x1d, 0xac, 0x5d, 0xfa, 0x7d, 0x77, 0x76, 0x80])
+    static let DEVICE_LOCK_XY4 = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f])
+    
+    static let DEVICE_CONNECTABLE_SOURCE_UUID_XY4 =  NSUUID(uuidString: "00000000-785F-0000-0000-0401F4AC4EA4")
+    static let DEVICE_CONNECTABLE_SOURCE_UUID_DEFAULT =  NSUUID(uuidString: "a500248c-abc2-4206-9bd7-034f4fc9ed10")
 }
 
 public enum XYDeviceProximity: Int {
@@ -50,28 +58,26 @@ public enum XYButtonType2 : Int {
     case long
 }
 
+
+
 public enum XYFinderSong {
     case off
     case findIt
 
-    public func values(for device: XYFinderDeviceFamily) -> [UInt8] {
+    public func values(for device: XYDeviceFamily) -> [UInt8] {
         switch self {
         case .off:
-            switch device {
-            case .xy4:
+            switch device.id {
+            case XY4BluetoothDevice.id:
                 return [0xff, 0x03]
-            case .xy1:
-                return [0x01]
             default:
                 return [0xff]
             }
         case .findIt:
-            switch device {
-            case .xy4:
+            switch device.id {
+            case XY4BluetoothDevice.id:
                 return [0x0b, 0x03]
-            case .xy2:
-                return [0x01]
-            case .xy1:
+            case XY2BluetoothDevice.id:
                 return [0x01]
             default:
                 return [0x02]

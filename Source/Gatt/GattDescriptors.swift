@@ -74,5 +74,5 @@ public struct GattDeviceDescriptor {
             ControlService.values +
             ExtendedConfigService.values +
             ExtendedControlService.values +
-            PrimaryService.values
+            XYFinderPrimaryService.values
 }

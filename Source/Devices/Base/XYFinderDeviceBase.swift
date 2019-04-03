@@ -13,22 +13,17 @@ import Promises
 
 // The base XYFinder class
 public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
-    public let
-    iBeacon: XYIBeaconDefinition?,
-    family: XYFinderDeviceFamily
-
-    public fileprivate(set) var
+    public var
     location: XYLocationCoordinate2D = XYLocationCoordinate2D(),
     isRegistered: Bool = false,
     batteryLevel: Int = -1,
     firmware: String = ""
-
+    
     internal var handlingButtonPress: Bool = false
+    var shouldCheckForButtonPressOnDetection = false
 
-    public init(_ family: XYFinderDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
-        self.family = family
-        self.iBeacon = iBeacon
-        super.init(id, rssi: rssi)
+    public init(_ family: XYDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
+        super.init(id, rssi: rssi, family: family, iBeacon: iBeacon)
     }
 
     fileprivate static let buttonTimeout: DispatchTimeInterval = .seconds(30)
@@ -38,12 +33,42 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     fileprivate static let monitorTimeout: DispatchTimeInterval = .seconds(30)
     fileprivate static let monitorTimerQueue = DispatchQueue(label:"com.xyfindables.sdk.XYFinderDeviceMonitorTimerQueue")
     fileprivate var monitorTimer: DispatchSourceTimer?
-
+    
+    override public func attachPeripheral(_ peripheral: XYPeripheral) -> Bool {
+        guard
+            self.peripheral == nil,
+            let services = peripheral.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [CBUUID]
+            else { return false }
+        
+         let connectableServices = self.connectableServices
+        
+        guard
+            connectableServices.count == 2,
+            services.contains(connectableServices[0]) || services.contains(connectableServices[1])
+            else { return false }
+        
+        // Set the peripheral and delegate to self
+        self.peripheral = peripheral.peripheral
+        self.peripheral?.delegate = self
+        
+        // Save off the services this device was found with for BG monitoring
+        self.supportedServices = services
+        
+        return true
+    }
+    
+    
     public var connectableServices: [CBUUID] {
-        guard let major = iBeacon?.major, let minor = iBeacon?.minor else { return [] }
+        guard let major = iBeacon?.major else {
+            return []
+        }
+        
+        guard let minor = iBeacon?.minor else {
+            return []
+        }
 
         func getServiceUuid() -> CBUUID {
-            let uuidSource = family.connectableSourceUuid
+            let uuidSource = NSUUID(uuidString: "a500248c-abc2-4206-9bd7-034f4fc9ed10")
             let uuidBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: 16)
             uuidSource?.getBytes(uuidBytes)
             for i in (0...11) {
@@ -57,7 +82,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             return CBUUID(data: Data(bytes:uuidBytes, count:16))
         }
 
-        return [XYFinderDeviceFamily.powerLow, XYFinderDeviceFamily.powerHigh].map { _ in getServiceUuid() }
+        return [XYConstants.DEVICE_POWER_LOW, XYConstants.DEVICE_POWER_HIGH].map { _ in getServiceUuid() }
     }
 
     public func getRegistrationFlag() {
@@ -68,6 +93,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
             }
         }
     }
+    
 
     // If while we are monitoring the device we detect it has exited, we start a timer as a device may have just
     // triggered the exit while still being close by. Once the timer expires before it enters, we fire the notification
@@ -89,14 +115,14 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         self.monitorTimer = nil
         XYFinderDeviceEventManager.report(events: [.entered(device: self)])
     }
-
-    public func detected() {
+    
+    public override func detected() {
         guard self.isUpdatingFirmware == false else { return }
 
         var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
 
         // If the button has been pressed on a compatible devices, we add the appropriate event
-        if powerLevel == 8, (family == .xy4 || family == .xy3 || family == .xygps) {
+        if powerLevel == 8, shouldCheckForButtonPressOnDetection {
             if buttonTimer == nil {
                 self.buttonTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.buttonTimeout, queue: XYFinderDeviceBase.buttonTimerQueue) { [weak self] in
                     guard let strong = self else { return }
@@ -143,11 +169,13 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     }
 
     // Handles the xy1 and xy2 cases
-    @discardableResult public func subscribeToButtonPress() -> XYBluetoothResult {
+    @discardableResult
+    public func subscribeToButtonPress() -> XYBluetoothResult {
         return XYBluetoothResult.empty
     }
 
-    @discardableResult public func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {
+    @discardableResult
+    public func unsubscribeToButtonPress(for referenceKey: UUID? = nil) -> XYBluetoothResult {
         return XYBluetoothResult.empty
     }
 
@@ -159,45 +187,38 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         self.batteryLevel = newLevel
     }
 
-    @discardableResult public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
+    @discardableResult
+    public func find(_ song: XYFinderSong = .findIt) -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult public func stayAwake() -> XYBluetoothResult {
+    @discardableResult
+    public func stayAwake() -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult public func isAwake() -> XYBluetoothResult {
-        switch self.family {
-        case .xy1, .xy2:
-            return XYBluetoothResult(data: Data([0x01]))
-        default:
-            return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        }
+    @discardableResult
+    public func isAwake() -> XYBluetoothResult {
+         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult public func fallAsleep() -> XYBluetoothResult {
+    @discardableResult
+    public func fallAsleep() -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult public func lock() -> XYBluetoothResult {
+    @discardableResult
+    public func lock() -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult public func unlock() -> XYBluetoothResult {
+    @discardableResult
+    public func unlock() -> XYBluetoothResult {
         return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 
-    @discardableResult public func version() -> XYBluetoothResult {
-        switch self.family {
-        case .xy1:
-            self.firmware = "1.0"
-            fallthrough
-        case .xy2:
-            self.firmware = "2.0"
-            return XYBluetoothResult(data: self.firmware.data(using: .utf8))
-        default:
-            return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
-        }
+    @discardableResult
+    public func version() -> XYBluetoothResult {
+        return XYBluetoothResult(error: XYBluetoothError.actionNotSupported)
     }
 }

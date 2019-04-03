@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "container:XyBleSdk.xcodeproj">
+      location = "group:SampleiOS.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Carthage/Checkouts/promises/Promises.xcodeproj">
+      location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>

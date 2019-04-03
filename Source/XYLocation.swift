@@ -10,10 +10,10 @@ import CoreLocation
 import CoreBluetooth
 
 public protocol XYLocationDelegate: class {
-    func didRangeBeacons(_ beacons: [XYFinderDevice], for family: XYFinderDeviceFamily?)
-    func deviceEntered(_ device: XYFinderDevice)
-    func deviceExited(_ device: XYFinderDevice)
-    func deviceExiting(_ device: XYFinderDevice)
+    func didRangeBeacons(_ beacons: [XYBluetoothDevice], for family: XYDeviceFamily?)
+    func deviceEntered(_ device: XYBluetoothDevice)
+    func deviceExited(_ device: XYBluetoothDevice)
+    func deviceExiting(_ device: XYBluetoothDevice)
     func locationsUpdated(_ locations: [XYLocationCoordinate2D])
 }
 
@@ -77,22 +77,23 @@ public extension XYLocation {
 extension XYLocation {
 
     // Convenience method
-    public func startRanging(for families: [XYFinderDeviceFamily]) {
+    public func startRanging(for families: [XYDeviceFamily]) {
+        
         families.forEach { startRangning(for: $0) }
     }
 
     // Start ranging for a particular type of XY device
-    public func startRangning(for family: XYFinderDeviceFamily) {
-        guard let device = XYFinderDeviceFactory.build(from: family) else { return }
+    public func startRangning(for family: XYDeviceFamily) {
+        guard let device = XYBluetoothDeviceFactory.build(from: family) else { return }
         self.startRanging(for: device)
     }
 
-    public func startRangning(for devices: [XYFinderDevice]) {
+    public func startRangning(for devices: [XYBluetoothDevice]) {
         // Get the existing regions that location manager is looking for
         let rangedDevices = manager.rangedRegions
             .compactMap { $0 as? CLBeaconRegion }
             .filter { $0.minor != nil && $0.major != nil }
-            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
+            .compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
 
         // Remove devices from rangning that are not on the list
         rangedDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach { self.stopRanging(for: $0) }
@@ -101,8 +102,8 @@ extension XYLocation {
         devices.filter { device in !rangedDevices.contains(where: { $0.id == device.id }) }.forEach { self.startRanging(for: $0) }
     }
 
-    public func startRanging(for device: XYFinderDevice) {
-        let beaconRegion = CLBeaconRegion(proximityUUID: device.uuid, identifier: device.id)
+    public func startRanging(for device: XYBluetoothDevice) {
+        let beaconRegion = CLBeaconRegion(proximityUUID: device.family.uuid, identifier: device.id)
         manager.startRangingBeacons(in: beaconRegion)
     }
 
@@ -112,10 +113,10 @@ extension XYLocation {
             .forEach { manager.stopRangingBeacons(in: $0) }
     }
 
-    public func stopRanging(for device: XYFinderDevice) {
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 4))
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 7))
-        manager.stopRangingBeacons(in: device.beaconRegion(device.uuid, slot: 8))
+    public func stopRanging(for device: XYBluetoothDevice) {
+        manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 4))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 7))
+        manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 8))
     }
 }
 
@@ -129,21 +130,26 @@ public extension XYLocation {
     }
 
     // Convenience method
-    public func startMonitoring(for families: [XYFinderDeviceFamily]) {
+    public func startMonitoring(for families: [XYDeviceFamily]) {
+        
         families.forEach { startMonitoring(for: $0, isHighPriority: false) }
     }
 
-    func startMonitoring(for family: XYFinderDeviceFamily, isHighPriority: Bool) {
-        guard let device = XYFinderDeviceFactory.build(from: family) else { return }
+    func startMonitoring(for family: XYDeviceFamily, isHighPriority: Bool) {
+        
+        guard let device = XYBluetoothDeviceFactory.build(from: family) else {
+            return
+        }
+        
         self.startMonitoring(for: device, isHighPriority: isHighPriority)
     }
 
-    func startMonitoring(for devices: [XYFinderDevice]) {
+    func startMonitoring(for devices: [XYBluetoothDevice]) {
         // Get the existing regions that location manager is looking for
         let monitoredDevices = manager.monitoredRegions
             .compactMap { $0 as? CLBeaconRegion }
             .filter { $0.minor != nil && $0.major != nil }
-            .compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
+            .compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
 
         // Remove devices from monitored that are not on the list
         monitoredDevices.filter { device in !devices.contains(where: { $0.id == device.id }) }.forEach {
@@ -156,7 +162,7 @@ public extension XYLocation {
         }
     }
 
-    func startMonitoring(for device: XYFinderDevice, isHighPriority: Bool) {
+    func startMonitoring(for device: XYBluetoothDevice, isHighPriority: Bool) {
         if isHighPriority {
             //monitor for button presses also, aka power level 8
             let beaconRegionLevel8 = device.beaconRegion(slot: 8)
@@ -174,10 +180,10 @@ public extension XYLocation {
         self.manager.startMonitoring(for: beaconRegionLevel4)
     }
 
-    public func stopMonitoring(for device: XYFinderDevice) {
-        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 4))
-        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 7))
-        manager.stopMonitoring(for: device.beaconRegion(device.uuid, slot: 8))
+    public func stopMonitoring(for device: XYBluetoothDevice) {
+        manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 4))
+        manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 7))
+        manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 8))
     }
 
 }
@@ -187,29 +193,34 @@ extension XYLocation: CLLocationManagerDelegate {
 
     // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
     public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
-        let processedBeacons = beacons.compactMap { XYFinderDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
-        self.delegates.forEach { $1?.didRangeBeacons(
-            processedBeacons,
-            for: region.family
-        )}
+        let processedBeacons = beacons.compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
+        self.delegates.forEach {
+            $1?.didRangeBeacons(processedBeacons,for: region.family)
+        }
     }
 
     public func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         guard
             let beaconRegion = region as? CLBeaconRegion,
-            let device = XYFinderDeviceFactory.build(from: beaconRegion.xyiBeaconDefinition)
+            let device = XYBluetoothDeviceFactory.build(from: beaconRegion.xyiBeaconDefinition)
             else { return }
 
-        self.delegates.forEach { $1?.deviceEntered(device) }
+        
+        self.delegates.forEach {
+            $1?.deviceEntered(device)
+            
+        }
     }
 
     public func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
         guard
             let beaconRegion = region as? CLBeaconRegion,
-            let device = XYFinderDeviceFactory.build(from: beaconRegion.xyiBeaconDefinition)
+            let device = XYBluetoothDeviceFactory.build(from: beaconRegion.xyiBeaconDefinition)
             else { return }
 
-        self.delegates.forEach { $1?.deviceExited(device) }
+        self.delegates.forEach {
+            $1?.deviceExited(device)
+        }
     }
 
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
@@ -217,7 +228,10 @@ extension XYLocation: CLLocationManagerDelegate {
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.delegates.forEach { $1?.locationsUpdated(locations.map { XYLocationCoordinate2D($0) }) }
+        self.delegates.forEach {
+            $1?.locationsUpdated(locations.map { XYLocationCoordinate2D($0) })
+            
+        }
     }
 
     public func locationManagerShouldDisplayHeadingCalibration(_ manager: CLLocationManager) -> Bool {

@@ -26,7 +26,7 @@ public protocol XYBluetoothBase: class {
     func update(_ rssi: Int, powerLevel: UInt8)
     func resetRssi()
 
-    var supportedServices: [CBUUID] { get }
+    var supportedServices: [CBUUID] { get set }
 
     var deviceBleQueue: DispatchQueue { get }
 }

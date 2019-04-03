@@ -11,7 +11,7 @@ import CoreBluetooth
 // Holds a cache for devices that have been found via the XYLocation manager
 class XYDeviceCache {
 
-    internal private(set) var devices = [String: XYFinderDevice]()
+    internal private(set) var devices = [String: XYBluetoothDevice]()
     private let accessQueue = DispatchQueue(label:"com.xyfindables.sdk.XYDeviceCacheQueue", attributes: .concurrent)
 
     func removeAll() {
@@ -32,14 +32,14 @@ class XYDeviceCache {
         return count
     }
 
-    subscript(index: String) -> XYFinderDevice? {
+    subscript(index: String) -> XYBluetoothDevice? {
         set {
             self.accessQueue.async(flags: .barrier) {
                 self.devices[index] = newValue
             }
         }
         get {
-            var device: XYFinderDevice?
+            var device: XYBluetoothDevice?
             self.accessQueue.sync {
                 device = self.devices[index]
             }

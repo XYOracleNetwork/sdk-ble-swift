@@ -13,28 +13,27 @@ enum TableSection: Int {
 
     var title: String {
         switch self {
-        case .xy1: return XYFinderDeviceFamily.xy1.familyName
-        case .xy2: return XYFinderDeviceFamily.xy2.familyName
-        case .xy3: return XYFinderDeviceFamily.xy3.familyName
-        case .xy4: return XYFinderDeviceFamily.xy4.familyName
-        case .xyMobile: return XYFinderDeviceFamily.xymobile.familyName
-        case .xyGps: return XYFinderDeviceFamily.xygps.familyName
+        case .xy1: return "XY1"
+        case .xy2: return XY2BluetoothDevice.familyName
+        case .xy3: return XY3BluetoothDevice.familyName
+        case .xy4: return XY4BluetoothDevice.familyName
+        case .xyMobile: return XYMobileBluetoothDevice.familyName
+        case .xyGps: return XYGPSBluetoothDevice.familyName
         }
     }
 
     static let values = [xy1, xy2, xy3, xy4, xyMobile, xyGps]
 }
 
-extension XYFinderDeviceFamily {
+extension XYDeviceFamily {
 
     var toTableSection: TableSection? {
-        switch self {
-        case .xy1: return TableSection.xy1
-        case .xy2: return TableSection.xy2
-        case .xy3: return TableSection.xy3
-        case .xy4: return TableSection.xy4
-        case .xymobile: return TableSection.xy1
-        case .xygps: return TableSection.xyGps
+        switch self.id {
+        case XY2BluetoothDevice.id: return TableSection.xy2
+        case XY3BluetoothDevice.id: return TableSection.xy3
+        case XY4BluetoothDevice.id: return TableSection.xy4
+        case XYMobileBluetoothDevice.id: return TableSection.xyMobile
+        case XYGPSBluetoothDevice.id: return TableSection.xyGps
         default: return nil
         }
     }

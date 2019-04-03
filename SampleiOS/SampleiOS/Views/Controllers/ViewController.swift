@@ -102,10 +102,15 @@ private extension ViewController {
 }
 
 extension ViewController: RangedDevicesManagerDelegate {
-    
-    func buttonPressed(on device: XYFinderDevice) {
+    func buttonPressed(on device: XYBluetoothDevice) {
         self.showBasicAlert(title: "Button Pressed", message: device.id)
     }
+    
+    func deviceDisconnected(device: XYBluetoothDevice) {
+        self.spinner.stopAnimating()
+        self.showBasicAlert(title: "Disconnected", message: device.id)
+    }
+    
 
     func showDetails() {
         self.spinner.stopAnimating()
@@ -121,11 +126,6 @@ extension ViewController: RangedDevicesManagerDelegate {
 
     func stateChanged(_ newState: CBManagerState) {
         self.centralStateLabel.text = newState.toString
-    }
-
-    func deviceDisconnected(device: XYFinderDevice) {
-        self.spinner.stopAnimating()
-        self.showBasicAlert(title: "Disconnected", message: device.id)
     }
 }
 
