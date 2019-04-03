@@ -41,7 +41,7 @@ public class XYSmartScan {
 
     fileprivate var trackedDevices = [String: XYFinderDevice]()
 
-    fileprivate lazy var currentDiscoveryList = [XYFinderDevice]()
+    fileprivate lazy var currentDiscoveryList = [XYDeviceFamily]()
 
     fileprivate let location = XYLocation.instance
     fileprivate let central = XYCentral.instance
@@ -328,7 +328,7 @@ extension XYSmartScan: XYCentralDelegate {
         guard
             let beacon = peripheral.beaconDefinitionFromAdData,
             let rssi = peripheral.rssi,
-            let device = XYFinderDeviceFactory.build(from: beacon, rssi: Int(truncating: rssi), updateRssiAndPower: true)
+            let device = XYBluetoothDeviceFactory.build(from: beacon, rssi: Int(truncating: rssi), updateRssiAndPower: true)
             else { return }
 
         let family = device.family

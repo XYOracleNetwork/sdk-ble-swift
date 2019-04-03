@@ -22,6 +22,9 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        XY4BluetoothDevice.family.enable(enable: true)
+        XY4BluetoothDeviceCreator.enable(enable: true)
+
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.tableView.doubleAction = #selector(selectedDevice)
@@ -56,9 +59,9 @@ class ViewController: NSViewController {
 }
 
 extension ViewController: XYSmartScanDelegate {
-    func smartScan(detected device: XYFinderDevice, signalStrength: Int, family: XYFinderDeviceFamily) {
-        if self.items.contains(where: { $0 == device }) == false {
-            self.items.append(device)
+    func smartScan(detected device: XYBluetoothDevice, signalStrength: Int, family: XYDeviceFamily) {
+        if self.items.contains(where: { $0 == device }) == false, let xyDevice = device as? XYFinderDevice {
+            self.items.append(xyDevice)
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -67,10 +70,10 @@ extension ViewController: XYSmartScanDelegate {
 
     func smartScan(status: XYSmartScanStatus) {}
     func smartScan(location: XYLocationCoordinate2D) {}
-    func smartScan(detected devices: [XYFinderDevice], family: XYFinderDeviceFamily) {}
-    func smartScan(entered device: XYFinderDevice) {}
+    func smartScan(detected devices: [XYBluetoothDevice], family: XYDeviceFamily) {}
+    func smartScan(entered device: XYBluetoothDevice) {}
     func smartScan(exiting device: XYBluetoothDevice) {}
-    func smartScan(exited device: XYFinderDevice) {}
+    func smartScan(exited device: XYBluetoothDevice) {}
 }
 
 extension ViewController: NSTableViewDataSource {
