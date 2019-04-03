@@ -1,6 +1,6 @@
-[logo]: https://www.xy.company/img/home/logo_xy.png
+[logo]: https://cdn.xy.company/img/brand/XY_Logo_GitHub.png
 
-![logo]
+[![logo]](https://xy.company)
 
 # sdk-ble-ios
 A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
@@ -8,12 +8,15 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 ## Requirements
 
 - iOS 11.0+
-- Xcode 9.3+
-- Swift 3.1+
+- MacOS 10.13+
+- Xcode 10.1+
+- Swift 4.2+
 
 ## Installation
 
 ### CocoaPods
+
+> Note that CocoaPods support is only for iOS currently
 
 [CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
 
@@ -21,7 +24,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 $ gem install cocoapods
 ```
 
-> CocoaPods 1.1+ is required.
+> CocoaPods 1.6.0.beta.2+ is required.
 
 To integrate into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
@@ -40,6 +43,39 @@ Then, run the following command:
 ```bash
 $ pod install
 ```
+
+### Carthage
+
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
+
+```bash
+$ brew update
+$ brew install carthage
+```
+
+To integrate into your Xcode project using Carthage, specify it in your `Cartfile`:
+
+```ogdl
+github "XYOracleNetwork/sdk-ble-swift" ~> 0.1.0
+```
+
+Run `carthage update --use-submodules` to build the framework and drag the built `XyBleSdk.framework`, `FBLPromises.framework` and `Promises.framework` to the _Linked Frameworks and Libraries_ of your Xcode project. Then switch to the _Build Phases_ tab and add a _New run script phase_. Expand _Run Script_ and add the following to the _Shell_ text field:
+
+```
+/usr/local/bin/carthage copy-frameworks
+```
+
+Click the + button under _Input Files_ and add:
+
+```
+$(SRCROOT)/Carthage/Build/<target platform>/Promises.framework
+$(SRCROOT)/Carthage/Build/<target platform>/FBLPromises.framework
+$(SRCROOT)/Carthage/Build/<target platform>/XyBleSdk.framework
+```
+
+Finally, you will need to add a _New Copy Files Phase_, selecting _Frameworks_ for the _Destination_ and adding the three frameworks, ensuring the _Code Sign On Copy_ boxes are checked.
 
 ## Overview
 Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral`, with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Bluetooth devices are often not predictable in their reponse times due to firmware and environmental conditions, which can make them tricky to deal with, especially if the application requires multiple, disparate devices connected to operate properly.
@@ -179,18 +215,13 @@ The result of the `subscribe` call is a subscription UUID that you can use to un
 XYFinderDeviceEventManager.unsubscribe(to: [.buttonPressed], referenceKey: self.subscriptionUuid)
 ```
 
-
 ## Smart Scan
 
-The `XYSmartScan` singleton can be used to range and monitor for XY Finder devices. It will range for devices in a particular XY Finder device family when put into foreground mode using `switchToForeground`, and use lower power monitoring when placed into backgound mode with `switchToBackground`.
+The `XYSmartScan` singleton can be used to range and monitor for XY Finder devices. When using the library in an iOS application, it will range for devices in a particular XY Finder device family when put into foreground mode using `switchToForeground`, and use lower power monitoring when placed into backgound mode with `switchToBackground`. The macOS library will locate devices using the `CBCentralManager.scanForPeripherals` method.
 
-## Example
+## Samples
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first. This project is a simple XY locator scanner, allowing you to view the characteristics of the device's various services.
-
-## Author
-
-Darren Sutherland, darren@xyo.network
+The library comes with two sample projects, one for macOS and one for iOS. The macOS sample requires you to run `carthage update` in the project directory. The iOS sample requires either `pod install` or `carthage update` to be run. 
 
 ## License
 

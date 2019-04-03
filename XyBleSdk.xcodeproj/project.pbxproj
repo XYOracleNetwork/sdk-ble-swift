@@ -1,0 +1,970 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		314B3F7E21CDB176006E2EC3 /* XYFirmwareUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */; };
+		314B3F7F21CDB176006E2EC3 /* XYFirmwareUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */; };
+		314B3F8021CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4421CDB176006E2EC3 /* XYFirmwareLoader.swift */; };
+		314B3F8121CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4421CDB176006E2EC3 /* XYFirmwareLoader.swift */; };
+		314B3F8221CDB176006E2EC3 /* XYDeviceCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4521CDB176006E2EC3 /* XYDeviceCache.swift */; };
+		314B3F8321CDB176006E2EC3 /* XYDeviceCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4521CDB176006E2EC3 /* XYDeviceCache.swift */; };
+		314B3F8421CDB176006E2EC3 /* XYConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4721CDB176006E2EC3 /* XYConstants.swift */; };
+		314B3F8521CDB176006E2EC3 /* XYConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4721CDB176006E2EC3 /* XYConstants.swift */; };
+		314B3F8621CDB176006E2EC3 /* XYGeocode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4821CDB176006E2EC3 /* XYGeocode.swift */; };
+		314B3F8721CDB176006E2EC3 /* XYGeocode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4821CDB176006E2EC3 /* XYGeocode.swift */; };
+		314B3F8821CDB176006E2EC3 /* Array+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */; };
+		314B3F8921CDB176006E2EC3 /* Array+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */; };
+		314B3F8A21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */; };
+		314B3F8B21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */; };
+		314B3F8C21CDB176006E2EC3 /* XY4BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */; };
+		314B3F8D21CDB176006E2EC3 /* XY4BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */; };
+		314B3F8E21CDB176006E2EC3 /* XYConnectionAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4F21CDB176006E2EC3 /* XYConnectionAgent.swift */; };
+		314B3F8F21CDB176006E2EC3 /* XYConnectionAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4F21CDB176006E2EC3 /* XYConnectionAgent.swift */; };
+		314B3F9021CDB176006E2EC3 /* XYCentralAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5021CDB176006E2EC3 /* XYCentralAgent.swift */; };
+		314B3F9121CDB176006E2EC3 /* XYCentralAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5021CDB176006E2EC3 /* XYCentralAgent.swift */; };
+		314B3F9221CDB176006E2EC3 /* XYIBeaconDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5121CDB176006E2EC3 /* XYIBeaconDefinition.swift */; };
+		314B3F9321CDB176006E2EC3 /* XYIBeaconDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5121CDB176006E2EC3 /* XYIBeaconDefinition.swift */; };
+		314B3F9421CDB176006E2EC3 /* XY3BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5221CDB176006E2EC3 /* XY3BluetoothDevice.swift */; };
+		314B3F9521CDB176006E2EC3 /* XY3BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5221CDB176006E2EC3 /* XY3BluetoothDevice.swift */; };
+		314B3F9621CDB176006E2EC3 /* XYMobileBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5321CDB176006E2EC3 /* XYMobileBluetoothDevice.swift */; };
+		314B3F9721CDB176006E2EC3 /* XYMobileBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5321CDB176006E2EC3 /* XYMobileBluetoothDevice.swift */; };
+		314B3F9821CDB176006E2EC3 /* XYGPSBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5421CDB176006E2EC3 /* XYGPSBluetoothDevice.swift */; };
+		314B3F9921CDB176006E2EC3 /* XYGPSBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5421CDB176006E2EC3 /* XYGPSBluetoothDevice.swift */; };
+		314B3F9A21CDB176006E2EC3 /* XYBluetoothDeviceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5621CDB176006E2EC3 /* XYBluetoothDeviceBase.swift */; };
+		314B3F9B21CDB176006E2EC3 /* XYBluetoothDeviceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5621CDB176006E2EC3 /* XYBluetoothDeviceBase.swift */; };
+		314B3F9C21CDB176006E2EC3 /* XYBluetoothBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5721CDB176006E2EC3 /* XYBluetoothBase.swift */; };
+		314B3F9D21CDB176006E2EC3 /* XYBluetoothBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5721CDB176006E2EC3 /* XYBluetoothBase.swift */; };
+		314B3F9E21CDB176006E2EC3 /* XYBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5821CDB176006E2EC3 /* XYBluetoothDevice.swift */; };
+		314B3F9F21CDB176006E2EC3 /* XYBluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5821CDB176006E2EC3 /* XYBluetoothDevice.swift */; };
+		314B3FA021CDB176006E2EC3 /* XYBluetoothError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5921CDB176006E2EC3 /* XYBluetoothError.swift */; };
+		314B3FA121CDB176006E2EC3 /* XYBluetoothError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5921CDB176006E2EC3 /* XYBluetoothError.swift */; };
+		314B3FA221CDB176006E2EC3 /* XYBluetoothResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5A21CDB176006E2EC3 /* XYBluetoothResult.swift */; };
+		314B3FA321CDB176006E2EC3 /* XYBluetoothResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5A21CDB176006E2EC3 /* XYBluetoothResult.swift */; };
+		314B3FA421CDB176006E2EC3 /* XYFinderDeviceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5B21CDB176006E2EC3 /* XYFinderDeviceBase.swift */; };
+		314B3FA521CDB176006E2EC3 /* XYFinderDeviceBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5B21CDB176006E2EC3 /* XYFinderDeviceBase.swift */; };
+		314B3FA621CDB176006E2EC3 /* XYFinderDeviceEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5C21CDB176006E2EC3 /* XYFinderDeviceEventManager.swift */; };
+		314B3FA721CDB176006E2EC3 /* XYFinderDeviceEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5C21CDB176006E2EC3 /* XYFinderDeviceEventManager.swift */; };
+		314B3FA821CDB176006E2EC3 /* XYFinderDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5D21CDB176006E2EC3 /* XYFinderDevice.swift */; };
+		314B3FA921CDB176006E2EC3 /* XYFinderDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5D21CDB176006E2EC3 /* XYFinderDevice.swift */; };
+		314B3FAA21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5E21CDB176006E2EC3 /* XYFinderDeviceEvent.swift */; };
+		314B3FAB21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F5E21CDB176006E2EC3 /* XYFinderDeviceEvent.swift */; };
+		314B3FB021CDB176006E2EC3 /* XY2BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6121CDB176006E2EC3 /* XY2BluetoothDevice.swift */; };
+		314B3FB121CDB176006E2EC3 /* XY2BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6121CDB176006E2EC3 /* XY2BluetoothDevice.swift */; };
+		314B3FB221CDB176006E2EC3 /* XYDeviceConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6221CDB176006E2EC3 /* XYDeviceConnectionManager.swift */; };
+		314B3FB321CDB176006E2EC3 /* XYDeviceConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6221CDB176006E2EC3 /* XYDeviceConnectionManager.swift */; };
+		314B3FB421CDB176006E2EC3 /* XYCentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6321CDB176006E2EC3 /* XYCentral.swift */; };
+		314B3FB521CDB176006E2EC3 /* XYCentral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6321CDB176006E2EC3 /* XYCentral.swift */; };
+		314B3FB621CDB176006E2EC3 /* XYLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6421CDB176006E2EC3 /* XYLocation.swift */; };
+		314B3FB721CDB176006E2EC3 /* XYLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6421CDB176006E2EC3 /* XYLocation.swift */; };
+		314B3FB821CDB176006E2EC3 /* XYSmartScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6521CDB176006E2EC3 /* XYSmartScan.swift */; };
+		314B3FB921CDB176006E2EC3 /* XYSmartScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6521CDB176006E2EC3 /* XYSmartScan.swift */; };
+		314B3FBA21CDB176006E2EC3 /* XYLocationCoordinate2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6721CDB176006E2EC3 /* XYLocationCoordinate2D.swift */; };
+		314B3FBB21CDB176006E2EC3 /* XYLocationCoordinate2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6721CDB176006E2EC3 /* XYLocationCoordinate2D.swift */; };
+		314B3FBC21CDB176006E2EC3 /* XYServiceCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6921CDB176006E2EC3 /* XYServiceCharacteristic.swift */; };
+		314B3FBD21CDB176006E2EC3 /* XYServiceCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6921CDB176006E2EC3 /* XYServiceCharacteristic.swift */; };
+		314B3FBE21CDB176006E2EC3 /* GattDescriptors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6A21CDB176006E2EC3 /* GattDescriptors.swift */; };
+		314B3FBF21CDB176006E2EC3 /* GattDescriptors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6A21CDB176006E2EC3 /* GattDescriptors.swift */; };
+		314B3FC021CDB176006E2EC3 /* GattRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6B21CDB176006E2EC3 /* GattRequest.swift */; };
+		314B3FC121CDB176006E2EC3 /* GattRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6B21CDB176006E2EC3 /* GattRequest.swift */; };
+		314B3FC221CDB176006E2EC3 /* BatteryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6D21CDB176006E2EC3 /* BatteryService.swift */; };
+		314B3FC321CDB176006E2EC3 /* BatteryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6D21CDB176006E2EC3 /* BatteryService.swift */; };
+		314B3FC421CDB176006E2EC3 /* CurrentTimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6E21CDB176006E2EC3 /* CurrentTimeService.swift */; };
+		314B3FC521CDB176006E2EC3 /* CurrentTimeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6E21CDB176006E2EC3 /* CurrentTimeService.swift */; };
+		314B3FC621CDB176006E2EC3 /* GenericAttributeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6F21CDB176006E2EC3 /* GenericAttributeService.swift */; };
+		314B3FC721CDB176006E2EC3 /* GenericAttributeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F6F21CDB176006E2EC3 /* GenericAttributeService.swift */; };
+		314B3FC821CDB176006E2EC3 /* LinkLossService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7021CDB176006E2EC3 /* LinkLossService.swift */; };
+		314B3FC921CDB176006E2EC3 /* LinkLossService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7021CDB176006E2EC3 /* LinkLossService.swift */; };
+		314B3FCA21CDB176006E2EC3 /* GenericAccessService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7121CDB176006E2EC3 /* GenericAccessService.swift */; };
+		314B3FCB21CDB176006E2EC3 /* GenericAccessService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7121CDB176006E2EC3 /* GenericAccessService.swift */; };
+		314B3FCC21CDB176006E2EC3 /* TxPowerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7221CDB176006E2EC3 /* TxPowerService.swift */; };
+		314B3FCD21CDB176006E2EC3 /* TxPowerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7221CDB176006E2EC3 /* TxPowerService.swift */; };
+		314B3FCE21CDB176006E2EC3 /* DeviceInformationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7321CDB176006E2EC3 /* DeviceInformationService.swift */; };
+		314B3FCF21CDB176006E2EC3 /* DeviceInformationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7321CDB176006E2EC3 /* DeviceInformationService.swift */; };
+		314B3FD021CDB176006E2EC3 /* AlertNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7421CDB176006E2EC3 /* AlertNotificationService.swift */; };
+		314B3FD121CDB176006E2EC3 /* AlertNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7421CDB176006E2EC3 /* AlertNotificationService.swift */; };
+		314B3FD221CDB176006E2EC3 /* OtaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7521CDB176006E2EC3 /* OtaService.swift */; };
+		314B3FD321CDB176006E2EC3 /* OtaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7521CDB176006E2EC3 /* OtaService.swift */; };
+		314B3FD421CDB176006E2EC3 /* GattInquisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7621CDB176006E2EC3 /* GattInquisitor.swift */; };
+		314B3FD521CDB176006E2EC3 /* GattInquisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7621CDB176006E2EC3 /* GattInquisitor.swift */; };
+		314B3FD621CDB176006E2EC3 /* ExtendedConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7821CDB176006E2EC3 /* ExtendedConfigService.swift */; };
+		314B3FD721CDB176006E2EC3 /* ExtendedConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7821CDB176006E2EC3 /* ExtendedConfigService.swift */; };
+		314B3FD821CDB176006E2EC3 /* ControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7921CDB176006E2EC3 /* ControlService.swift */; };
+		314B3FD921CDB176006E2EC3 /* ControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7921CDB176006E2EC3 /* ControlService.swift */; };
+		314B3FDA21CDB176006E2EC3 /* ExtendedControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7A21CDB176006E2EC3 /* ExtendedControlService.swift */; };
+		314B3FDB21CDB176006E2EC3 /* ExtendedControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7A21CDB176006E2EC3 /* ExtendedControlService.swift */; };
+		314B3FDC21CDB176006E2EC3 /* BasicConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7B21CDB176006E2EC3 /* BasicConfigService.swift */; };
+		314B3FDD21CDB176006E2EC3 /* BasicConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F7B21CDB176006E2EC3 /* BasicConfigService.swift */; };
+		31BACF1621E436510006C0AE /* XyBleSdk.h in Headers */ = {isa = PBXBuildFile; fileRef = 31BACF1421E436510006C0AE /* XyBleSdk.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		31BACF1721E436A80006C0AE /* XyBleSdk.h in Headers */ = {isa = PBXBuildFile; fileRef = 31BACF1421E436510006C0AE /* XyBleSdk.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		31BCE82022541BD7004799D7 /* Promises.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31BCE81E22541BD7004799D7 /* Promises.framework */; };
+		31BCE82122541BD7004799D7 /* FBLPromises.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31BCE81F22541BD7004799D7 /* FBLPromises.framework */; };
+		31BCE82222541BDC004799D7 /* FBLPromises.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31BCE81F22541BD7004799D7 /* FBLPromises.framework */; };
+		31BCE82322541BDF004799D7 /* Promises.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31BCE81E22541BD7004799D7 /* Promises.framework */; };
+		31BCE82622541F5C004799D7 /* XYBluetoothDeviceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82422541F5C004799D7 /* XYBluetoothDeviceFactory.swift */; };
+		31BCE82722541F5C004799D7 /* XYDeviceFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82522541F5C004799D7 /* XYDeviceFamily.swift */; };
+		31BCE82822541F64004799D7 /* XYBluetoothDeviceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82422541F5C004799D7 /* XYBluetoothDeviceFactory.swift */; };
+		31BCE82922541F64004799D7 /* XYDeviceFamily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82522541F5C004799D7 /* XYDeviceFamily.swift */; };
+		31BCE8372254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82A2254203A004799D7 /* XYGPSBluetoothDeviceCreator.swift */; };
+		31BCE8382254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82A2254203A004799D7 /* XYGPSBluetoothDeviceCreator.swift */; };
+		31BCE8392254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82B2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */; };
+		31BCE83A2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82B2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */; };
+		31BCE83B2254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82C2254203B004799D7 /* XY3BluetoothDeviceCreator.swift */; };
+		31BCE83C2254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82C2254203B004799D7 /* XY3BluetoothDeviceCreator.swift */; };
+		31BCE83D2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82E2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */; };
+		31BCE83E2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82E2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */; };
+		31BCE83F2254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82F2254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift */; };
+		31BCE8402254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE82F2254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift */; };
+		31BCE8412254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8302254203B004799D7 /* XY4BluetoothDeviceCreator.swift */; };
+		31BCE8422254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8302254203B004799D7 /* XY4BluetoothDeviceCreator.swift */; };
+		31BCE8432254203B004799D7 /* XYDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8312254203B004799D7 /* XYDeviceCreator.swift */; };
+		31BCE8442254203B004799D7 /* XYDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8312254203B004799D7 /* XYDeviceCreator.swift */; };
+		31BCE8452254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8322254203B004799D7 /* XY2BluetoothDeviceCreator.swift */; };
+		31BCE8462254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8322254203B004799D7 /* XY2BluetoothDeviceCreator.swift */; };
+		31BCE8472254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8332254203B004799D7 /* XY3BluetoothDeviceCreator.swift */; };
+		31BCE8482254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8332254203B004799D7 /* XY3BluetoothDeviceCreator.swift */; };
+		31BCE8492254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8342254203B004799D7 /* XY2BluetoothDeviceCreator.swift */; };
+		31BCE84A2254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8342254203B004799D7 /* XY2BluetoothDeviceCreator.swift */; };
+		31BCE84B2254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8352254203B004799D7 /* XY4BluetoothDeviceCreator.swift */; };
+		31BCE84C2254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8352254203B004799D7 /* XY4BluetoothDeviceCreator.swift */; };
+		31BCE84D2254203B004799D7 /* XYDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8362254203B004799D7 /* XYDeviceCreator.swift */; };
+		31BCE84E2254203B004799D7 /* XYDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8362254203B004799D7 /* XYDeviceCreator.swift */; };
+		31BCE85022542062004799D7 /* XYFinderPrimaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */; };
+		31BCE85122542062004799D7 /* XYFinderPrimaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		314B3F2C21CDB051006E2EC3 /* XyBleSdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XyBleSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		314B3F3921CDB074006E2EC3 /* XyBleSdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XyBleSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFirmwareUpdateManager.swift; sourceTree = "<group>"; };
+		314B3F4421CDB176006E2EC3 /* XYFirmwareLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFirmwareLoader.swift; sourceTree = "<group>"; };
+		314B3F4521CDB176006E2EC3 /* XYDeviceCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYDeviceCache.swift; sourceTree = "<group>"; };
+		314B3F4721CDB176006E2EC3 /* XYConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYConstants.swift; sourceTree = "<group>"; };
+		314B3F4821CDB176006E2EC3 /* XYGeocode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYGeocode.swift; sourceTree = "<group>"; };
+		314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+extensions.swift"; sourceTree = "<group>"; };
+		314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dispatch+extensions.swift"; sourceTree = "<group>"; };
+		314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY4BluetoothDevice.swift; sourceTree = "<group>"; };
+		314B3F4F21CDB176006E2EC3 /* XYConnectionAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYConnectionAgent.swift; sourceTree = "<group>"; };
+		314B3F5021CDB176006E2EC3 /* XYCentralAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYCentralAgent.swift; sourceTree = "<group>"; };
+		314B3F5121CDB176006E2EC3 /* XYIBeaconDefinition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYIBeaconDefinition.swift; sourceTree = "<group>"; };
+		314B3F5221CDB176006E2EC3 /* XY3BluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY3BluetoothDevice.swift; sourceTree = "<group>"; };
+		314B3F5321CDB176006E2EC3 /* XYMobileBluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYMobileBluetoothDevice.swift; sourceTree = "<group>"; };
+		314B3F5421CDB176006E2EC3 /* XYGPSBluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYGPSBluetoothDevice.swift; sourceTree = "<group>"; };
+		314B3F5621CDB176006E2EC3 /* XYBluetoothDeviceBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYBluetoothDeviceBase.swift; sourceTree = "<group>"; };
+		314B3F5721CDB176006E2EC3 /* XYBluetoothBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYBluetoothBase.swift; sourceTree = "<group>"; };
+		314B3F5821CDB176006E2EC3 /* XYBluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYBluetoothDevice.swift; sourceTree = "<group>"; };
+		314B3F5921CDB176006E2EC3 /* XYBluetoothError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYBluetoothError.swift; sourceTree = "<group>"; };
+		314B3F5A21CDB176006E2EC3 /* XYBluetoothResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYBluetoothResult.swift; sourceTree = "<group>"; };
+		314B3F5B21CDB176006E2EC3 /* XYFinderDeviceBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFinderDeviceBase.swift; sourceTree = "<group>"; };
+		314B3F5C21CDB176006E2EC3 /* XYFinderDeviceEventManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFinderDeviceEventManager.swift; sourceTree = "<group>"; };
+		314B3F5D21CDB176006E2EC3 /* XYFinderDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFinderDevice.swift; sourceTree = "<group>"; };
+		314B3F5E21CDB176006E2EC3 /* XYFinderDeviceEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFinderDeviceEvent.swift; sourceTree = "<group>"; };
+		314B3F6121CDB176006E2EC3 /* XY2BluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY2BluetoothDevice.swift; sourceTree = "<group>"; };
+		314B3F6221CDB176006E2EC3 /* XYDeviceConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYDeviceConnectionManager.swift; sourceTree = "<group>"; };
+		314B3F6321CDB176006E2EC3 /* XYCentral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYCentral.swift; sourceTree = "<group>"; };
+		314B3F6421CDB176006E2EC3 /* XYLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYLocation.swift; sourceTree = "<group>"; };
+		314B3F6521CDB176006E2EC3 /* XYSmartScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYSmartScan.swift; sourceTree = "<group>"; };
+		314B3F6721CDB176006E2EC3 /* XYLocationCoordinate2D.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYLocationCoordinate2D.swift; sourceTree = "<group>"; };
+		314B3F6921CDB176006E2EC3 /* XYServiceCharacteristic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYServiceCharacteristic.swift; sourceTree = "<group>"; };
+		314B3F6A21CDB176006E2EC3 /* GattDescriptors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GattDescriptors.swift; sourceTree = "<group>"; };
+		314B3F6B21CDB176006E2EC3 /* GattRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GattRequest.swift; sourceTree = "<group>"; };
+		314B3F6D21CDB176006E2EC3 /* BatteryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BatteryService.swift; sourceTree = "<group>"; };
+		314B3F6E21CDB176006E2EC3 /* CurrentTimeService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrentTimeService.swift; sourceTree = "<group>"; };
+		314B3F6F21CDB176006E2EC3 /* GenericAttributeService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericAttributeService.swift; sourceTree = "<group>"; };
+		314B3F7021CDB176006E2EC3 /* LinkLossService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkLossService.swift; sourceTree = "<group>"; };
+		314B3F7121CDB176006E2EC3 /* GenericAccessService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericAccessService.swift; sourceTree = "<group>"; };
+		314B3F7221CDB176006E2EC3 /* TxPowerService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxPowerService.swift; sourceTree = "<group>"; };
+		314B3F7321CDB176006E2EC3 /* DeviceInformationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceInformationService.swift; sourceTree = "<group>"; };
+		314B3F7421CDB176006E2EC3 /* AlertNotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertNotificationService.swift; sourceTree = "<group>"; };
+		314B3F7521CDB176006E2EC3 /* OtaService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OtaService.swift; sourceTree = "<group>"; };
+		314B3F7621CDB176006E2EC3 /* GattInquisitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GattInquisitor.swift; sourceTree = "<group>"; };
+		314B3F7821CDB176006E2EC3 /* ExtendedConfigService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtendedConfigService.swift; sourceTree = "<group>"; };
+		314B3F7921CDB176006E2EC3 /* ControlService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlService.swift; sourceTree = "<group>"; };
+		314B3F7A21CDB176006E2EC3 /* ExtendedControlService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtendedControlService.swift; sourceTree = "<group>"; };
+		314B3F7B21CDB176006E2EC3 /* BasicConfigService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicConfigService.swift; sourceTree = "<group>"; };
+		31BACF1321E436510006C0AE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		31BACF1421E436510006C0AE /* XyBleSdk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XyBleSdk.h; sourceTree = "<group>"; };
+		31BCE81E22541BD7004799D7 /* Promises.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Promises.framework; path = Carthage/Build/Mac/Promises.framework; sourceTree = "<group>"; };
+		31BCE81F22541BD7004799D7 /* FBLPromises.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBLPromises.framework; path = Carthage/Build/Mac/FBLPromises.framework; sourceTree = "<group>"; };
+		31BCE82422541F5C004799D7 /* XYBluetoothDeviceFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYBluetoothDeviceFactory.swift; sourceTree = "<group>"; };
+		31BCE82522541F5C004799D7 /* XYDeviceFamily.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYDeviceFamily.swift; sourceTree = "<group>"; };
+		31BCE82A2254203A004799D7 /* XYGPSBluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XYGPSBluetoothDeviceCreator.swift; path = Creators/XYGPSBluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE82B2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XYMobileBluetoothDeviceCreator.swift; path = Creators/XYMobileBluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE82C2254203B004799D7 /* XY3BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XY3BluetoothDeviceCreator.swift; path = Creators/XY3BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE82E2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYMobileBluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE82F2254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYGPSBluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8302254203B004799D7 /* XY4BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY4BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8312254203B004799D7 /* XYDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8322254203B004799D7 /* XY2BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY2BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8332254203B004799D7 /* XY3BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY3BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8342254203B004799D7 /* XY2BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XY2BluetoothDeviceCreator.swift; path = Creators/XY2BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8352254203B004799D7 /* XY4BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XY4BluetoothDeviceCreator.swift; path = Creators/XY4BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE8362254203B004799D7 /* XYDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XYDeviceCreator.swift; path = Creators/XYDeviceCreator.swift; sourceTree = "<group>"; };
+		31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFinderPrimaryService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		314B3F2921CDB051006E2EC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31BCE82022541BD7004799D7 /* Promises.framework in Frameworks */,
+				31BCE82122541BD7004799D7 /* FBLPromises.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		314B3F3621CDB074006E2EC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31BCE82322541BDF004799D7 /* Promises.framework in Frameworks */,
+				31BCE82222541BDC004799D7 /* FBLPromises.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		314B3F1221CDB009006E2EC3 = {
+			isa = PBXGroup;
+			children = (
+				314B3F4121CDB121006E2EC3 /* Source */,
+				314B3F1D21CDB009006E2EC3 /* Products */,
+				314B3FE021CDB687006E2EC3 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		314B3F1D21CDB009006E2EC3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F2C21CDB051006E2EC3 /* XyBleSdk.framework */,
+				314B3F3921CDB074006E2EC3 /* XyBleSdk.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		314B3F4121CDB121006E2EC3 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				31BACF1221E436420006C0AE /* Supporting Files */,
+				314B3F4621CDB176006E2EC3 /* Constants */,
+				314B3F4C21CDB176006E2EC3 /* Devices */,
+				314B3F4921CDB176006E2EC3 /* Extensions */,
+				314B3F4221CDB176006E2EC3 /* Firmware */,
+				314B3F6821CDB176006E2EC3 /* Gatt */,
+				314B3F6621CDB176006E2EC3 /* Models */,
+				314B3F6321CDB176006E2EC3 /* XYCentral.swift */,
+				314B3F4521CDB176006E2EC3 /* XYDeviceCache.swift */,
+				314B3F6221CDB176006E2EC3 /* XYDeviceConnectionManager.swift */,
+				314B3F4821CDB176006E2EC3 /* XYGeocode.swift */,
+				314B3F6421CDB176006E2EC3 /* XYLocation.swift */,
+				314B3F6521CDB176006E2EC3 /* XYSmartScan.swift */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		314B3F4221CDB176006E2EC3 /* Firmware */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */,
+				314B3F4421CDB176006E2EC3 /* XYFirmwareLoader.swift */,
+			);
+			path = Firmware;
+			sourceTree = "<group>";
+		};
+		314B3F4621CDB176006E2EC3 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F4721CDB176006E2EC3 /* XYConstants.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		314B3F4921CDB176006E2EC3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */,
+				314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		314B3F4C21CDB176006E2EC3 /* Devices */ = {
+			isa = PBXGroup;
+			children = (
+				31BCE82D2254203B004799D7 /* Creators */,
+				31BCE8342254203B004799D7 /* XY2BluetoothDeviceCreator.swift */,
+				31BCE82C2254203B004799D7 /* XY3BluetoothDeviceCreator.swift */,
+				31BCE8352254203B004799D7 /* XY4BluetoothDeviceCreator.swift */,
+				31BCE8362254203B004799D7 /* XYDeviceCreator.swift */,
+				31BCE82A2254203A004799D7 /* XYGPSBluetoothDeviceCreator.swift */,
+				31BCE82B2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */,
+				314B3F4E21CDB176006E2EC3 /* Agents */,
+				314B3F5521CDB176006E2EC3 /* Base */,
+				314B3F6121CDB176006E2EC3 /* XY2BluetoothDevice.swift */,
+				314B3F5221CDB176006E2EC3 /* XY3BluetoothDevice.swift */,
+				314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */,
+				31BCE82422541F5C004799D7 /* XYBluetoothDeviceFactory.swift */,
+				31BCE82522541F5C004799D7 /* XYDeviceFamily.swift */,
+				314B3F5421CDB176006E2EC3 /* XYGPSBluetoothDevice.swift */,
+				314B3F5121CDB176006E2EC3 /* XYIBeaconDefinition.swift */,
+				314B3F5321CDB176006E2EC3 /* XYMobileBluetoothDevice.swift */,
+			);
+			path = Devices;
+			sourceTree = "<group>";
+		};
+		314B3F4E21CDB176006E2EC3 /* Agents */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F4F21CDB176006E2EC3 /* XYConnectionAgent.swift */,
+				314B3F5021CDB176006E2EC3 /* XYCentralAgent.swift */,
+			);
+			path = Agents;
+			sourceTree = "<group>";
+		};
+		314B3F5521CDB176006E2EC3 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F5621CDB176006E2EC3 /* XYBluetoothDeviceBase.swift */,
+				314B3F5721CDB176006E2EC3 /* XYBluetoothBase.swift */,
+				314B3F5821CDB176006E2EC3 /* XYBluetoothDevice.swift */,
+				314B3F5921CDB176006E2EC3 /* XYBluetoothError.swift */,
+				314B3F5A21CDB176006E2EC3 /* XYBluetoothResult.swift */,
+				314B3F5B21CDB176006E2EC3 /* XYFinderDeviceBase.swift */,
+				314B3F5C21CDB176006E2EC3 /* XYFinderDeviceEventManager.swift */,
+				314B3F5D21CDB176006E2EC3 /* XYFinderDevice.swift */,
+				314B3F5E21CDB176006E2EC3 /* XYFinderDeviceEvent.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		314B3F6621CDB176006E2EC3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F6721CDB176006E2EC3 /* XYLocationCoordinate2D.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		314B3F6821CDB176006E2EC3 /* Gatt */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F6C21CDB176006E2EC3 /* Standard */,
+				314B3F7721CDB176006E2EC3 /* xy3 */,
+				314B3F7C21CDB176006E2EC3 /* xy4 */,
+				314B3F6A21CDB176006E2EC3 /* GattDescriptors.swift */,
+				314B3F7621CDB176006E2EC3 /* GattInquisitor.swift */,
+				314B3F6B21CDB176006E2EC3 /* GattRequest.swift */,
+				314B3F6921CDB176006E2EC3 /* XYServiceCharacteristic.swift */,
+			);
+			path = Gatt;
+			sourceTree = "<group>";
+		};
+		314B3F6C21CDB176006E2EC3 /* Standard */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F6D21CDB176006E2EC3 /* BatteryService.swift */,
+				314B3F6E21CDB176006E2EC3 /* CurrentTimeService.swift */,
+				314B3F6F21CDB176006E2EC3 /* GenericAttributeService.swift */,
+				314B3F7021CDB176006E2EC3 /* LinkLossService.swift */,
+				314B3F7121CDB176006E2EC3 /* GenericAccessService.swift */,
+				314B3F7221CDB176006E2EC3 /* TxPowerService.swift */,
+				314B3F7321CDB176006E2EC3 /* DeviceInformationService.swift */,
+				314B3F7421CDB176006E2EC3 /* AlertNotificationService.swift */,
+				314B3F7521CDB176006E2EC3 /* OtaService.swift */,
+			);
+			path = Standard;
+			sourceTree = "<group>";
+		};
+		314B3F7721CDB176006E2EC3 /* xy3 */ = {
+			isa = PBXGroup;
+			children = (
+				314B3F7821CDB176006E2EC3 /* ExtendedConfigService.swift */,
+				314B3F7921CDB176006E2EC3 /* ControlService.swift */,
+				314B3F7A21CDB176006E2EC3 /* ExtendedControlService.swift */,
+				314B3F7B21CDB176006E2EC3 /* BasicConfigService.swift */,
+			);
+			path = xy3;
+			sourceTree = "<group>";
+		};
+		314B3F7C21CDB176006E2EC3 /* xy4 */ = {
+			isa = PBXGroup;
+			children = (
+				31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */,
+			);
+			path = xy4;
+			sourceTree = "<group>";
+		};
+		314B3FE021CDB687006E2EC3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				31BCE81F22541BD7004799D7 /* FBLPromises.framework */,
+				31BCE81E22541BD7004799D7 /* Promises.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		31BACF1221E436420006C0AE /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				31BACF1321E436510006C0AE /* Info.plist */,
+				31BACF1421E436510006C0AE /* XyBleSdk.h */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		31BCE82D2254203B004799D7 /* Creators */ = {
+			isa = PBXGroup;
+			children = (
+				31BCE82E2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift */,
+				31BCE82F2254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift */,
+				31BCE8302254203B004799D7 /* XY4BluetoothDeviceCreator.swift */,
+				31BCE8312254203B004799D7 /* XYDeviceCreator.swift */,
+				31BCE8322254203B004799D7 /* XY2BluetoothDeviceCreator.swift */,
+				31BCE8332254203B004799D7 /* XY3BluetoothDeviceCreator.swift */,
+			);
+			path = Creators;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		314B3F2721CDB051006E2EC3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31BACF1621E436510006C0AE /* XyBleSdk.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		314B3F3421CDB074006E2EC3 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				31BACF1721E436A80006C0AE /* XyBleSdk.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		314B3F2B21CDB051006E2EC3 /* XyBleSdk iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 314B3F3121CDB051006E2EC3 /* Build configuration list for PBXNativeTarget "XyBleSdk iOS" */;
+			buildPhases = (
+				314B3F2821CDB051006E2EC3 /* Sources */,
+				314B3F2921CDB051006E2EC3 /* Frameworks */,
+				314B3F2721CDB051006E2EC3 /* Headers */,
+				314B3F2A21CDB051006E2EC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "XyBleSdk iOS";
+			productName = "XyBleSdk iOS";
+			productReference = 314B3F2C21CDB051006E2EC3 /* XyBleSdk.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		314B3F3821CDB074006E2EC3 /* XyBleSdk macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 314B3F3E21CDB074006E2EC3 /* Build configuration list for PBXNativeTarget "XyBleSdk macOS" */;
+			buildPhases = (
+				314B3F3521CDB074006E2EC3 /* Sources */,
+				314B3F3621CDB074006E2EC3 /* Frameworks */,
+				314B3F3421CDB074006E2EC3 /* Headers */,
+				314B3F3721CDB074006E2EC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "XyBleSdk macOS";
+			productName = "XyBleSdk macOS";
+			productReference = 314B3F3921CDB074006E2EC3 /* XyBleSdk.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		314B3F1321CDB009006E2EC3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = "XYO Network";
+				TargetAttributes = {
+					314B3F2B21CDB051006E2EC3 = {
+						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1010;
+					};
+					314B3F3821CDB074006E2EC3 = {
+						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1010;
+					};
+				};
+			};
+			buildConfigurationList = 314B3F1621CDB009006E2EC3 /* Build configuration list for PBXProject "XyBleSdk" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 314B3F1221CDB009006E2EC3;
+			productRefGroup = 314B3F1D21CDB009006E2EC3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				314B3F2B21CDB051006E2EC3 /* XyBleSdk iOS */,
+				314B3F3821CDB074006E2EC3 /* XyBleSdk macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		314B3F2A21CDB051006E2EC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		314B3F3721CDB074006E2EC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		314B3F2821CDB051006E2EC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				314B3FB021CDB176006E2EC3 /* XY2BluetoothDevice.swift in Sources */,
+				314B3F9821CDB176006E2EC3 /* XYGPSBluetoothDevice.swift in Sources */,
+				31BCE82722541F5C004799D7 /* XYDeviceFamily.swift in Sources */,
+				314B3FBC21CDB176006E2EC3 /* XYServiceCharacteristic.swift in Sources */,
+				314B3F8621CDB176006E2EC3 /* XYGeocode.swift in Sources */,
+				31BCE8372254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */,
+				314B3FDA21CDB176006E2EC3 /* ExtendedControlService.swift in Sources */,
+				314B3F9C21CDB176006E2EC3 /* XYBluetoothBase.swift in Sources */,
+				31BCE84B2254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */,
+				314B3F8021CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */,
+				314B3F8A21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */,
+				31BCE8392254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
+				31BCE8452254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
+				314B3FAA21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */,
+				31BCE82622541F5C004799D7 /* XYBluetoothDeviceFactory.swift in Sources */,
+				314B3FCC21CDB176006E2EC3 /* TxPowerService.swift in Sources */,
+				314B3F8E21CDB176006E2EC3 /* XYConnectionAgent.swift in Sources */,
+				314B3FDC21CDB176006E2EC3 /* BasicConfigService.swift in Sources */,
+				314B3FA021CDB176006E2EC3 /* XYBluetoothError.swift in Sources */,
+				314B3F9A21CDB176006E2EC3 /* XYBluetoothDeviceBase.swift in Sources */,
+				314B3F9221CDB176006E2EC3 /* XYIBeaconDefinition.swift in Sources */,
+				314B3FB421CDB176006E2EC3 /* XYCentral.swift in Sources */,
+				314B3FB821CDB176006E2EC3 /* XYSmartScan.swift in Sources */,
+				314B3F9621CDB176006E2EC3 /* XYMobileBluetoothDevice.swift in Sources */,
+				314B3FA821CDB176006E2EC3 /* XYFinderDevice.swift in Sources */,
+				314B3FB221CDB176006E2EC3 /* XYDeviceConnectionManager.swift in Sources */,
+				314B3F9421CDB176006E2EC3 /* XY3BluetoothDevice.swift in Sources */,
+				314B3FCE21CDB176006E2EC3 /* DeviceInformationService.swift in Sources */,
+				314B3FA421CDB176006E2EC3 /* XYFinderDeviceBase.swift in Sources */,
+				314B3F8221CDB176006E2EC3 /* XYDeviceCache.swift in Sources */,
+				314B3FC021CDB176006E2EC3 /* GattRequest.swift in Sources */,
+				314B3F8421CDB176006E2EC3 /* XYConstants.swift in Sources */,
+				314B3F7E21CDB176006E2EC3 /* XYFirmwareUpdateManager.swift in Sources */,
+				31BCE84D2254203B004799D7 /* XYDeviceCreator.swift in Sources */,
+				314B3FB621CDB176006E2EC3 /* XYLocation.swift in Sources */,
+				314B3F9E21CDB176006E2EC3 /* XYBluetoothDevice.swift in Sources */,
+				31BCE8412254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */,
+				314B3FC421CDB176006E2EC3 /* CurrentTimeService.swift in Sources */,
+				314B3FD821CDB176006E2EC3 /* ControlService.swift in Sources */,
+				314B3FC221CDB176006E2EC3 /* BatteryService.swift in Sources */,
+				314B3F8C21CDB176006E2EC3 /* XY4BluetoothDevice.swift in Sources */,
+				314B3FD021CDB176006E2EC3 /* AlertNotificationService.swift in Sources */,
+				314B3FA621CDB176006E2EC3 /* XYFinderDeviceEventManager.swift in Sources */,
+				31BCE85022542062004799D7 /* XYFinderPrimaryService.swift in Sources */,
+				31BCE8492254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
+				314B3FC821CDB176006E2EC3 /* LinkLossService.swift in Sources */,
+				31BCE83B2254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */,
+				314B3FD421CDB176006E2EC3 /* GattInquisitor.swift in Sources */,
+				31BCE8432254203B004799D7 /* XYDeviceCreator.swift in Sources */,
+				31BCE83F2254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */,
+				31BCE8472254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */,
+				314B3FD221CDB176006E2EC3 /* OtaService.swift in Sources */,
+				314B3FA221CDB176006E2EC3 /* XYBluetoothResult.swift in Sources */,
+				314B3FBA21CDB176006E2EC3 /* XYLocationCoordinate2D.swift in Sources */,
+				314B3FBE21CDB176006E2EC3 /* GattDescriptors.swift in Sources */,
+				31BCE83D2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
+				314B3FC621CDB176006E2EC3 /* GenericAttributeService.swift in Sources */,
+				314B3F9021CDB176006E2EC3 /* XYCentralAgent.swift in Sources */,
+				314B3FD621CDB176006E2EC3 /* ExtendedConfigService.swift in Sources */,
+				314B3FCA21CDB176006E2EC3 /* GenericAccessService.swift in Sources */,
+				314B3F8821CDB176006E2EC3 /* Array+extensions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		314B3F3521CDB074006E2EC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				314B3FB121CDB176006E2EC3 /* XY2BluetoothDevice.swift in Sources */,
+				314B3F9921CDB176006E2EC3 /* XYGPSBluetoothDevice.swift in Sources */,
+				31BCE82922541F64004799D7 /* XYDeviceFamily.swift in Sources */,
+				314B3FBD21CDB176006E2EC3 /* XYServiceCharacteristic.swift in Sources */,
+				314B3F8721CDB176006E2EC3 /* XYGeocode.swift in Sources */,
+				31BCE8382254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */,
+				314B3FDB21CDB176006E2EC3 /* ExtendedControlService.swift in Sources */,
+				314B3F9D21CDB176006E2EC3 /* XYBluetoothBase.swift in Sources */,
+				31BCE84C2254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */,
+				314B3F8121CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */,
+				314B3F8B21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */,
+				31BCE83A2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
+				31BCE8462254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
+				314B3FAB21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */,
+				31BCE82822541F64004799D7 /* XYBluetoothDeviceFactory.swift in Sources */,
+				314B3FCD21CDB176006E2EC3 /* TxPowerService.swift in Sources */,
+				314B3F8F21CDB176006E2EC3 /* XYConnectionAgent.swift in Sources */,
+				314B3FDD21CDB176006E2EC3 /* BasicConfigService.swift in Sources */,
+				314B3FA121CDB176006E2EC3 /* XYBluetoothError.swift in Sources */,
+				314B3F9B21CDB176006E2EC3 /* XYBluetoothDeviceBase.swift in Sources */,
+				314B3F9321CDB176006E2EC3 /* XYIBeaconDefinition.swift in Sources */,
+				314B3FB521CDB176006E2EC3 /* XYCentral.swift in Sources */,
+				314B3FB921CDB176006E2EC3 /* XYSmartScan.swift in Sources */,
+				314B3F9721CDB176006E2EC3 /* XYMobileBluetoothDevice.swift in Sources */,
+				314B3FA921CDB176006E2EC3 /* XYFinderDevice.swift in Sources */,
+				314B3FB321CDB176006E2EC3 /* XYDeviceConnectionManager.swift in Sources */,
+				314B3F9521CDB176006E2EC3 /* XY3BluetoothDevice.swift in Sources */,
+				314B3FCF21CDB176006E2EC3 /* DeviceInformationService.swift in Sources */,
+				314B3FA521CDB176006E2EC3 /* XYFinderDeviceBase.swift in Sources */,
+				314B3F8321CDB176006E2EC3 /* XYDeviceCache.swift in Sources */,
+				314B3FC121CDB176006E2EC3 /* GattRequest.swift in Sources */,
+				314B3F8521CDB176006E2EC3 /* XYConstants.swift in Sources */,
+				314B3F7F21CDB176006E2EC3 /* XYFirmwareUpdateManager.swift in Sources */,
+				31BCE84E2254203B004799D7 /* XYDeviceCreator.swift in Sources */,
+				314B3FB721CDB176006E2EC3 /* XYLocation.swift in Sources */,
+				314B3F9F21CDB176006E2EC3 /* XYBluetoothDevice.swift in Sources */,
+				31BCE8422254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */,
+				314B3FC521CDB176006E2EC3 /* CurrentTimeService.swift in Sources */,
+				314B3FD921CDB176006E2EC3 /* ControlService.swift in Sources */,
+				314B3FC321CDB176006E2EC3 /* BatteryService.swift in Sources */,
+				314B3F8D21CDB176006E2EC3 /* XY4BluetoothDevice.swift in Sources */,
+				314B3FD121CDB176006E2EC3 /* AlertNotificationService.swift in Sources */,
+				314B3FA721CDB176006E2EC3 /* XYFinderDeviceEventManager.swift in Sources */,
+				31BCE85122542062004799D7 /* XYFinderPrimaryService.swift in Sources */,
+				31BCE84A2254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
+				314B3FC921CDB176006E2EC3 /* LinkLossService.swift in Sources */,
+				31BCE83C2254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */,
+				314B3FD521CDB176006E2EC3 /* GattInquisitor.swift in Sources */,
+				31BCE8442254203B004799D7 /* XYDeviceCreator.swift in Sources */,
+				31BCE8402254203B004799D7 /* XYGPSBluetoothDeviceCreator.swift in Sources */,
+				31BCE8482254203B004799D7 /* XY3BluetoothDeviceCreator.swift in Sources */,
+				314B3FD321CDB176006E2EC3 /* OtaService.swift in Sources */,
+				314B3FA321CDB176006E2EC3 /* XYBluetoothResult.swift in Sources */,
+				314B3FBB21CDB176006E2EC3 /* XYLocationCoordinate2D.swift in Sources */,
+				314B3FBF21CDB176006E2EC3 /* GattDescriptors.swift in Sources */,
+				31BCE83E2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
+				314B3FC721CDB176006E2EC3 /* GenericAttributeService.swift in Sources */,
+				314B3F9121CDB176006E2EC3 /* XYCentralAgent.swift in Sources */,
+				314B3FD721CDB176006E2EC3 /* ExtendedConfigService.swift in Sources */,
+				314B3FCB21CDB176006E2EC3 /* GenericAccessService.swift in Sources */,
+				314B3F8921CDB176006E2EC3 /* Array+extensions.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		314B3F2221CDB009006E2EC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		314B3F2321CDB009006E2EC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		314B3F3221CDB051006E2EC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = Source/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.webble.xy.XyBleSdk;
+				PRODUCT_MODULE_NAME = XyBleSdk;
+				PRODUCT_NAME = XyBleSdk;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		314B3F3321CDB051006E2EC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = Source/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.webble.xy.XyBleSdk;
+				PRODUCT_MODULE_NAME = XyBleSdk;
+				PRODUCT_NAME = XyBleSdk;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		314B3F3F21CDB074006E2EC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/Mac";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Source/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = com.webble.xy.XyBleSdk;
+				PRODUCT_MODULE_NAME = XyBleSdk;
+				PRODUCT_NAME = XyBleSdk;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		314B3F4021CDB074006E2EC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/Mac";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = Source/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_BUNDLE_IDENTIFIER = com.webble.xy.XyBleSdk;
+				PRODUCT_MODULE_NAME = XyBleSdk;
+				PRODUCT_NAME = XyBleSdk;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		314B3F1621CDB009006E2EC3 /* Build configuration list for PBXProject "XyBleSdk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				314B3F2221CDB009006E2EC3 /* Debug */,
+				314B3F2321CDB009006E2EC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		314B3F3121CDB051006E2EC3 /* Build configuration list for PBXNativeTarget "XyBleSdk iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				314B3F3221CDB051006E2EC3 /* Debug */,
+				314B3F3321CDB051006E2EC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		314B3F3E21CDB074006E2EC3 /* Build configuration list for PBXNativeTarget "XyBleSdk macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				314B3F3F21CDB074006E2EC3 /* Debug */,
+				314B3F4021CDB074006E2EC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 314B3F1321CDB009006E2EC3 /* Project object */;
+}
