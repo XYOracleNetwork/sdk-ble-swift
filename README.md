@@ -9,7 +9,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 
 - iOS 11.0+
 - MacOS 10.13+
-- Xcode 9.3+
+- Xcode 10.1+
 - Swift 4.2+
 
 ## Installation
