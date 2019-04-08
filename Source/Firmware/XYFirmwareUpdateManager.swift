@@ -47,6 +47,16 @@ public struct XYFirmwareUpdateParameters {
             patchBaseAddress: 1,
             shouldReconnect: false)
     }
+
+    public static func updateSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
+        return XYFirmwareUpdateParameters(
+            spiMISOAddress: 0x05,
+            spiMOSIAddress: 0x06,
+            spiCSAddress: 0x07,
+            spiSCKAddress: 0x00,
+            patchBaseAddress: bank,
+            shouldReconnect: true)
+    }
 }
 
 public protocol XYFirmwareUpdateManagerProgressDelegate: class {
@@ -67,7 +77,7 @@ public class XYFirmwareUpdateManager {
     }
 
     fileprivate let
-    device: XYFinderDevice
+    device: XYBluetoothDevice
 
     fileprivate var
     firmwareData: Data
@@ -99,7 +109,7 @@ public class XYFirmwareUpdateManager {
 
     let memoryType: XYFirmwareUpdateManager.UpdateMemoryType = .SUOTA_SPI
 
-    public init(for device: XYFinderDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
+    public init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
         self.device = device
         self.parameters = parameters
         self.firmwareData = firmwareData
@@ -144,9 +154,13 @@ public class XYFirmwareUpdateManager {
                 // All done, so unsubscribe from the ota service and the events, and then return success
                 self.device.connection {
                     _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
-                    for _ in 1...10 {
-                        if self.device.stayAwake().hasError == false {
-                            break
+
+                    // If we're a finder, put us awake
+                    if let device = self.device as? XYFinderDevice {
+                        for _ in 1...10 {
+                            if device.stayAwake().hasError == false {
+                                break
+                            }
                         }
                     }
                 }.always {
