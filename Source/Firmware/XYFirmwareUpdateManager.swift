@@ -16,7 +16,8 @@ public struct XYFirmwareUpdateParameters {
     spiCSAddress: Int32,
     spiSCKAddress: Int32,
     patchBaseAddress: Int32,
-    shouldReconnect: Bool
+    shouldReconnect: Bool,
+    shouldReboot: Bool
 
     public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
@@ -25,7 +26,8 @@ public struct XYFirmwareUpdateParameters {
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
             patchBaseAddress: 0,
-            shouldReconnect: true)
+            shouldReconnect: true,
+            shouldReboot: true)
     }
 
     public static var convertXy4ToSentinelXBank0: XYFirmwareUpdateParameters {
@@ -35,7 +37,8 @@ public struct XYFirmwareUpdateParameters {
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
             patchBaseAddress: 0,
-            shouldReconnect: false)
+            shouldReconnect: false,
+            shouldReboot: true)
     }
 
     public static var convertXy4ToSentinelXBank1: XYFirmwareUpdateParameters {
@@ -45,7 +48,8 @@ public struct XYFirmwareUpdateParameters {
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
             patchBaseAddress: 1,
-            shouldReconnect: false)
+            shouldReconnect: false,
+            shouldReboot: true)
     }
 
     public static func updateSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
@@ -55,7 +59,8 @@ public struct XYFirmwareUpdateParameters {
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
             patchBaseAddress: bank,
-            shouldReconnect: true)
+            shouldReconnect: true,
+            shouldReboot: false)
     }
 }
 
@@ -122,15 +127,15 @@ public class XYFirmwareUpdateManager {
         self.currentStep = .unstarted
     }
 
+    private func cleanup() {
+        print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
+        XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
+        self.success?()
+    }
+
     public func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
         self.success = success
         self.failure = failure
-
-        func cleanup() {
-            print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
-            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
-            self.success?()
-        }
 
         // Watch for various events to properly handle the OTA
         self.subscribeKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected, .connected], for: self.device) { event in
@@ -143,7 +148,7 @@ public class XYFirmwareUpdateManager {
                     // We don't need to reconnect, so remove, cleanup and return success
                     XYCentral.instance.disconnect(from: self.device)
                     self.device.detachPeripheral()
-                    cleanup()
+                    self.cleanup()
                 }
             case .disconnected where self.currentStep != .completed:
                 // The update bombed out at some point, so remove the peripheral and let the user know to retry
@@ -164,7 +169,7 @@ public class XYFirmwareUpdateManager {
                         }
                     }
                 }.always {
-                    cleanup()
+                    self.cleanup()
                 }
 
             default:
@@ -335,13 +340,17 @@ private extension XYFirmwareUpdateManager {
         case .rebootDevice:
             self.currentStep = .completed
 
-            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.rebootDevice.rawValue)")
+            if self.parameters.shouldReboot == false {
+                self.cleanup()
+            } else {
+                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.rebootDevice.rawValue)")
 
-            var suotaEnd: UInt32 = 0xFD000000
-            let data = NSData(bytes: &suotaEnd, length: MemoryLayout<UInt32>.size)
-            let parameter = XYBluetoothResult(data: Data(referencing: data))
+                var suotaEnd: UInt32 = 0xFD000000
+                let data = NSData(bytes: &suotaEnd, length: MemoryLayout<UInt32>.size)
+                let parameter = XYBluetoothResult(data: Data(referencing: data))
 
-            self.writeValue(to: .memDev, value: parameter)
+                self.writeValue(to: .memDev, value: parameter)
+            }
 
         case .completed:
             break
