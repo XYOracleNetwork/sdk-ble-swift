@@ -17,7 +17,7 @@ public struct XYFirmwareUpdateParameters {
     spiSCKAddress: Int32,
     patchBaseAddress: Int32,
     shouldReconnect: Bool,
-    shouldReboot: Bool
+    rebootNoConfirm: Bool
 
     public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
@@ -27,29 +27,18 @@ public struct XYFirmwareUpdateParameters {
             spiSCKAddress: 0x00,
             patchBaseAddress: 0,
             shouldReconnect: true,
-            shouldReboot: true)
+            rebootNoConfirm: false)
     }
 
-    public static var convertXy4ToSentinelXBank0: XYFirmwareUpdateParameters {
+    public static func convertXy4ToSentinel(bank: Int32) -> XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
             spiMISOAddress: 0x05,
             spiMOSIAddress: 0x06,
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
-            patchBaseAddress: 0,
+            patchBaseAddress: bank,
             shouldReconnect: false,
-            shouldReboot: true)
-    }
-
-    public static var convertXy4ToSentinelXBank1: XYFirmwareUpdateParameters {
-        return XYFirmwareUpdateParameters(
-            spiMISOAddress: 0x05,
-            spiMOSIAddress: 0x06,
-            spiCSAddress: 0x07,
-            spiSCKAddress: 0x00,
-            patchBaseAddress: 1,
-            shouldReconnect: false,
-            shouldReboot: true)
+            rebootNoConfirm: false)
     }
 
     public static func updateSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
@@ -60,7 +49,7 @@ public struct XYFirmwareUpdateParameters {
             spiSCKAddress: 0x00,
             patchBaseAddress: bank,
             shouldReconnect: true,
-            shouldReboot: false)
+            rebootNoConfirm: true)
     }
 }
 
@@ -340,16 +329,18 @@ private extension XYFirmwareUpdateManager {
         case .rebootDevice:
             self.currentStep = .completed
 
-            if self.parameters.shouldReboot == false {
+            print("- FIRMWARE Step: \(XYFirmwareUpdateStep.rebootDevice.rawValue)")
+
+            var suotaEnd: UInt32 = 0xFD000000
+            let data = NSData(bytes: &suotaEnd, length: MemoryLayout<UInt32>.size)
+            let parameter = XYBluetoothResult(data: Data(referencing: data))
+
+            self.writeValue(to: .memDev, value: parameter)
+
+            // We never get a reboot response from a Sentinel X reboot, so inform
+            // the delegate we are all done so they can "reboot"
+            if self.parameters.rebootNoConfirm {
                 self.cleanup()
-            } else {
-                print("- FIRMWARE Step: \(XYFirmwareUpdateStep.rebootDevice.rawValue)")
-
-                var suotaEnd: UInt32 = 0xFD000000
-                let data = NSData(bytes: &suotaEnd, length: MemoryLayout<UInt32>.size)
-                let parameter = XYBluetoothResult(data: Data(referencing: data))
-
-                self.writeValue(to: .memDev, value: parameter)
             }
 
         case .completed:
@@ -389,6 +380,8 @@ private extension XYFirmwareUpdateManager {
             } else {
                 print(result.error?.toString ?? "<unknown>")
             }
+        }.catch { error in
+            self.failure?(error as? XYBluetoothError ?? XYBluetoothError.cbPeripheralDelegateError(error))
         }
     }
 
