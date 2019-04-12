@@ -185,6 +185,7 @@ final class GattRequest: NSObject {
             strong.timer = nil
             strong.status = .timedOut
             strong.notifyPromise.reject(XYBluetoothError.timedOut)
+            operationPromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
