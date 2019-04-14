@@ -46,7 +46,7 @@ final class GattRequest: NSObject {
 
     fileprivate let operationsQueue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestOperationsQueue")
 
-    fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
+    fileprivate static let callTimeout: DispatchTimeInterval = .seconds(18)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")
     fileprivate var timer: DispatchSourceTimer?
 
