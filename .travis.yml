@@ -6,3 +6,5 @@ xcode_destination: platform=iOS Simulator,OS=11.0,name=iPhone X
 
 script:
   - gem install cocoapods
+  - pod install
+  
