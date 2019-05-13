@@ -5,10 +5,4 @@ xcode_scheme: sdk-ble-swift
 xcode_destination: platform=iOS Simulator,OS=11.0,name=iPhone X
 
 script:
-  - gem install cocoapods &&
-    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-0.6.3-darwin-amd64 > ./cc-test-reporter &&
-    chmod 777 ./cc-test-reporter &&
-    ./cc-test-reporter before-build &&
-    pod deintegrate &&
-    xcodebuild -project sdk-ble-swift.xcodeproj -scheme sdk-ble-swift -destination platform\=iOS\ Simulator,OS\=11.0,name\=iPhone\ X build test | xcpretty -x --scheme sdk-ble-swift sdk-ble-swift.xcodeproj &&
-    ./cc-test-reporter after-build
+  - gem install cocoapods
