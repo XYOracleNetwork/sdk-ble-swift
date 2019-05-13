@@ -1,0 +1,15 @@
+osx_image: xcode10.1
+language: swift
+xcode_project: sdk-ble-swift.xcodeproj 
+xcode_scheme: sdk-ble-swift
+xcode_destination: platform=iOS Simulator,OS=11.3,name=iPhone X
+
+script:
+  - gem install slather &&
+    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-0.6.3-darwin-amd64 > ./cc-test-reporter &&
+    chmod 777 ./cc-test-reporter &&
+    ./cc-test-reporter before-build &&
+    pod deintegrate &&
+    xcodebuild -project sdk-ble-swift.xcodeproj -scheme sdk-ble-swift -destination platform\=iOS\ Simulator,OS\=12.1,name\=iPhone\ X build test | xcpretty &&
+    slather coverage -x --scheme sdk-ble-swift sdk-ble-swift.xcodeproj &&
+    ./cc-test-reporter after-build
