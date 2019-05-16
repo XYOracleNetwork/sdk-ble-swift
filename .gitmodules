@@ -1,6 +1,6 @@
 [submodule "Carthage/Checkouts/promises"]
-	path = sdk-ble-swift/Carthage/Checkouts/promises
+	path = Carthage/Checkouts/promises
 	url = https://github.com/google/promises.git
 [submodule "Carthage/Checkouts/sdk-ble-swift"]
-	path = sdk-ble-swift/Carthage/Checkouts/sdk-ble-swift
+	path = Carthage/Checkouts/sdk-ble-swift
 	url = https://github.com/XYOracleNetwork/sdk-ble-swift.git
