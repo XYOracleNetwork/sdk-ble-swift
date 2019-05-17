@@ -17,7 +17,8 @@ public struct XYFirmwareUpdateParameters {
     spiSCKAddress: Int32,
     patchBaseAddress: Int32,
     shouldReconnect: Bool,
-    rebootNoConfirm: Bool
+    rebootNoConfirm: Bool,
+    disconnectOnComplete: Bool
 
     public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
@@ -27,7 +28,8 @@ public struct XYFirmwareUpdateParameters {
             spiSCKAddress: 0x00,
             patchBaseAddress: 0,
             shouldReconnect: true,
-            rebootNoConfirm: false)
+            rebootNoConfirm: false,
+            disconnectOnComplete: false)
     }
 
     public static func convertXy4ToSentinel(bank: Int32) -> XYFirmwareUpdateParameters {
@@ -38,7 +40,8 @@ public struct XYFirmwareUpdateParameters {
             spiSCKAddress: 0x00,
             patchBaseAddress: bank,
             shouldReconnect: false,
-            rebootNoConfirm: false)
+            rebootNoConfirm: false,
+            disconnectOnComplete: false)
     }
 
     public static func updateSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
@@ -48,8 +51,21 @@ public struct XYFirmwareUpdateParameters {
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
             patchBaseAddress: bank,
-            shouldReconnect: true,
-            rebootNoConfirm: true)
+            shouldReconnect: false,
+            rebootNoConfirm: true,
+            disconnectOnComplete: false)
+    }
+
+    public static func fixSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
+        return XYFirmwareUpdateParameters(
+            spiMISOAddress: 0x05,
+            spiMOSIAddress: 0x06,
+            spiCSAddress: 0x07,
+            spiSCKAddress: 0x00,
+            patchBaseAddress: bank,
+            shouldReconnect: false,
+            rebootNoConfirm: true,
+            disconnectOnComplete: true)
     }
 }
 
@@ -116,9 +132,17 @@ public class XYFirmwareUpdateManager {
         self.currentStep = .unstarted
     }
 
+    private func disconnect() {
+        XYCentral.instance.disconnect(from: self.device)
+        self.device.detachPeripheral()
+    }
+
     private func cleanup() {
         print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
         XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
+        if self.parameters.disconnectOnComplete {
+//            self.disconnect()
+        }
         self.success?()
     }
 
@@ -135,8 +159,7 @@ public class XYFirmwareUpdateManager {
                     self.completeUpdate()
                 } else {
                     // We don't need to reconnect, so remove, cleanup and return success
-                    XYCentral.instance.disconnect(from: self.device)
-                    self.device.detachPeripheral()
+                    self.disconnect()
                     self.cleanup()
                 }
             case .disconnected where self.currentStep != .completed:
