@@ -1,8 +1,10 @@
 osx_image: xcode10.2
 language: swift
-xcode_project: XyBleSdk.xcodeproj 
-xcode_scheme: XyBleSdk iOS
+xcode_project: SampleiOS/SampleiOS.xcworkspace
+xcode_scheme: SampleiOS
 xcode_destination: platform=iOS Simulator,OS=11.0,name=iPhone X
 addons:
   sonarcloud:
     organization: xyo-network
+before_install:
+  - gem install cocoapods -v '1.7.0.beta.2'
