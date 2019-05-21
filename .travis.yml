@@ -9,4 +9,5 @@ addons:
 before_install:
   - gem install cocoapods -v '1.7.0.beta.2'
 script:
+  - pod install --project-directory=SampleiOS
   - xcodebuild -workspace SampleiOS/SampleiOS.xcworkspace -scheme SampleiOS -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
