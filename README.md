@@ -2,6 +2,8 @@
 
 [![logo]](https://xy.company)
 
+[![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-ble-swift?branch=master)](https://bettercodehub.com/)
+
 # sdk-ble-ios
 A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
 
@@ -225,7 +227,7 @@ The library comes with two sample projects, one for macOS and one for iOS. The m
 
 ## License
 
-XyBleSdk is available under the MIT license. See the LICENSE file for more info.
+XyBleSdk is available under the LGPL-3.0 license. See the LICENSE file for more info.
 
 <br><hr><br>
 <p align="center">Made with  ❤️  by [<b>XY - The Persistent Company</b>] (https://xy.company)</p>
