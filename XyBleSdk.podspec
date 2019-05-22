@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name = 'XyBleSdk'
-  s.version = '0.0.2'
+  s.version = '0.0.3'
   s.license = { :type => 'MIT', :file => 'LICENSE' }
   s.summary = 'Swift BLE SDK for app developers who want better bluetooth performance'
   s.homepage = 'https://github.com/XYOracleNetwork/sdk-ble-swift'

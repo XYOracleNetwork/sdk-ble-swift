@@ -1,11 +1,13 @@
-osx_image: xcode10.1
+osx_image: xcode10.2
 language: swift
-xcode_project: sdk-ble-swift.xcodeproj 
-xcode_scheme: sdk-ble-swift
+xcode_project: SampleiOS/SampleiOS.xcworkspace
+xcode_scheme: SampleiOS
 xcode_destination: platform=iOS Simulator,OS=11.0,name=iPhone X
 addons:
   sonarcloud:
     organization: xyo-network
-install:
-  - gem install cocoapods
-  
+before_install:
+  - gem install cocoapods -v '1.7.0.beta.2'
+script:
+  - pod install --project-directory=SampleiOS
+  - xcodebuild -workspace SampleiOS/SampleiOS.xcworkspace -scheme SampleiOS -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
