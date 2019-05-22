@@ -103,6 +103,8 @@ final class GattRequest: NSObject {
             print("ALWAYS Get: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
         }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
+        }.catch(on: operationsQueue) { error in
+            self.characteristicPromise.reject(error)
         }
 
         return operationPromise
@@ -151,6 +153,8 @@ final class GattRequest: NSObject {
             print("ALWAYS Set: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
         }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
+        }.catch(on: operationsQueue) { error in
+            self.characteristicPromise.reject(error)
         }
 
         return operationPromise
@@ -200,6 +204,8 @@ final class GattRequest: NSObject {
             print("ALWAYS Notify: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
         }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
+        }.catch(on: operationsQueue) { error in
+            self.characteristicPromise.reject(error)
         }
 
         return operationPromise
