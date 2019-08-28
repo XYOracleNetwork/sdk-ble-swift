@@ -1,13 +1,11 @@
-osx_image: xcode10.2
-language: swift
-xcode_project: SampleiOS/SampleiOS.xcworkspace
-xcode_scheme: SampleiOS
+os: osx
+osx_image: xcode11
+language: objective-c
+cache: cocoapods
+podfile: $TRAVIS_BUILD_DIR/Podfile
+xcode_project: XyBleSdk.xcworkspace
+xcode_scheme: XyBleSdk iOS
 xcode_destination: platform=iOS Simulator,OS=11.0,name=iPhone X
 addons:
   sonarcloud:
     organization: xyo-network
-before_install:
-  - gem install cocoapods -v '1.7.0.beta.2'
-script:
-  - pod install --project-directory=SampleiOS
-  - xcodebuild -workspace SampleiOS/SampleiOS.xcworkspace -scheme SampleiOS -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
