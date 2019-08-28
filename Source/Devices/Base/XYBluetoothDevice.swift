@@ -9,6 +9,8 @@
 import CoreBluetooth
 import CoreLocation
 import Promises
+import CoreLocation
+
 
 
 // Use for notifying when a property that the client has subscribed to has changed
