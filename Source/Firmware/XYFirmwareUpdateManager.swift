@@ -16,7 +16,9 @@ public struct XYFirmwareUpdateParameters {
     spiCSAddress: Int32,
     spiSCKAddress: Int32,
     patchBaseAddress: Int32,
-    shouldReconnect: Bool
+    shouldReconnect: Bool,
+    rebootNoConfirm: Bool,
+    disconnectOnComplete: Bool
 
     public static var xy4: XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
@@ -25,27 +27,45 @@ public struct XYFirmwareUpdateParameters {
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
             patchBaseAddress: 0,
-            shouldReconnect: true)
+            shouldReconnect: true,
+            rebootNoConfirm: false,
+            disconnectOnComplete: false)
     }
 
-    public static var convertXy4ToSentinelXBank0: XYFirmwareUpdateParameters {
+    public static func convertXy4ToSentinel(bank: Int32) -> XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
             spiMISOAddress: 0x05,
             spiMOSIAddress: 0x06,
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
-            patchBaseAddress: 0,
-            shouldReconnect: false)
+            patchBaseAddress: bank,
+            shouldReconnect: false,
+            rebootNoConfirm: false,
+            disconnectOnComplete: false)
     }
 
-    public static var convertXy4ToSentinelXBank1: XYFirmwareUpdateParameters {
+    public static func updateSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
         return XYFirmwareUpdateParameters(
             spiMISOAddress: 0x05,
             spiMOSIAddress: 0x06,
             spiCSAddress: 0x07,
             spiSCKAddress: 0x00,
-            patchBaseAddress: 1,
-            shouldReconnect: false)
+            patchBaseAddress: bank,
+            shouldReconnect: false,
+            rebootNoConfirm: true,
+            disconnectOnComplete: false)
+    }
+
+    public static func fixSentinelX(bank: Int32) -> XYFirmwareUpdateParameters {
+        return XYFirmwareUpdateParameters(
+            spiMISOAddress: 0x05,
+            spiMOSIAddress: 0x06,
+            spiCSAddress: 0x07,
+            spiSCKAddress: 0x00,
+            patchBaseAddress: bank,
+            shouldReconnect: false,
+            rebootNoConfirm: true,
+            disconnectOnComplete: true)
     }
 }
 
@@ -67,7 +87,7 @@ public class XYFirmwareUpdateManager {
     }
 
     fileprivate let
-    device: XYFinderDevice
+    device: XYBluetoothDevice
 
     fileprivate var
     firmwareData: Data
@@ -99,7 +119,7 @@ public class XYFirmwareUpdateManager {
 
     let memoryType: XYFirmwareUpdateManager.UpdateMemoryType = .SUOTA_SPI
 
-    public init(for device: XYFinderDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
+    public init(for device: XYBluetoothDevice, parameters: XYFirmwareUpdateParameters, firmwareData: Data, delegate: XYFirmwareUpdateManagerProgressDelegate? = nil) {
         self.device = device
         self.parameters = parameters
         self.firmwareData = firmwareData
@@ -112,15 +132,23 @@ public class XYFirmwareUpdateManager {
         self.currentStep = .unstarted
     }
 
+    private func disconnect() {
+        XYCentral.instance.disconnect(from: self.device)
+        self.device.detachPeripheral()
+    }
+
+    private func cleanup() {
+        print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
+        XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
+        if self.parameters.disconnectOnComplete {
+//            self.disconnect()
+        }
+        self.success?()
+    }
+
     public func update(_ success: @escaping () -> Void, failure: @escaping (_ error: XYBluetoothError) -> Void) {
         self.success = success
         self.failure = failure
-
-        func cleanup() {
-            print("- FIRMWARE Step SUCCESS: \(XYFirmwareUpdateStep.completed.rawValue)")
-            XYFinderDeviceEventManager.unsubscribe(to: [.disconnected, .connected], referenceKey: self.subscribeKey)
-            self.success?()
-        }
 
         // Watch for various events to properly handle the OTA
         self.subscribeKey = XYFinderDeviceEventManager.subscribe(to: [.disconnected, .connected], for: self.device) { event in
@@ -131,9 +159,8 @@ public class XYFirmwareUpdateManager {
                     self.completeUpdate()
                 } else {
                     // We don't need to reconnect, so remove, cleanup and return success
-                    XYCentral.instance.disconnect(from: self.device)
-                    self.device.detachPeripheral()
-                    cleanup()
+                    self.disconnect()
+                    self.cleanup()
                 }
             case .disconnected where self.currentStep != .completed:
                 // The update bombed out at some point, so remove the peripheral and let the user know to retry
@@ -144,13 +171,17 @@ public class XYFirmwareUpdateManager {
                 // All done, so unsubscribe from the ota service and the events, and then return success
                 self.device.connection {
                     _ = self.device.unsubscribe(from: OtaService.servStatus, key: self.notifyKey)
-                    for _ in 1...10 {
-                        if self.device.stayAwake().hasError == false {
-                            break
+
+                    // If we're a finder, put us awake
+                    if let device = self.device as? XYFinderDevice {
+                        for _ in 1...10 {
+                            if device.stayAwake().hasError == false {
+                                break
+                            }
                         }
                     }
                 }.always {
-                    cleanup()
+                    self.cleanup()
                 }
 
             default:
@@ -329,6 +360,12 @@ private extension XYFirmwareUpdateManager {
 
             self.writeValue(to: .memDev, value: parameter)
 
+            // We never get a reboot response from a Sentinel X reboot, so inform
+            // the delegate we are all done so they can "reboot"
+            if self.parameters.rebootNoConfirm {
+                self.cleanup()
+            }
+
         case .completed:
             break
 
@@ -366,6 +403,8 @@ private extension XYFirmwareUpdateManager {
             } else {
                 print(result.error?.toString ?? "<unknown>")
             }
+        }.catch { error in
+            self.failure?(error as? XYBluetoothError ?? XYBluetoothError.cbPeripheralDelegateError(error))
         }
     }
 

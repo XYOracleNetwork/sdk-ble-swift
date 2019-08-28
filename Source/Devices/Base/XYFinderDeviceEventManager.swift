@@ -14,21 +14,12 @@ internal struct XYFinderDeviceEventDirective {
     let
     referenceKey: UUID = UUID.init(),
     handler: XYFinderDeviceEventNotifier,
-    device: XYFinderDevice?
+    device: XYBluetoothDevice?
 }
 
 public class XYFinderDeviceEventManager {
 
     fileprivate static var handlerRegistry = [XYFinderEvent: [XYFinderDeviceEventDirective]]()
-//    {
-//        didSet {
-//            let count = handlerRegistry.reduce(0) { $0 + $1.value.count }
-//            self.handlerRegistry.forEach { key, value in
-//                print("\(key.rawValue) - \(value.count)")
-//            }
-//            print("I got set and my new count is \(count)")
-//        }
-//    }
 
     fileprivate static let managerQueue = DispatchQueue(label: "com.xyfindables.sdk.XYFinderDeviceEventManagerQueue")
 
@@ -47,7 +38,7 @@ public class XYFinderDeviceEventManager {
     }
 
     // Subscribe to a single device's events. This will simply filter when it comes to reporting to the handlers
-    public static func subscribe(to events: [XYFinderEvent], for device: XYFinderDevice?, handler: @escaping XYFinderDeviceEventNotifier) -> UUID {
+    public static func subscribe(to events: [XYFinderEvent], for device: XYBluetoothDevice?, handler: @escaping XYFinderDeviceEventNotifier) -> UUID {
         let directive = XYFinderDeviceEventDirective(handler: handler, device: device)
         managerQueue.async {
             events.forEach { event in

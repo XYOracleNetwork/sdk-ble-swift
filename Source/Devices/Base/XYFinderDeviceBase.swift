@@ -9,7 +9,6 @@
 import Foundation
 import CoreLocation
 import CoreBluetooth
-import Promises
 
 // The base XYFinder class
 public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {

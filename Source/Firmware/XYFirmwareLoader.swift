@@ -101,7 +101,7 @@ public class XYFirmwareRemoteVersionLoader {
 // MARK: Fetches the version JSON and the path to the firmware
 public class XYSentinelFirmwareRemoteVersionLoader {
 
-    public class func get(from path: String = "https://s3.amazonaws.com/xyfirmware.xyo.network/sentinelx/version.json") -> XYRemoteVersionData2? {
+    public class func get(from path: String) -> XYRemoteVersionData2? {
         guard
             let url = URL(string: path),
             let versionData = self.loadJson(from: url) else {

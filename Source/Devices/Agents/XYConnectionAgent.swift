@@ -6,8 +6,8 @@
 //  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
-import Promises
 import CoreBluetooth
+import Promises
 
 // A helper to allow for adding connecting to a peripheral to a connection() operation closure
 internal final class XYConnectionAgent: XYCentralDelegate {

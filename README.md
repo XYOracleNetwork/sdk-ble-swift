@@ -2,15 +2,18 @@
 
 [![logo]](https://xy.company)
 
+[![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-ble-swift?branch=master)](https://bettercodehub.com/)
+
 # sdk-ble-ios
+
 A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
 
 ## Requirements
 
-- iOS 11.0+
-- MacOS 10.13+
-- Xcode 10.1+
-- Swift 4.2+
+-   iOS 11.0+
+-   MacOS 10.13+
+-   Xcode 10.1+
+-   Swift 4.2+
 
 ## Installation
 
@@ -63,24 +66,22 @@ github "XYOracleNetwork/sdk-ble-swift" ~> 0.1.0
 
 Run `carthage update --use-submodules` to build the framework and drag the built `XyBleSdk.framework`, `FBLPromises.framework` and `Promises.framework` to the _Linked Frameworks and Libraries_ of your Xcode project. Then switch to the _Build Phases_ tab and add a _New run script phase_. Expand _Run Script_ and add the following to the _Shell_ text field:
 
-```
-/usr/local/bin/carthage copy-frameworks
-```
+    /usr/local/bin/carthage copy-frameworks
 
 Click the + button under _Input Files_ and add:
 
-```
-$(SRCROOT)/Carthage/Build/<target platform>/Promises.framework
-$(SRCROOT)/Carthage/Build/<target platform>/FBLPromises.framework
-$(SRCROOT)/Carthage/Build/<target platform>/XyBleSdk.framework
-```
+    $(SRCROOT)/Carthage/Build/<target platform>/Promises.framework
+    $(SRCROOT)/Carthage/Build/<target platform>/FBLPromises.framework
+    $(SRCROOT)/Carthage/Build/<target platform>/XyBleSdk.framework
 
 Finally, you will need to add a _New Copy Files Phase_, selecting _Frameworks_ for the _Destination_ and adding the three frameworks, ensuring the _Code Sign On Copy_ boxes are checked.
 
 ## Overview
+
 Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral`, with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Bluetooth devices are often not predictable in their reponse times due to firmware and environmental conditions, which can make them tricky to deal with, especially if the application requires multiple, disparate devices connected to operate properly.
 
 ## Code Example
+
 The XyBleSdk provides a simple interface to communicating with an XY Finder or other Bluetooth device. Let's take a look at an example for an XY Finder device:
 
 ```swift
@@ -154,6 +155,7 @@ device.connection {
     self.updateView()
 }
 ```
+
 ## Services
 
 The library provides three types of communication with a Bluetooth device, `get`, `set`, and `notify`. These operate on the characteristic of a GATT service, which is defined with the `XYServiceCharacteristicType` protocol. Add a new service by creating an enumeration that implements this protocol:
@@ -225,7 +227,8 @@ The library comes with two sample projects, one for macOS and one for iOS. The m
 
 ## License
 
-XyBleSdk is available under the MIT license. See the LICENSE file for more info.
+See the [LICENSE.md](LICENSE) file for license details.
 
-<br><hr><br>
-<p align="center">Made with  ❤️  by [<b>XY - The Persistent Company</b>] (https://xy.company)</p>
+## Credits
+
+Made with 🔥and ❄️ by [XY - The Persistent Company](https://www.xy.company)

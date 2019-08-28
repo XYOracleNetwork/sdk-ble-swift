@@ -46,7 +46,7 @@ final class GattRequest: NSObject {
 
     fileprivate let operationsQueue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestOperationsQueue")
 
-    fileprivate static let callTimeout: DispatchTimeInterval = .seconds(30)
+    fileprivate static let callTimeout: DispatchTimeInterval = .seconds(18)
     fileprivate static let queue = DispatchQueue(label:"com.xyfindables.sdk.XYGattRequestTimeoutQueue")
     fileprivate var timer: DispatchSourceTimer?
 
@@ -103,6 +103,8 @@ final class GattRequest: NSObject {
             print("ALWAYS Get: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
         }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
+        }.catch(on: operationsQueue) { error in
+            self.characteristicPromise.reject(error)
         }
 
         return operationPromise
@@ -151,6 +153,8 @@ final class GattRequest: NSObject {
             print("ALWAYS Set: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
         }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
+        }.catch(on: operationsQueue) { error in
+            self.characteristicPromise.reject(error)
         }
 
         return operationPromise
@@ -185,6 +189,7 @@ final class GattRequest: NSObject {
             strong.timer = nil
             strong.status = .timedOut
             strong.notifyPromise.reject(XYBluetoothError.timedOut)
+            operationPromise.reject(XYBluetoothError.timedOut)
         }
 
         // Assign the pending operation promise to the results from getting services/characteristics and
@@ -199,6 +204,8 @@ final class GattRequest: NSObject {
             print("ALWAYS Notify: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
         }.catch(on: operationsQueue) { error in
             operationPromise.reject(error)
+        }.catch(on: operationsQueue) { error in
+            self.characteristicPromise.reject(error)
         }
 
         return operationPromise
