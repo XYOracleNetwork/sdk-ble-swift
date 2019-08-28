@@ -9,7 +9,6 @@
 import Foundation
 import CoreLocation
 import CoreBluetooth
-import Promises
 
 // A device from the XY family, has an iBeacon and other XY-specific identifiers
 public protocol XYFinderDevice: XYBluetoothDevice {

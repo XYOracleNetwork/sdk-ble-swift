@@ -6,8 +6,8 @@
 //  Copyright © 2018 XY - The Findables Company. All rights reserved.
 //
 
-import Promises
 import CoreBluetooth
+import Promises
 
 // An agent that allows for adding connecting to the Central in an XYBluetoothDevice connection block
 // or any other Promises chain

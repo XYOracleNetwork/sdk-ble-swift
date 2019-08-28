@@ -7,7 +7,6 @@
 //
 
 import CoreBluetooth
-import Promises
 
 // The XYGPS-specific implementation
 public class XYGPSBluetoothDevice: XYFinderDeviceBase {
