@@ -6,6 +6,11 @@ podfile: $TRAVIS_BUILD_DIR/Podfile
 xcode_project: XyBleSdk.xcworkspace
 xcode_scheme: XyBleSdk iOS
 xcode_destination: platform=iOS Simulator,OS=11.0,name=iPhone X
-addons:
-  sonarcloud:
-    organization: xyo-network
+script:
+  ./scripts/build.sh
+deploy:
+    provider: script
+    script:
+      ./scripts/deploy.sh
+    on:
+      branch: master
