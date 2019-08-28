@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.authors = { 'XY - The Persistent Company' => 'darren@xyo.network' }
   s.source = { :git => 'https://github.com/XYOracleNetwork/sdk-ble-swift.git', :tag => s.version }
   s.documentation_url = 'https://github.com/XYOracleNetwork/sdk-ble-swift'
-  s.swift_version = '4.2'
+  s.swift_version = '5.0'
 
   s.ios.deployment_target = '11.0'
 

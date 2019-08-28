@@ -7,7 +7,6 @@
 //
 
 import CoreBluetooth
-import Promises
 
 // The XY3-specific implementation
 public class XY3BluetoothDevice: XYFinderDeviceBase {

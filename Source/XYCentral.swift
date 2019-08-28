@@ -8,7 +8,6 @@
 
 import Foundation
 import CoreBluetooth
-import Promises
 
 // A wrapper around CBPeripheral, used also to mark any devices for restore or delete if the app is killed in the background
 public struct XYPeripheral: Hashable, Equatable {

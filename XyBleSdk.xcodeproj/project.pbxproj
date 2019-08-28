@@ -135,9 +135,13 @@
 		31BCE84E2254203B004799D7 /* XYDeviceCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE8362254203B004799D7 /* XYDeviceCreator.swift */; };
 		31BCE85022542062004799D7 /* XYFinderPrimaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */; };
 		31BCE85122542062004799D7 /* XYFinderPrimaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */; };
+		5EBF4D0C5A931FD17C5FD6EA /* Pods_XyBleSdk_macOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29D38CE963DE5677B289B7F4 /* Pods_XyBleSdk_macOS.framework */; };
+		65021E2842220085E60CF14A /* Pods_XyBleSdk_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A768E05594F957F4F2060ADB /* Pods_XyBleSdk_iOS.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		20A41A591BE6078C782A2AB6 /* Pods-XyBleSdk iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk iOS.release.xcconfig"; path = "Target Support Files/Pods-XyBleSdk iOS/Pods-XyBleSdk iOS.release.xcconfig"; sourceTree = "<group>"; };
+		29D38CE963DE5677B289B7F4 /* Pods_XyBleSdk_macOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XyBleSdk_macOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		314B3F2C21CDB051006E2EC3 /* XyBleSdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XyBleSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		314B3F3921CDB074006E2EC3 /* XyBleSdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XyBleSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFirmwareUpdateManager.swift; sourceTree = "<group>"; };
@@ -205,6 +209,10 @@
 		31BCE8352254203B004799D7 /* XY4BluetoothDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XY4BluetoothDeviceCreator.swift; path = Creators/XY4BluetoothDeviceCreator.swift; sourceTree = "<group>"; };
 		31BCE8362254203B004799D7 /* XYDeviceCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XYDeviceCreator.swift; path = Creators/XYDeviceCreator.swift; sourceTree = "<group>"; };
 		31BCE84F22542062004799D7 /* XYFinderPrimaryService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYFinderPrimaryService.swift; sourceTree = "<group>"; };
+		44203549EDE565E64F914ECD /* Pods-XyBleSdk iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk iOS.debug.xcconfig"; path = "Target Support Files/Pods-XyBleSdk iOS/Pods-XyBleSdk iOS.debug.xcconfig"; sourceTree = "<group>"; };
+		45780DD0A72D671AB215300B /* Pods-XyBleSdk macOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk macOS.debug.xcconfig"; path = "Target Support Files/Pods-XyBleSdk macOS/Pods-XyBleSdk macOS.debug.xcconfig"; sourceTree = "<group>"; };
+		70185BC5630AB8BD36036C25 /* Pods-XyBleSdk macOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk macOS.release.xcconfig"; path = "Target Support Files/Pods-XyBleSdk macOS/Pods-XyBleSdk macOS.release.xcconfig"; sourceTree = "<group>"; };
+		A768E05594F957F4F2060ADB /* Pods_XyBleSdk_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XyBleSdk_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -214,6 +222,7 @@
 			files = (
 				31BCE82022541BD7004799D7 /* Promises.framework in Frameworks */,
 				31BCE82122541BD7004799D7 /* FBLPromises.framework in Frameworks */,
+				65021E2842220085E60CF14A /* Pods_XyBleSdk_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,6 +232,7 @@
 			files = (
 				31BCE82322541BDF004799D7 /* Promises.framework in Frameworks */,
 				31BCE82222541BDC004799D7 /* FBLPromises.framework in Frameworks */,
+				5EBF4D0C5A931FD17C5FD6EA /* Pods_XyBleSdk_macOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +245,7 @@
 				314B3F4121CDB121006E2EC3 /* Source */,
 				314B3F1D21CDB009006E2EC3 /* Products */,
 				314B3FE021CDB687006E2EC3 /* Frameworks */,
+				514CEEA17A96F069D060FCD0 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -404,6 +415,8 @@
 			children = (
 				31BCE81F22541BD7004799D7 /* FBLPromises.framework */,
 				31BCE81E22541BD7004799D7 /* Promises.framework */,
+				A768E05594F957F4F2060ADB /* Pods_XyBleSdk_iOS.framework */,
+				29D38CE963DE5677B289B7F4 /* Pods_XyBleSdk_macOS.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -428,6 +441,17 @@
 				31BCE8332254203B004799D7 /* XY3BluetoothDeviceCreator.swift */,
 			);
 			path = Creators;
+			sourceTree = "<group>";
+		};
+		514CEEA17A96F069D060FCD0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				44203549EDE565E64F914ECD /* Pods-XyBleSdk iOS.debug.xcconfig */,
+				20A41A591BE6078C782A2AB6 /* Pods-XyBleSdk iOS.release.xcconfig */,
+				45780DD0A72D671AB215300B /* Pods-XyBleSdk macOS.debug.xcconfig */,
+				70185BC5630AB8BD36036C25 /* Pods-XyBleSdk macOS.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -456,6 +480,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 314B3F3121CDB051006E2EC3 /* Build configuration list for PBXNativeTarget "XyBleSdk iOS" */;
 			buildPhases = (
+				4D5C1982124562A6C7F7F1AF /* [CP] Check Pods Manifest.lock */,
 				314B3F2821CDB051006E2EC3 /* Sources */,
 				314B3F2921CDB051006E2EC3 /* Frameworks */,
 				314B3F2721CDB051006E2EC3 /* Headers */,
@@ -474,6 +499,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 314B3F3E21CDB074006E2EC3 /* Build configuration list for PBXNativeTarget "XyBleSdk macOS" */;
 			buildPhases = (
+				1BDF6B903EB474868E0F28C8 /* [CP] Check Pods Manifest.lock */,
 				314B3F3521CDB074006E2EC3 /* Sources */,
 				314B3F3621CDB074006E2EC3 /* Frameworks */,
 				314B3F3421CDB074006E2EC3 /* Headers */,
@@ -499,7 +525,7 @@
 				TargetAttributes = {
 					314B3F2B21CDB051006E2EC3 = {
 						CreatedOnToolsVersion = 10.1;
-						LastSwiftMigration = 1010;
+						LastSwiftMigration = 1030;
 					};
 					314B3F3821CDB074006E2EC3 = {
 						CreatedOnToolsVersion = 10.1;
@@ -541,6 +567,53 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1BDF6B903EB474868E0F28C8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-XyBleSdk macOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4D5C1982124562A6C7F7F1AF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-XyBleSdk iOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		314B3F2821CDB051006E2EC3 /* Sources */ = {
@@ -806,6 +879,7 @@
 		};
 		314B3F3221CDB051006E2EC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 44203549EDE565E64F914ECD /* Pods-XyBleSdk iOS.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -832,13 +906,14 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
 		314B3F3321CDB051006E2EC3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20A41A591BE6078C782A2AB6 /* Pods-XyBleSdk iOS.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -864,13 +939,14 @@
 				PRODUCT_NAME = XyBleSdk;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 		314B3F3F21CDB074006E2EC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 45780DD0A72D671AB215300B /* Pods-XyBleSdk macOS.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
@@ -904,6 +980,7 @@
 		};
 		314B3F4021CDB074006E2EC3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 70185BC5630AB8BD36036C25 /* Pods-XyBleSdk macOS.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
