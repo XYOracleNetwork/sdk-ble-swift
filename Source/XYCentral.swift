@@ -58,16 +58,16 @@ internal extension XYPeripheral {
         
         var uuid = [UInt8](repeating: 0, count: 16)
         manufacturerData.copyBytes(to: &uuid, from: 4..<20)
-        guard let foundUuid = UUID(uuidString: CBUUID(data: Data(bytes: uuid)).uuidString) else { return nil }
+        guard let foundUuid = UUID(uuidString: CBUUID(data: Data(uuid)).uuidString) else { return nil }
         
         var major = [UInt8](repeating: 0, count: 2)
         manufacturerData.copyBytes(to: &major, from: 20..<22)
-        let rawMajor = Data(bytes: major)
+        let rawMajor = Data(major)
         let foundMajor = UInt16(bigEndian: rawMajor.withUnsafeBytes { $0.pointee })
         
         var minor = [UInt8](repeating: 0, count: 2)
         manufacturerData.copyBytes(to: &minor, from: 22..<24)
-        let rawMinor = Data(bytes: minor)
+        let rawMinor = Data(minor)
         let foundMinor = UInt16(bigEndian: rawMinor.withUnsafeBytes { $0.pointee })
         
         var measuredPower: UInt8 = 0
@@ -80,7 +80,7 @@ internal extension XYPeripheral {
 
 public extension CBManagerState {
 
-    public var toString: String {
+    var toString: String {
         switch self {
         case .poweredOff: return "Powered Off"
         case .poweredOn: return "Powered On"
@@ -88,6 +88,7 @@ public extension CBManagerState {
         case .unauthorized: return "Unauthorized"
         case .unknown: return "Unknown"
         case .unsupported: return "Unsupported"
+        default: return "Unknown"
         }
     }
 }
