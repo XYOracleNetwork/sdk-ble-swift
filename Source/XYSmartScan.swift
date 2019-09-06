@@ -189,12 +189,18 @@ extension XYSmartScan {
             break
         case .poweredOff:
             newStatus = .bluetoothDisabled
+          break
         case .unsupported:
             newStatus = .bluetoothUnavailable
+          break
         case .unauthorized:
             newStatus = .backgroundLocationDisabled
+          break
         case .resetting:
             newStatus = .none
+          break
+        default:
+          break;
         }
 
         if self.currentStatus != newStatus {

@@ -123,14 +123,14 @@ extension XYLocation {
 // MARK: Monitoring methods (used for background operation)
 public extension XYLocation {
 
-    public func clearMonitoring() {
+    func clearMonitoring() {
         self.manager.monitoredRegions.forEach { region in
             self.manager.stopMonitoring(for: region)
         }
     }
 
     // Convenience method
-    public func startMonitoring(for families: [XYDeviceFamily]) {
+    func startMonitoring(for families: [XYDeviceFamily]) {
         
         families.forEach { startMonitoring(for: $0, isHighPriority: false) }
     }
@@ -180,7 +180,7 @@ public extension XYLocation {
         self.manager.startMonitoring(for: beaconRegionLevel4)
     }
 
-    public func stopMonitoring(for device: XYBluetoothDevice) {
+    func stopMonitoring(for device: XYBluetoothDevice) {
         manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 4))
         manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 7))
         manager.stopMonitoring(for: device.beaconRegion(device.family.uuid, slot: 8))
