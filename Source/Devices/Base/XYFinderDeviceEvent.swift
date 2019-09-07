@@ -39,7 +39,7 @@ public enum XYFinderEventNotification {
     case reconnected(device: XYBluetoothDevice)
     case disconnected(device: XYBluetoothDevice)
     case buttonPressed(device: XYBluetoothDevice, type: XYButtonType2)
-    case detected(device: XYBluetoothDevice, powerLevel: Int, signalStrength: Int, distance: Double)
+    case detected(device: XYBluetoothDevice, powerLevel: Int, rssi: Int, distance: Double)
     case entered(device: XYBluetoothDevice)
     case exiting(device: XYBluetoothDevice)
     case exited(device: XYBluetoothDevice)

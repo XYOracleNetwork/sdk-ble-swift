@@ -39,11 +39,11 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         rangedDevicesManager.setDelegate(self)
         self.navigationItem.rightBarButtonItem = self.pauseButton
-        rangedDevicesManager.startRanging()
+        rangedDevicesManager.start()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        rangedDevicesManager.stopRanging()
+        rangedDevicesManager.stop()
     }
 
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
@@ -56,13 +56,13 @@ private extension ViewController {
 
     @objc func pauseTapped() {
         self.shouldReload = false
-        self.rangedDevicesManager.stopRanging()
+        self.rangedDevicesManager.stop()
         self.navigationItem.rightBarButtonItem = self.playButton
     }
 
     @objc func playTapped() {
         self.shouldReload = true
-        self.rangedDevicesManager.startRanging()
+        self.rangedDevicesManager.start()
         self.navigationItem.rightBarButtonItem = self.pauseButton
     }
 
