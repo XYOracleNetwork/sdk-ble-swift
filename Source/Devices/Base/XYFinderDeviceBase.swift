@@ -115,10 +115,10 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
         XYFinderDeviceEventManager.report(events: [.entered(device: self)])
     }
     
-    public override func detected() {
+  public override func detected(_ rssi: Int) {
         guard self.isUpdatingFirmware == false else { return }
 
-        var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), signalStrength: self.rssi, distance: 0)]
+        var events: [XYFinderEventNotification] = [.detected(device: self, powerLevel: Int(self.powerLevel), rssi: self.rssi, distance: 0)]
 
         // If the button has been pressed on a compatible devices, we add the appropriate event
         if powerLevel == 8, shouldCheckForButtonPressOnDetection {

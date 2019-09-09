@@ -70,7 +70,7 @@ internal final class XYConnectionAgent: XYCentralDelegate {
     }
 
     // 3a. Delegate called from scan(), we found the device and now will connect
-    func located(peripheral: XYPeripheral) {
+  func located(peripheral: XYPeripheral) {
         connectionQueue.async {
             if self.device.attachPeripheral(peripheral) {
                 self.central.connect(to: self.device)

@@ -14,11 +14,11 @@ public class XYBluetoothDeviceFactory {
     internal static let deviceCache = XYDeviceCache()
     
     public static func addCreator (uuid : String, creator: XYDeviceCreator) {
-        uuidToCreators[uuid] = creator
+        uuidToCreators[uuid.lowercased() ] = creator
     }
     
     public static func removeCreator (uuid: String) {
-        uuidToCreators.removeValue(forKey: uuid)
+        uuidToCreators.removeValue(forKey: uuid.lowercased())
     }
     
     public static var devices: [XYBluetoothDevice] {
@@ -53,7 +53,7 @@ public class XYBluetoothDeviceFactory {
     }
     
     // Create a device from an iBeacon definition, or update a cached device with the latest iBeacon/rssi data
-    public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int = XYDeviceProximity.defaultProximity, updateRssiAndPower: Bool = false) -> XYBluetoothDevice? {
+    public class func build(from iBeacon: XYIBeaconDefinition, rssi: Int? = nil, updateRssiAndPower: Bool = false) -> XYBluetoothDevice? {
         guard let family = XYDeviceFamily.build(iBeacon: iBeacon) else {
             return nil
         }
@@ -63,7 +63,7 @@ public class XYBluetoothDeviceFactory {
         if let foundDevice = deviceCache[iBeacon.xyId(from: family)] {
             device = foundDevice
         } else {
-            device = uuidToCreators[iBeacon.uuid.uuidString.lowercased()]?.createFromIBeacon(iBeacon: iBeacon, rssi: rssi)
+          device = uuidToCreators[iBeacon.uuid.uuidString.lowercased()]?.createFromIBeacon(iBeacon: iBeacon, rssi: rssi ?? XYDeviceProximity.defaultProximity)
             
             if let device = device {
                 deviceCache[device.id] = device
@@ -73,7 +73,9 @@ public class XYBluetoothDeviceFactory {
         if updateRssiAndPower {
             // Update the device based on the read value if requested (typically when ranging beacons
             // to detect button presses and rssi changes)
-            device?.update(rssi, powerLevel: iBeacon.powerLevel)
+          if ((rssi != nil ? rssi! : 0) < 0) {
+            device?.update(rssi ?? XYDeviceProximity.defaultProximity, powerLevel: iBeacon.powerLevel)
+          }
         }
         
         return device
