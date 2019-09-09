@@ -14,11 +14,11 @@ public class XYBluetoothDeviceFactory {
     internal static let deviceCache = XYDeviceCache()
     
     public static func addCreator (uuid : String, creator: XYDeviceCreator) {
-        uuidToCreators[uuid] = creator
+        uuidToCreators[uuid.lowercased() ] = creator
     }
     
     public static func removeCreator (uuid: String) {
-        uuidToCreators.removeValue(forKey: uuid)
+        uuidToCreators.removeValue(forKey: uuid.lowercased())
     }
     
     public static var devices: [XYBluetoothDevice] {
@@ -73,7 +73,9 @@ public class XYBluetoothDeviceFactory {
         if updateRssiAndPower {
             // Update the device based on the read value if requested (typically when ranging beacons
             // to detect button presses and rssi changes)
-          device?.update(rssi ?? XYDeviceProximity.defaultProximity, powerLevel: iBeacon.powerLevel)
+          if ((rssi != nil ? rssi! : 0) < 0) {
+            device?.update(rssi ?? XYDeviceProximity.defaultProximity, powerLevel: iBeacon.powerLevel)
+          }
         }
         
         return device

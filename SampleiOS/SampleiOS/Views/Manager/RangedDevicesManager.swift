@@ -221,6 +221,20 @@ extension RangedDevicesManager: UITableViewDataSource {
 
 extension RangedDevicesManager: XYSmartScanDelegate {
   
+  func upsertDeviceToGroup(_ family: TableSection,  device: XYBluetoothDevice) {
+    if (self.rangedDevices[family] == nil) {
+      self.rangedDevices[family] = [XYBluetoothDevice]()
+    }
+    let existing = self.rangedDevices[family]!.first{element in
+      return (element.id == device.id)
+    }
+    if (existing != nil) {
+      existing!.update(device.rssi, powerLevel: device.powerLevel)
+    } else {
+      self.rangedDevices[family]?.append(device)
+    }
+  }
+  
   func smartScan(detected devices: [XYBluetoothDevice], family: XYDeviceFamily) {
     DispatchQueue.main.async {
       // Filter out devices not in the specified range and sort by rssi
@@ -234,9 +248,11 @@ extension RangedDevicesManager: XYSmartScanDelegate {
       // Group up the values into the appropriate table section and reload the view
       let group = Dictionary(grouping: inRange, by: { $0.family.toTableSection! })
       if let family = group.keys.first {
-        group.count > 0 ? self.rangedDevices[family] = group[family] : self.rangedDevices[family]?.removeAll()
-        self.delegate?.reloadTableView()
+        devices.forEach { device in
+          self.upsertDeviceToGroup(family, device: device)
+        }
       }
+      self.delegate?.reloadTableView()
     }
   }
   

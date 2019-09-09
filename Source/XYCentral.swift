@@ -41,6 +41,21 @@ public struct XYPeripheral: Hashable, Equatable {
 // MARK: Convert peripheral into beacon definition from ad data, used on Mac OS
 internal extension XYPeripheral {
   
+  private func iBeaconFromUUID(_ uuid: CBUUID, family: UUID) -> XYIBeaconDefinition? {
+    
+    var minor = [UInt8](repeating: 0, count: 2)
+    uuid.data.copyBytes(to: &minor, from: 2..<4)
+    let rawMinor = Data(minor)
+    let foundMinor = UInt16(littleEndian: rawMinor.withUnsafeBytes { $0.load(as: UInt16.self) })
+    
+    var major = [UInt8](repeating: 0, count: 2)
+    uuid.data.copyBytes(to: &major, from: 0..<2)
+    let rawMajor = Data(major)
+    let foundMajor = UInt16(littleEndian: rawMajor.withUnsafeBytes { $0.load(as: UInt16.self) })
+    
+    return XYIBeaconDefinition(uuid: family, major: foundMajor, minor: foundMinor)
+  }
+  
   var beaconDefinitionFromAdData: XYIBeaconDefinition? {
     if let manufacturerData = self.advertisementData?[CBAdvertisementDataManufacturerDataKey] as? Data {
       
@@ -80,10 +95,16 @@ internal extension XYPeripheral {
     } else {
       if let serviceids = self.advertisementData?[CBAdvertisementDataServiceUUIDsKey] as? [Any] {
         if let uuid = serviceids[0] as? CBUUID {
-
-          if (uuid.uuidString.hasSuffix("-785F-0000-0000-0401F4AC4EA4")) {print ("XY4")}
-          if (uuid.uuidString.hasSuffix("-DF36-484E-BC98-2D5398C5593E")) {print ("SenX")}
+          if (uuid.uuidString.hasSuffix("-785F-0000-0000-0401F4AC4EA4")) {
+            print ("XY4")
+            return iBeaconFromUUID(uuid, family:UUID(uuidString: "a44eacf4-0104-0000-0000-5f784c9977b5")!)
+          }
+          if (uuid.uuidString.hasSuffix("-DF36-484E-BC98-2D5398C5593E")) {
+            print ("SenX")
+            return iBeaconFromUUID(uuid, family:UUID(uuidString: "d684352e-df36-484e-bc98-2d5398c5593e")!)
+          }
           print(uuid.uuidString)
+          return nil
         }
         return nil
       } else {

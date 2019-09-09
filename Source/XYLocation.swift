@@ -194,9 +194,9 @@ extension XYLocation: CLLocationManagerDelegate {
   // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
   public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
     let processedBeacons = beacons.compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
-    self.delegates.forEach {
-      $1?.didRangeBeacons(processedBeacons,for: region.family)
-    }
+    //self.delegates.forEach {
+      //$1?.didRangeBeacons(processedBeacons,for: region.family)
+   //}
   }
   
   public func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {

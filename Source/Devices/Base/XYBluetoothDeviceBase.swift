@@ -26,9 +26,18 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
   
   internal var verifyCounter = 0
   
+  var _rssi: Int = 0
+  
   public var
-  rssi: Int,
-  powerLevel: UInt8
+  rssi: Int {
+    set {
+      _rssi = newValue
+    }
+    get {
+      return _rssi
+    }
+  }
+  public var powerLevel: UInt8
   
   public let
   name: String,
@@ -63,13 +72,13 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
   
   public init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue, family : XYDeviceFamily, iBeacon : XYIBeaconDefinition?) {
     self.id = id
-    self.rssi = rssi
     self.name = ""
     self.powerLevel = 0
     self.deviceBleQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothBaseQueueFor\(id.shortId)")
     self.family = family
     self.iBeacon = iBeacon
     super.init()
+    self.rssi = rssi
   }
   
   open func detected(_ rssi: Int) {}
