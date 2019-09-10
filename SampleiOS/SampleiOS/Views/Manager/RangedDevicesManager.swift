@@ -241,7 +241,7 @@ extension RangedDevicesManager: XYSmartScanDelegate {
       var inRange = devices
       
       if self.rssiRangeToDisplay != 0 {
-        inRange = devices.filter { $0.rssi >= self.rssiRangeToDisplay && $0.rssi != 0 }
+        inRange = devices.filter { $0.rssi >= self.rssiRangeToDisplay && $0.rssi < 0 }
       }
       inRange = inRange.sorted(by: { ($0.powerLevel, $0.rssi) > ($1.powerLevel, $1.rssi) } )
       
@@ -256,10 +256,18 @@ extension RangedDevicesManager: XYSmartScanDelegate {
     }
   }
   
+  func smartScan(detected device: XYBluetoothDevice, rssi: Int, family: XYDeviceFamily) {
+    DispatchQueue.main.async {
+      if (device.rssi >= self.rssiRangeToDisplay && device.rssi < 0) {
+        self.upsertDeviceToGroup(family.toTableSection!, device: device)
+        self.delegate?.reloadTableView()
+      }
+    }
+  }
+  
   func smartScan(status: XYSmartScanStatus) {    }
   func smartScan(entered device: XYBluetoothDevice) {    }
   func smartScan(exiting device: XYBluetoothDevice) {    }
   func smartScan(location: XYLocationCoordinate2D) {    }
-  func smartScan(detected device: XYBluetoothDevice, rssi: Int, family: XYDeviceFamily) {    }
   func smartScan(exited device: XYBluetoothDevice) {    }
 }
