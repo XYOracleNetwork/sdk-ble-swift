@@ -29,6 +29,7 @@ public enum XYSmartScanStatus: Int {
 }
 
 public enum XYSmartScanMode {
+  case initializing
   case foreground
   case background
 }
@@ -50,7 +51,7 @@ public class XYSmartScan {
   public fileprivate(set) var currentStatus = XYSmartScanStatus.none
   fileprivate var isActive: Bool = false
   
-  public fileprivate(set) var mode: XYSmartScanMode = .background
+  public fileprivate(set) var mode: XYSmartScanMode = .initializing
   
   fileprivate var isCheckingExits: Bool = false
   
@@ -75,13 +76,14 @@ public class XYSmartScan {
     switch mode {
     case .foreground: self.switchToForeground(families)
     case .background: self.switchToBackground(families)
+    default: self.switchToForeground(families)
     }
     
     self.isActive = true
     #endif
     
     // In the case of macOS, we use central to discover and filter devices on ad data to determine if they are iBeacons
-    //#if os(macOS)
+    #if os(macOS)
     self.currentDiscoveryList = families
     
     self.central.state == .poweredOn ?
@@ -89,7 +91,7 @@ public class XYSmartScan {
       self.central.enable()
     
     self.isActive = true
-    //#endif
+    #endif
   }
   
   public func stop() {
@@ -135,7 +137,7 @@ public class XYSmartScan {
 fileprivate extension XYSmartScan {
   
   func switchToForeground(_ families: [XYDeviceFamily]) {
-    guard self.mode == .background else { return }
+    guard self.mode != .foreground else { return }
     
     self.mode = .foreground
     
@@ -144,6 +146,10 @@ fileprivate extension XYSmartScan {
     self.location.startRanging(for: families)
     #endif
     
+    self.central.state == .poweredOn ?
+      self.central.scan() :
+      self.central.enable()
+    
     self.isCheckingExits = true
     self.checkExits()
     self.updateTracking()
@@ -151,7 +157,7 @@ fileprivate extension XYSmartScan {
   }
   
   func switchToBackground(_ families: [XYDeviceFamily]) {
-    guard self.mode == .foreground else { return }
+    guard self.mode != .background else { return }
     
     self.mode = .background
     #if os(iOS)
