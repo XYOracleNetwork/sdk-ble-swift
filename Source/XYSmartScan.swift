@@ -191,8 +191,9 @@ extension XYSmartScan {
     
     switch central.state {
     case .unknown:
-      newStatus = .none;
+      newStatus = .none
     case .poweredOn:
+      newStatus = .enabled
       break
     case .poweredOff:
       newStatus = .bluetoothDisabled
@@ -336,6 +337,7 @@ extension XYSmartScan: XYCentralDelegate {
     if newState == .poweredOn {
       self.central.scan()
     }
+    updateStatus()
   }
   
   public func located(peripheral: XYPeripheral) {
