@@ -71,7 +71,7 @@ extension XYFinderDeviceBase: XYBluetoothDeviceNotifyDelegate {
         else { return }
 
        let data = Data(_: rawValue)
-        if let value = try? Int(littleEndian: data.withUnsafeBytes { $0.pointee }) {
+       if let value = (data.withUnsafeBytes { $0.load(as: Int?.self) }) {
             let buttonPressed = XYButtonType2.init(rawValue: value)!
 
             if !self.handlingButtonPress {
