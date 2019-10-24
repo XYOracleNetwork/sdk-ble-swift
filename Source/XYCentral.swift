@@ -204,7 +204,10 @@ internal class XYCentral: NSObject {
   public func scan(for services: [XYServiceCharacteristic]? = nil, stopOnNoDelegates: Bool = false) {
     guard state == .poweredOn else { return }
     
-    guard self.cbManager?.isScanning == false else { return }
+    if self.cbManager?.isScanning == true {
+        // Stop current scan and continue
+        self.stopScan()
+    }
     
     self.stopOnNoDelegates = stopOnNoDelegates
     print("START: Scanning for devices")
