@@ -3,6 +3,8 @@
 [![logo]](https://xy.company)
 
 [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-ble-swift?branch=master)](https://bettercodehub.com/)
+[![](https://img.shields.io/cocoapods/v/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk)
+
 
 # sdk-ble-ios
 
@@ -37,7 +39,7 @@ platform :ios, '11.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'XYSdkBle', '~> 0.1.0'
+    pod 'XyBleSdk', '~> 3.0.7'
 end
 ```
 
@@ -61,7 +63,7 @@ $ brew install carthage
 To integrate into your Xcode project using Carthage, specify it in your `Cartfile`:
 
 ```ogdl
-github "XYOracleNetwork/sdk-ble-swift" ~> 0.1.0
+github "XYOracleNetwork/sdk-ble-swift" ~> 3.0.7
 ```
 
 Run `carthage update --use-submodules` to build the framework and drag the built `XyBleSdk.framework`, `FBLPromises.framework` and `Promises.framework` to the _Linked Frameworks and Libraries_ of your Xcode project. Then switch to the _Build Phases_ tab and add a _New run script phase_. Expand _Run Script_ and add the following to the _Shell_ text field:
