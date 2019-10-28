@@ -38,8 +38,10 @@ public class XYSmartScan {
   
   public static let instance = XYSmartScan()
   
+  // TODO fix leak - make dictionary store weak references to delegates
   fileprivate var delegates = [String: XYSmartScanDelegate?]()
   
+  // TODO fix leak - make dictionary store weak references to tracked devices
   fileprivate var trackedDevices = [String: XYFinderDevice]()
   
   fileprivate lazy var currentDiscoveryList = [XYDeviceFamily]()
