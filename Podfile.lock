@@ -7,7 +7,7 @@ DEPENDENCIES:
   - PromisesSwift
 
 SPEC REPOS:
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - PromisesObjC
     - PromisesSwift
 

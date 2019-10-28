@@ -144,6 +144,7 @@ internal protocol XYCentralDelegate: class {
 // Singleton wrapper around CBCentral.
 internal class XYCentral: NSObject {
   
+  // TODO fix leak - make dictionary store weak references to delegates
   fileprivate var delegates = [String: XYCentralDelegate?]()
   
   public static let instance = XYCentral()
