@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0ABBECC2236761F90054BCEE /* XYMutableService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABBECBF236761F90054BCEE /* XYMutableService.swift */; };
+		0ABBECC3236761F90054BCEE /* XYMutableService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABBECBF236761F90054BCEE /* XYMutableService.swift */; };
+		0ABBECC4236761F90054BCEE /* XYCBPeripheralManager .swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABBECC0236761F90054BCEE /* XYCBPeripheralManager .swift */; };
+		0ABBECC5236761F90054BCEE /* XYCBPeripheralManager .swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABBECC0236761F90054BCEE /* XYCBPeripheralManager .swift */; };
+		0ABBECC6236761F90054BCEE /* XYMutableCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABBECC1236761F90054BCEE /* XYMutableCharacteristic.swift */; };
+		0ABBECC7236761F90054BCEE /* XYMutableCharacteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABBECC1236761F90054BCEE /* XYMutableCharacteristic.swift */; };
 		314B3F7E21CDB176006E2EC3 /* XYFirmwareUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */; };
 		314B3F7F21CDB176006E2EC3 /* XYFirmwareUpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4321CDB176006E2EC3 /* XYFirmwareUpdateManager.swift */; };
 		314B3F8021CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4421CDB176006E2EC3 /* XYFirmwareLoader.swift */; };
@@ -128,6 +134,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0ABBECBF236761F90054BCEE /* XYMutableService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYMutableService.swift; sourceTree = "<group>"; };
+		0ABBECC0236761F90054BCEE /* XYCBPeripheralManager .swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XYCBPeripheralManager .swift"; sourceTree = "<group>"; };
+		0ABBECC1236761F90054BCEE /* XYMutableCharacteristic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYMutableCharacteristic.swift; sourceTree = "<group>"; };
 		20A41A591BE6078C782A2AB6 /* Pods-XyBleSdk iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk iOS.release.xcconfig"; path = "Target Support Files/Pods-XyBleSdk iOS/Pods-XyBleSdk iOS.release.xcconfig"; sourceTree = "<group>"; };
 		29D38CE963DE5677B289B7F4 /* Pods_XyBleSdk_macOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XyBleSdk_macOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		314B3F2C21CDB051006E2EC3 /* XyBleSdk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XyBleSdk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -227,6 +236,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0ABBECBE236761F80054BCEE /* Peripheral */ = {
+			isa = PBXGroup;
+			children = (
+				0ABBECBF236761F90054BCEE /* XYMutableService.swift */,
+				0ABBECC0236761F90054BCEE /* XYCBPeripheralManager .swift */,
+				0ABBECC1236761F90054BCEE /* XYMutableCharacteristic.swift */,
+			);
+			path = Peripheral;
+			sourceTree = "<group>";
+		};
 		314B3F1221CDB009006E2EC3 = {
 			isa = PBXGroup;
 			children = (
@@ -352,6 +371,7 @@
 		314B3F6821CDB176006E2EC3 /* Gatt */ = {
 			isa = PBXGroup;
 			children = (
+				0ABBECBE236761F80054BCEE /* Peripheral */,
 				314B3F6C21CDB176006E2EC3 /* Standard */,
 				314B3F7721CDB176006E2EC3 /* xy3 */,
 				314B3F7C21CDB176006E2EC3 /* xy4 */,
@@ -622,6 +642,8 @@
 				314B3F8A21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */,
 				31BCE8392254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
 				31BCE8452254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
+				0ABBECC4236761F90054BCEE /* XYCBPeripheralManager .swift in Sources */,
+				0ABBECC6236761F90054BCEE /* XYMutableCharacteristic.swift in Sources */,
 				314B3FAA21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */,
 				31BCE82622541F5C004799D7 /* XYBluetoothDeviceFactory.swift in Sources */,
 				314B3FCC21CDB176006E2EC3 /* TxPowerService.swift in Sources */,
@@ -630,6 +652,7 @@
 				314B3FA021CDB176006E2EC3 /* XYBluetoothError.swift in Sources */,
 				314B3F9A21CDB176006E2EC3 /* XYBluetoothDeviceBase.swift in Sources */,
 				314B3F9221CDB176006E2EC3 /* XYIBeaconDefinition.swift in Sources */,
+				0ABBECC2236761F90054BCEE /* XYMutableService.swift in Sources */,
 				314B3FB421CDB176006E2EC3 /* XYCentral.swift in Sources */,
 				314B3FB821CDB176006E2EC3 /* XYSmartScan.swift in Sources */,
 				314B3F9621CDB176006E2EC3 /* XYMobileBluetoothDevice.swift in Sources */,
@@ -684,6 +707,8 @@
 				314B3F8B21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */,
 				31BCE83A2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
 				31BCE8462254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
+				0ABBECC5236761F90054BCEE /* XYCBPeripheralManager .swift in Sources */,
+				0ABBECC7236761F90054BCEE /* XYMutableCharacteristic.swift in Sources */,
 				314B3FAB21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */,
 				31BCE82822541F64004799D7 /* XYBluetoothDeviceFactory.swift in Sources */,
 				314B3FCD21CDB176006E2EC3 /* TxPowerService.swift in Sources */,
@@ -692,6 +717,7 @@
 				314B3FA121CDB176006E2EC3 /* XYBluetoothError.swift in Sources */,
 				314B3F9B21CDB176006E2EC3 /* XYBluetoothDeviceBase.swift in Sources */,
 				314B3F9321CDB176006E2EC3 /* XYIBeaconDefinition.swift in Sources */,
+				0ABBECC3236761F90054BCEE /* XYMutableService.swift in Sources */,
 				314B3FB521CDB176006E2EC3 /* XYCentral.swift in Sources */,
 				314B3FB921CDB176006E2EC3 /* XYSmartScan.swift in Sources */,
 				314B3F9721CDB176006E2EC3 /* XYMobileBluetoothDevice.swift in Sources */,
@@ -784,7 +810,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -842,7 +868,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

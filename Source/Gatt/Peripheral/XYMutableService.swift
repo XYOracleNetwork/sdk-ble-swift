@@ -32,6 +32,11 @@ open class XYMutableService {
         
         cbService.characteristics?.remove(at: i)
     }
+  
+    public func removeCharacteristics() {
+      characteristics.removeAll()
+      cbService.characteristics?.removeAll()
+    }
     
     open func handleReadRequest(_ request: CBATTRequest, peripheral: CBPeripheralManager) {
         characteristics[request.characteristic.uuid.uuidString]?.handleReadRequest(request, peripheral: peripheral)
