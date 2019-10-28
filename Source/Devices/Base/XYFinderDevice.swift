@@ -67,17 +67,26 @@ extension XYFinderDeviceBase: XYBluetoothDeviceNotifyDelegate {
             // Validate the proper services and the value from the notification, then report
             serviceCharacteristic.characteristicUuid == XYFinderPrimaryService.buttonState.characteristicUuid ||
             serviceCharacteristic.characteristicUuid == ControlService.button.characteristicUuid,
-            let rawValue = value.asInteger,
-            let buttonPressed = XYButtonType2.init(rawValue: rawValue)
-            else { return }
+            let rawValue = value.asByteArray
+        else { return }
 
-        if !self.handlingButtonPress {
-            self.handlingButtonPress = true
-            XYFinderDeviceEventManager.report(events: [.buttonPressed(device: self, type: buttonPressed)])
+       let data = Data(_: rawValue)
+       if let value = (data.withUnsafeBytes { $0.load(as: Int?.self) }) {
+            let buttonPressed = XYButtonType2.init(rawValue: value)!
 
-            XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(3.0)) {
-                self.handlingButtonPress = false
+            if !self.handlingButtonPress {
+                self.handlingButtonPress = true
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else {return}
+                  XYFinderDeviceEventManager.report(events: [.buttonPressed(device: self, type: buttonPressed)])
+                }
+      
+
+                XYSmartScan.queue.asyncAfter(deadline: DispatchTime.now() + TimeInterval(3.0)) {
+                    self.handlingButtonPress = false
+                }
             }
         }
+        
     }
 }
