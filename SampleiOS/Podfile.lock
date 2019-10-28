@@ -1,0 +1,27 @@
+PODS:
+  - PromisesObjC (1.2.5)
+  - PromisesSwift (1.2.5):
+    - PromisesObjC (= 1.2.5)
+  - XyBleSdk (3.0.6):
+    - PromisesSwift
+
+DEPENDENCIES:
+  - XyBleSdk (from `../`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - PromisesObjC
+    - PromisesSwift
+
+EXTERNAL SOURCES:
+  XyBleSdk:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  PromisesObjC: 2b402ef5333bb9b436c74ee1bd7dcb2511b68caf
+  PromisesSwift: 63d93b8cc31b4245ca1014ff5cc24d6ae952a274
+  XyBleSdk: 4dc44b737643a564cd77610c96725d0532e07616
+
+PODFILE CHECKSUM: 104c0252a97e5cf91ea89ad2a040c51d3d8e8ef6
+
+COCOAPODS: 1.8.4
