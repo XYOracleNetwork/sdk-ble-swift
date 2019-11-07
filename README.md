@@ -1,12 +1,27 @@
-[logo]: https://cdn.xy.company/img/brand/XY_Logo_GitHub.png
+[logo]: https://cdn.xy.company/img/brand/XYO_full_colored.png
 
-[![logo]](https://xy.company)
+[![logo]](https://xyo.network)
 
 [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-ble-swift?branch=master)](https://bettercodehub.com/)
 [![](https://img.shields.io/cocoapods/v/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk)
 
 
 # sdk-ble-ios
+
+Table of Contents
+
+-   [Title](#sdk-ble-ios)
+-   [Description](#description)
+-   [Requirements](#security)
+-   [Install](#install)
+-   [SDK Overview](#sdk-overview)
+-   [Code Examples](#code-examples)
+-   [Sample Projects](#sample-projects)
+-   [Maintainers](#maintainers)
+-   [License](#license)
+-   [Credits](#credits)
+
+## Description
 
 A Bluetooth library, primarily for use with XY Finder devices but can be implemented to communicate with any Bluetooth device, with monitoring capability if the device emits an iBeacon signal. The library is designed to aleviate the delegate-based interaction with Core Bluetooth classes and presents a straightforward API, allowing the developer to write asyncronous code in a syncronous manner. The libray utlizes the [Google Promises](https://github.com/google/promises) library as a dependency.
 
@@ -17,7 +32,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 -   Xcode 10.1+
 -   Swift 4.2+
 
-## Installation
+## Install
 
 ### CocoaPods
 
@@ -78,11 +93,11 @@ Click the + button under _Input Files_ and add:
 
 Finally, you will need to add a _New Copy Files Phase_, selecting _Frameworks_ for the _Destination_ and adding the three frameworks, ensuring the _Code Sign On Copy_ boxes are checked.
 
-## Overview
+## SDK Overview
 
 Talking to a Bluetooth device using Core Bluetooth is a drag. The developer needs to monitor delegate methods from `CBCentral` and `CBPeripheral`, with no clear path to handling multiple connections. Tutorial code for Core Bluetooth is often a chain of use-case specific method calls from within these delegates, which can lead to frustration when trying to apply the code in a more resusable pattern. Bluetooth devices are often not predictable in their reponse times due to firmware and environmental conditions, which can make them tricky to deal with, especially if the application requires multiple, disparate devices connected to operate properly.
 
-## Code Example
+## Code Examples
 
 The XyBleSdk provides a simple interface to communicating with an XY Finder or other Bluetooth device. Let's take a look at an example for an XY Finder device:
 
@@ -158,7 +173,7 @@ device.connection {
 }
 ```
 
-## Services
+### Services
 
 The library provides three types of communication with a Bluetooth device, `get`, `set`, and `notify`. These operate on the characteristic of a GATT service, which is defined with the `XYServiceCharacteristicType` protocol. Add a new service by creating an enumeration that implements this protocol:
 
@@ -193,11 +208,11 @@ public enum MyService: String, XYServiceCharacteristic {
 }
 ```
 
-## Operation Results
+### Operation Results
 
 The `XYBluetoothResult` class wraps the data received from a `get` call and allows data to be passed to a `get` service call. The `XYBluetoothResult` allows for access to the raw data, as well as the convenience methods `asInteger`, `asString` and `asByteArray`. Any error information is available in `error` as an `XYFinderBluetoothError`.
 
-## Device Event Notifications
+### Device Event Notifications
 
 When a connected device changes state or an operation is performed (such as pressing the button on an XY4+) a `XYFinderEvent` notification is sent out via the `XYFinderDeviceEventManager`. You can subscribe to these events as shown here:
 
@@ -219,18 +234,23 @@ The result of the `subscribe` call is a subscription UUID that you can use to un
 XYFinderDeviceEventManager.unsubscribe(to: [.buttonPressed], referenceKey: self.subscriptionUuid)
 ```
 
-## Smart Scan
+### Smart Scan
 
 The `XYSmartScan` singleton can be used to range and monitor for XY Finder devices. When using the library in an iOS application, it will range for devices in a particular XY Finder device family when put into foreground mode using `switchToForeground`, and use lower power monitoring when placed into backgound mode with `switchToBackground`. The macOS library will locate devices using the `CBCentralManager.scanForPeripherals` method.
 
-## Samples
+## Sample Projects
 
 The library comes with two sample projects, one for macOS and one for iOS. The macOS sample requires you to run `carthage update` in the project directory. The iOS sample requires either `pod install` or `carthage update` to be run. 
 
+## Maintainers
+
+- Arie Trouw
+- Carter Harrison
+
 ## License
 
-See the [LICENSE.md](LICENSE) file for license details.
+See the [LICENSE](LICENSE) file for license details.
 
 ## Credits
 
-Made with 🔥and ❄️ by [XY - The Persistent Company](https://www.xy.company)
+Made with 🔥and ❄️ by [XYO](https://www.xyo.network)
