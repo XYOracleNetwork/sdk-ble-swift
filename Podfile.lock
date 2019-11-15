@@ -2,19 +2,31 @@ PODS:
   - PromisesObjC (1.2.8)
   - PromisesSwift (1.2.8):
     - PromisesObjC (= 1.2.8)
+  - sdk-core-swift (3.0.1):
+    - sdk-objectmodel-swift (~> 3.0)
+    - secp256k1.swift
+  - sdk-objectmodel-swift (3.0.2)
+  - secp256k1.swift (0.1.4)
 
 DEPENDENCIES:
   - PromisesSwift
+  - sdk-core-swift (= 3.0.1)
 
 SPEC REPOS:
   trunk:
     - PromisesObjC
     - PromisesSwift
+    - sdk-core-swift
+    - sdk-objectmodel-swift
+    - secp256k1.swift
 
 SPEC CHECKSUMS:
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
+  sdk-core-swift: 6b089045fe8483388bd3c82d2d1375d796c29745
+  sdk-objectmodel-swift: 8d880c7871ab0ce16fed958d782c737fd495dd53
+  secp256k1.swift: a7e7a214f6db6ce5db32cc6b2b45e5c4dd633634
 
-PODFILE CHECKSUM: 63851cdd7b4395e1cb24e39f40d098f68c212326
+PODFILE CHECKSUM: e9b2aec5761244e4e5cccacaf688e228e1da9c42
 
 COCOAPODS: 1.8.4

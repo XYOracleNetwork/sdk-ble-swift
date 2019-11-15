@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import sdk_objectmodel_swift
 
 /// A simple struct to encode major and minor values into a string
 struct XyoGattNameEncoder {

@@ -8,6 +8,7 @@
 
 import Foundation
 import sdk_core_swift
+import sdk_objectmodel_swift
 
 public class XyoBridgeProcedureCatalog : XyoFlagProcedureCatalog {
     private static let allSupportedFunctions = UInt32(

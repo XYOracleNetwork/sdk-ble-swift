@@ -8,6 +8,7 @@
 import Foundation
 import CoreBluetooth
 import sdk_core_swift
+import sdk_objectmodel_swift
 
 /// A class for managing the creation of pipes, the destructon of pipes, and the routing of write requests to pipes.
 class XyoPipeCharacteristic : XYMutableCharacteristic, XyoGattServerLisitener {

@@ -8,6 +8,7 @@
 
 import Foundation
 import XyBleSdk
+import sdk_objectmodel_swift
 import CoreBluetooth
 
 public class XyoSentinelXDevice : XyoDiffereniableDevice {

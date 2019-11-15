@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import sdk_objectmodel_swift
 
 /// This class manages an input stream where chunks of data are added, and they can be reconstructed
 /// into their original packet.

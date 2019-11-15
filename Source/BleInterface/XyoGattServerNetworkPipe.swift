@@ -8,6 +8,7 @@
 import Foundation
 import CoreBluetooth
 import sdk_core_swift
+import sdk_objectmodel_swift
 import Promises
 
 /// A class to conform to the XyoNetworkPipe protocal, acting as a gatt server.

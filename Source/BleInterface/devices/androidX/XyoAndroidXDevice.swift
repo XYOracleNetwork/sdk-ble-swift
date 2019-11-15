@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import XyBleSdk
+import sdk_objectmodel_swift
 import CoreBluetooth
 
 public enum XyoAndroidWifiStatus {
