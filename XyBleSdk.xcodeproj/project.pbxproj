@@ -152,6 +152,9 @@
 		46EB5FAA237CCB6700CCF90C /* XyoGattNameEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB5FA7237CCB6600CCF90C /* XyoGattNameEncoder.swift */; };
 		46EB5FAB237CCB6700CCF90C /* XyoInputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB5FA8237CCB6600CCF90C /* XyoInputStream.swift */; };
 		46EB5FAC237CCB6700CCF90C /* XyoOutputStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB5FA9237CCB6600CCF90C /* XyoOutputStream.swift */; };
+		46EB5FCF237E337300CCF90C /* XyoBleToTcpBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB5FCC237E337300CCF90C /* XyoBleToTcpBridge.swift */; };
+		46EB5FD0237E337300CCF90C /* XyoBridgeProcedureCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB5FCD237E337300CCF90C /* XyoBridgeProcedureCatalogue.swift */; };
+		46EB5FD1237E337300CCF90C /* XyoBridgeProcedureStrictCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EB5FCE237E337300CCF90C /* XyoBridgeProcedureStrictCatalogue.swift */; };
 		5EBF4D0C5A931FD17C5FD6EA /* Pods_XyBleSdk_macOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29D38CE963DE5677B289B7F4 /* Pods_XyBleSdk_macOS.framework */; };
 		65021E2842220085E60CF14A /* Pods_XyBleSdk_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A768E05594F957F4F2060ADB /* Pods_XyBleSdk_iOS.framework */; };
 /* End PBXBuildFile section */
@@ -254,6 +257,9 @@
 		46EB5FA7237CCB6600CCF90C /* XyoGattNameEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XyoGattNameEncoder.swift; sourceTree = "<group>"; };
 		46EB5FA8237CCB6600CCF90C /* XyoInputStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XyoInputStream.swift; sourceTree = "<group>"; };
 		46EB5FA9237CCB6600CCF90C /* XyoOutputStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XyoOutputStream.swift; sourceTree = "<group>"; };
+		46EB5FCC237E337300CCF90C /* XyoBleToTcpBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XyoBleToTcpBridge.swift; sourceTree = "<group>"; };
+		46EB5FCD237E337300CCF90C /* XyoBridgeProcedureCatalogue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XyoBridgeProcedureCatalogue.swift; sourceTree = "<group>"; };
+		46EB5FCE237E337300CCF90C /* XyoBridgeProcedureStrictCatalogue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XyoBridgeProcedureStrictCatalogue.swift; sourceTree = "<group>"; };
 		70185BC5630AB8BD36036C25 /* Pods-XyBleSdk macOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XyBleSdk macOS.release.xcconfig"; path = "Target Support Files/Pods-XyBleSdk macOS/Pods-XyBleSdk macOS.release.xcconfig"; sourceTree = "<group>"; };
 		A768E05594F957F4F2060ADB /* Pods_XyBleSdk_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XyBleSdk_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -518,6 +524,9 @@
 		46EB5F78237CC9DE00CCF90C /* BleTcpBridge */ = {
 			isa = PBXGroup;
 			children = (
+				46EB5FCC237E337300CCF90C /* XyoBleToTcpBridge.swift */,
+				46EB5FCD237E337300CCF90C /* XyoBridgeProcedureCatalogue.swift */,
+				46EB5FCE237E337300CCF90C /* XyoBridgeProcedureStrictCatalogue.swift */,
 			);
 			path = BleTcpBridge;
 			sourceTree = "<group>";
@@ -784,6 +793,7 @@
 				46EB5F92237CCACE00CCF90C /* XyoSentinelXDeviceCreator.swift in Sources */,
 				0ABBECC6236761F90054BCEE /* XYMutableCharacteristic.swift in Sources */,
 				314B3FAA21CDB176006E2EC3 /* XYFinderDeviceEvent.swift in Sources */,
+				46EB5FCF237E337300CCF90C /* XyoBleToTcpBridge.swift in Sources */,
 				46EB5F86237CCA4F00CCF90C /* XyoManufactorDeviceCreator.swift in Sources */,
 				31BCE82622541F5C004799D7 /* XYBluetoothDeviceFactory.swift in Sources */,
 				46EB5F8E237CCAC000CCF90C /* XyoDifferentiableDevice.swift in Sources */,
@@ -837,7 +847,9 @@
 				46EB5F83237CCA4F00CCF90C /* XyoBluetoothDevice.swift in Sources */,
 				314B3FBE21CDB176006E2EC3 /* GattDescriptors.swift in Sources */,
 				46EB5F94237CCACE00CCF90C /* XyoSentinelXDevice.swift in Sources */,
+				46EB5FD0237E337300CCF90C /* XyoBridgeProcedureCatalogue.swift in Sources */,
 				314B3FC621CDB176006E2EC3 /* GenericAttributeService.swift in Sources */,
+				46EB5FD1237E337300CCF90C /* XyoBridgeProcedureStrictCatalogue.swift in Sources */,
 				314B3F9021CDB176006E2EC3 /* XYCentralAgent.swift in Sources */,
 				46EB5F87237CCA4F00CCF90C /* XyoService.swift in Sources */,
 				314B3FD621CDB176006E2EC3 /* ExtendedConfigService.swift in Sources */,

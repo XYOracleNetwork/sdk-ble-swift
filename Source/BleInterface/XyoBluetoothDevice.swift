@@ -9,7 +9,6 @@
 import Foundation
 import Promises
 import CoreBluetooth
-import XyBleSdk
 import sdk_core_swift
 
 /// A class that gets created with XYO pipe enabled devices arround the world. Each device complies to the

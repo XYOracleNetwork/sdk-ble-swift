@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XyBleSdk
 
 /// A struct to manage the creation of XYO Devices to create pipes with.
 public struct XyoBluetoothDeviceCreator : XYDeviceCreator {

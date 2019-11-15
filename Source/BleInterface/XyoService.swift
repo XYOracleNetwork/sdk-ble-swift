@@ -8,7 +8,6 @@
 
 import Foundation
 import CoreBluetooth
-import XyBleSdk
 
 /// This acts as the primary service for all XYO related things (the pipe abstraction).
 public enum XyoService : XYServiceCharacteristic {

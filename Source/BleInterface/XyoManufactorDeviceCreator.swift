@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XyBleSdk
 
 public protocol XyoManufactorDeviceCreator {
     func createFromIBeacon (iBeacon: XYIBeaconDefinition, rssi: Int) -> XYBluetoothDevice?

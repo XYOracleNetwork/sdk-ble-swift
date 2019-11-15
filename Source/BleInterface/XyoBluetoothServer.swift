@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import XyBleSdk
 import CoreLocation
 import CoreBluetooth
 import Promises
