@@ -9,6 +9,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Build
-      env: 
-      run: swift build
+    - name: Build 
+      run: swift build -v swift-tools-version:5.1'
