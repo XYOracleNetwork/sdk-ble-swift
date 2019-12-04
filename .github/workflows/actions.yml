@@ -9,5 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: pre_build
+      run: swift -continue-building-after-errors
     - name: Build 
-      run: swift build -v -continue-building-after-errors
+      run: swift build -v 
