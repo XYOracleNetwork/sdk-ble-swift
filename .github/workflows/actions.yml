@@ -7,19 +7,12 @@ on:
 jobs:
   build:
     runs-on: macOS-latest
-    strategy: 
-      matrix:
-        destination: ['platform=iOS Simulator,iOS=13.1,name=iPhone11']
 
     steps:
     - uses: actions/checkout@v1
     - name: Build
       run: | 
-        cd SampleiOS
         pod deintegrate
-        xcrun simctl delete all
-        xcrun simctl create iPhone11 com.apple.CoreSimulator.SimDeviceType.iPhone-11 com.apple.CoreSimulator.SimRuntime.iOS-13-1
         pod install
-        xcodebuild clean build -workspace SampleiOS.xcworkspace -scheme "SampleiOS" -destination "${destination}"
-      env: 
-        destination: ${{ matrix.destination }}
+        pod update
+        xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
