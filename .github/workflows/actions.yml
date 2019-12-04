@@ -20,3 +20,5 @@ jobs:
         xcrun simctl create iPhone11 com.apple.CoreSimulator.SimDeviceType.iPhone-11 com.apple.CoreSimulator.SimRuntime.iOS-13-1
         pod install
         xcodebuild clean test -workspace sdk-ble-swift.xcworkspace -scheme sdk-ble-swift -destination "${destination}"
+      env: 
+        destination: ${{ matrix.destination }}
