@@ -24,9 +24,4 @@ jobs:
       env: 
         destination: ${{ matrix.destination }}
         podfile: $GITHUB_WORKSPACE/Podfile
-      run: | 
-        xcrun simctl create iPhone11 com.apple.CoreSimulator.SimDeviceType.iPhone-11 com.apple.CoreSimulator.SimRuntime.iOS-13-2
-        pod install
-        pod update
-        xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
-        xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
+      run: ./scripts/build.sh
