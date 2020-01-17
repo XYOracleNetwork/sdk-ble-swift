@@ -23,6 +23,7 @@ jobs:
     - name: build
       env: 
         destination: ${{ matrix.destination }}
+        podfile: $GITHUB_WORKSPACE/Podfile
       run: | 
         xcrun simctl create iPhone11 com.apple.CoreSimulator.SimDeviceType.iPhone-11 com.apple.CoreSimulator.SimRuntime.iOS-13-2
         pod install
