@@ -1,28 +1,19 @@
-name: Release 
+name: Release and Publish
 
 on: 
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 'master'
 
 jobs: 
-  build: 
-    name: Create Release
-    runs-on: macOS-latest
-    steps: 
-      - name: Checkout code
-        uses: actions/checkout@master
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this release
-            - First Change
-            - Second Change
-          draft: false
-          prerelease: false
+  publish:
+
+    runs-on: macOS-latest 
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: publish to cocoapod register
+        run: |
+          pod trunk register arie.trouw@xyo.network 'XYO Team' --description='Deploy Script'
+          pod lib lint
+          pod --allow-warnings trunk push XyBleSdk.podspec
