@@ -5,6 +5,7 @@ on:
 
 
 jobs:
+  build:
     runs-on: macos-latest
     strategy: 
       matrix:
