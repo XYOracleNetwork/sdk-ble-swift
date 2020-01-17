@@ -13,13 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: set up pod
-      run: |
-        gem install cocoapods --pr
-        pod repo update
-    - name: clear and prep
-      run: | 
-          pod deintegrate
     - name: build
       env: 
         destination: ${{ matrix.destination }}
