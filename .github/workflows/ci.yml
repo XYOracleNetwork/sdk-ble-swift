@@ -11,7 +11,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build
         run: |
-          xcode-select -s /Applications/Xcode_10.2.1.app/Contents/Developer
           pod install
           pod update
           xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
