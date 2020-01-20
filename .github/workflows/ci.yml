@@ -14,7 +14,7 @@ jobs:
           pod install
           pod update
       - name: check for xcode versions
-        run: ls /Applications | grep Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_11.app
       - name: Build
         run: |
           xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
