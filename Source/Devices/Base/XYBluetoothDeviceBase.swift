@@ -47,6 +47,7 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
   deviceBleQueue: DispatchQueue,
   family : XYDeviceFamily,
   iBeacon : XYIBeaconDefinition?
+  constraint : CLBeaconIdentityConstraint
   
   public fileprivate(set) var rssiRange: (min: Int, max: Int) = (0, 0) {
     didSet {
