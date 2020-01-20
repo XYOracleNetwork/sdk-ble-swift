@@ -27,7 +27,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
   var connected: Bool { get }
   var markedForDeletion: Bool? { get }
   var isUpdatingFirmware: Bool { get }
-  var constraint: CLBeaconIdentityConstraint? 
+  var constraint : CLBeaconIdentityConstraint { get }
   
   func stayConnected(_ value: Bool)
   func updatingFirmware(_ value: Bool)
