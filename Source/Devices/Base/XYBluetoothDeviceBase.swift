@@ -71,7 +71,7 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
   fileprivate lazy var delegates = [String: CBPeripheralDelegate?]()
   fileprivate lazy var notifyDelegates = [String: (serviceCharacteristic: XYServiceCharacteristic, delegate: XYBluetoothDeviceNotifyDelegate?)]()
   
-  public init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue, family : XYDeviceFamily, iBeacon : XYIBeaconDefinition?) {
+  public init(_ id: String, rssi: Int = XYDeviceProximity.none.rawValue, family : XYDeviceFamily, iBeacon : XYIBeaconDefinition?, constraint: CLBeaconIdentityConstraint) {
     self.id = id
     self.name = ""
     self.powerLevel = 0
