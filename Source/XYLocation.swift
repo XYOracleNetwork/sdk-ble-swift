@@ -10,7 +10,7 @@ import CoreLocation
 import CoreBluetooth
 
 public protocol XYLocationDelegate: class {
-  func didRangeBeacons(_ beacons: [XYBluetoothDevice], for family: XYDeviceFamily?)
+  func didRangeBeacons(_ beacons: [XYBluetoothDevice], satisfyingConstraint beaconConstraint: CLBeaconIdentityConstraint)
   func deviceEntered(_ device: XYBluetoothDevice)
   func deviceExited(_ device: XYBluetoothDevice)
   func deviceExiting(_ device: XYBluetoothDevice)
@@ -114,7 +114,7 @@ extension XYLocation {
   }
   
   public func stopRanging(for device: XYBluetoothDevice) {
-    manager.stopRangingBeacons(satisfying: device.beaconRegion(beaconIdentityConstraint: device.beaconIdentityConstraint, identifier: device.id))
+    manager.stopRangingBeacons(satisfying: beaconRegion(beaconIdentityConstraint: device.beaconIdentityConstraint, identifier: device.id))
   }
 }
 
@@ -193,7 +193,7 @@ extension XYLocation: CLLocationManagerDelegate {
   public func locationManager(_ manager: CLLocationManager, didRange beacons: [CLBeacon], satisfying beaconConstraint: CLBeaconIdentityConstraint) {
     let processedBeacons = beacons.compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
     self.delegates.forEach {
-      $1?.didRangeBeacons(processedBeacons,for: region.family)
+      $1?.didRangeBeacons(processedBeacons, satisfyingConstraint: device.beaconIdentityConstraint)
    }
   }
   
