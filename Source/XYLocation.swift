@@ -103,7 +103,7 @@ extension XYLocation {
   }
   
   public func startRanging(for device: XYBluetoothDevice) {
-    let beaconRegion = CLBeaconIdentityConstraint(uuid: device.family.uuid, major: device.id)
+    let beaconRegion = CLBeaconIdentityConstraint(uuid: device.family.uuid)
     manager.startRangingBeacons(satisfying: beaconRegion)
   }
   
