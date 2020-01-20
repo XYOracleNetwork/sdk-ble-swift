@@ -10,6 +10,8 @@ jobs:
     steps: 
       - uses: actions/checkout@v2
       - name: Build
+        env:
+          DEVELOPER_DIR: /Applications/Xcode_10.2.1.app/Contents/Developer
         run: |
           pod install
           pod update
