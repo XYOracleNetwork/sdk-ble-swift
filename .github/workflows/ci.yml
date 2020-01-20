@@ -9,9 +9,13 @@ jobs:
 
     steps: 
       - uses: actions/checkout@v2
-      - name: Build
+      - name: CocoaPod install
         run: |
           pod install
           pod update
+      - name: Switch Xcode Version
+        run: sudo xcode-select -switch /Applications/Xcode_10.2.1.app
+      - name: Build
+        run: |
           xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
           xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
