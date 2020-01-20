@@ -150,20 +150,13 @@ public extension XYBluetoothDevice {
     return beaconRegion(self.family.uuid, slot: slot)
   }
   
-  // for range constraint operations
-  func beaconRegion() -> CLBeaconRegion {
-   return beaconRegion(beaconIdentityConstraint: CLBeaconIdentityConstraint, identifier: String(format:"%@:4", id)) 
-  }
-  
   // Builds a beacon region for use in XYLocation based on the current XYIBeaconDefinition
   func beaconRegion(_ uuid: UUID, slot: UInt16? = nil) -> CLBeaconRegion {
     if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {
       let computedMinor = slot == nil ? minor : ((minor & 0xfff0) | slot!)
+      let constraint = CLBeaconIdentityConstraint(uuid: UUID, major: major, minor: minor)
       return CLBeaconRegion(
-        uuid: uuid,
-        major: major,
-        minor: computedMinor,
-        beaconIdentityConstraint: CLBeaconIdentityConstraint,
+        beaconIdentityConstraint: constraint,
         identifier: String(format:"%@:4", id))
     }
     
