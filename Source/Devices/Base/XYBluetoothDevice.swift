@@ -151,7 +151,7 @@ public extension XYBluetoothDevice {
   }
   
   // for range constraint operations
-  func beaconRegion() {
+  func beaconRegion() -> CLBeaconRegion {
    return beconRegion(beaconIdentityConstraint: CLBeaconIdentityConstraint, identifier: String(format:"%@:4", id)) 
   }
   
