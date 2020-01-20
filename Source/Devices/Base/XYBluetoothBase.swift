@@ -30,7 +30,7 @@ public protocol XYBluetoothBase: class {
 
     var deviceBleQueue: DispatchQueue { get }
     
-    var constraint : CLBeaconIdentityConstraint { get set }
+    var constraint : Set<CLBeaconIdentityConstraint> { get }
 
 }
 
