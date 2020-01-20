@@ -29,6 +29,9 @@ public protocol XYBluetoothBase: class {
     var supportedServices: [CBUUID] { get set }
 
     var deviceBleQueue: DispatchQueue { get }
+    
+    var constraint : CLBeaconIdentityConstraint { get set }
+
 }
 
 public extension XYBluetoothBase {

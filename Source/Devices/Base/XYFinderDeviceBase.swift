@@ -22,7 +22,7 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     var shouldCheckForButtonPressOnDetection = false
 
     public init(_ family: XYDeviceFamily, id: String, iBeacon: XYIBeaconDefinition?, rssi: Int) {
-        super.init(id, rssi: rssi, family: family, iBeacon: iBeacon)
+        super.init(id, rssi: rssi, family: family, iBeacon: iBeacon, constraint: CLBeaconIdentityConstraint)
     }
 
     fileprivate static let buttonTimeout: DispatchTimeInterval = .seconds(30)

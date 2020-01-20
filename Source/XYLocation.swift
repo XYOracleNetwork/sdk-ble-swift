@@ -91,7 +91,7 @@ extension XYLocation {
   public func startRanging(for devices: [XYBluetoothDevice]) {
     // Get the existing regions that location manager is looking for
     let rangedDevices = manager.rangedBeaconConstraints
-      .compactMap { $0 as? CLBeaconRegion }
+      .compactMap { $0 as? CLBeaconIdentityConstraint }
       .filter { $0.minor != nil && $0.major != nil }
       .compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
     
