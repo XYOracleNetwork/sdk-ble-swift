@@ -103,18 +103,18 @@ extension XYLocation {
   }
   
   public func startRanging(for device: XYBluetoothDevice) {
-    let beaconRegion = CLBeaconRegion(beaconIdentityConstraint: device.beaconIdentityConstraint, identifier: device.id)
+    let beaconRegion = CLBeaconRegion(beaconIdentityConstraint: device.constraint, identifier: device.id)
     manager.startRangingBeacons(satisfying: beaconRegion)
   }
   
   public func clearRanging() {
     manager.rangedBeaconConstraints
-      .compactMap { $0 as? CLBeaconRegion }
+      .compactMap { $0 as? CLBeaconIdentityConstraint }
       .forEach { manager.stopRangingBeacons(satisfying: $0) }
   }
   
   public func stopRanging(for device: XYBluetoothDevice) {
-    manager.stopRangingBeacons(satisfying: beaconRegion(beaconIdentityConstraint: device.beaconIdentityConstraint, identifier: device.id))
+    manager.stopRangingBeacons(satisfying beaconRegion(beaconIdentityConstraint: device.constraint, identifier: device.id))
   }
 }
 
@@ -193,7 +193,7 @@ extension XYLocation: CLLocationManagerDelegate {
   public func locationManager(_ manager: CLLocationManager, didRange beacons: [CLBeacon], satisfying beaconConstraint: CLBeaconIdentityConstraint) {
     let processedBeacons = beacons.compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
     self.delegates.forEach {
-      $1?.didRangeBeacons(processedBeacons, satisfyingConstraint: device.beaconIdentityConstraint)
+      $1?.didRangeBeacons(processedBeacons, satisfyingConstraint: device.constraint)
    }
   }
   

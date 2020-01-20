@@ -161,9 +161,9 @@ public extension XYBluetoothDevice {
     }
     
     if iBeacon?.hasMajor ?? false, let major = iBeacon?.major {
+      let constraint = CLBeaconIdentityConstraint(uuid: uuid, major: major)
       return CLBeaconRegion(
-        uuid: uuid,
-        major: major,
+        beaconIdentityConstraint: constraint,
         identifier: String(format:"%@:4", id))
     }
     
