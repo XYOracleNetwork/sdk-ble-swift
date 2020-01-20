@@ -78,9 +78,9 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
     self.deviceBleQueue = DispatchQueue(label: "com.xyfindables.sdk.XYBluetoothBaseQueueFor\(id.shortId)")
     self.family = family
     self.iBeacon = iBeacon
+    self.constraint = constraint
     super.init()
     self.rssi = rssi
-    self.constraint = constraint
   }
   
   open func detected(_ rssi: Int) {}
