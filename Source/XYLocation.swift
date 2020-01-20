@@ -114,7 +114,8 @@ extension XYLocation {
   }
   
   public func stopRanging(for device: XYBluetoothDevice) {
-    manager.stopRangingBeacons(satisfying: beaconRegion(beaconIdentityConstraint: device.constraint, identifier: device.id))
+    let beaconRegion = CLBeaconRegion(beaconIdentityConstraint: device.constraint, identifier: device.id)
+    manager.stopRangingBeacons(satisfying: beaconRegion)
   }
 }
 
