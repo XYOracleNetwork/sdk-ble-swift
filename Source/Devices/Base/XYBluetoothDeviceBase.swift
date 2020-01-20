@@ -38,6 +38,7 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
     }
   }
   public var powerLevel: UInt8
+  public var constraint : CLBeaconIdentityConstraint
   
   public let
   name: String,
@@ -47,7 +48,6 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
   deviceBleQueue: DispatchQueue,
   family : XYDeviceFamily,
   iBeacon : XYIBeaconDefinition?
-  constraint : CLBeaconIdentityConstraint
   
   public fileprivate(set) var rssiRange: (min: Int, max: Int) = (0, 0) {
     didSet {
