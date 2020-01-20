@@ -90,7 +90,7 @@ extension XYLocation {
   
   public func startRanging(for devices: [XYBluetoothDevice]) {
     // Get the existing regions that location manager is looking for
-    let rangedDevices = manager.rangedRegions
+    let rangedDevices = manager.rangedBeaconConstraints
       .compactMap { $0 as? CLBeaconRegion }
       .filter { $0.minor != nil && $0.major != nil }
       .compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
@@ -103,20 +103,20 @@ extension XYLocation {
   }
   
   public func startRanging(for device: XYBluetoothDevice) {
-    let beaconRegion = CLBeaconRegion(proximityUUID: device.family.uuid, identifier: device.id)
-    manager.startRangingBeacons(in: beaconRegion)
+    let beaconRegion = CLBeaconRegion(uuid: device.family.uuid, identifier: device.id)
+    manager.startRangingBeacons(satisfying: beaconRegion)
   }
   
   public func clearRanging() {
-    manager.rangedRegions
+    manager.rangedBeaconConstraints
       .compactMap { $0 as? CLBeaconRegion }
       .forEach { manager.stopRangingBeacons(in: $0) }
   }
   
   public func stopRanging(for device: XYBluetoothDevice) {
-    manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 4))
-    manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 7))
-    manager.stopRangingBeacons(in: device.beaconRegion(device.family.uuid, slot: 8))
+    manager.stopRangingBeacons(satisfying: device.beaconRegion(device.family.uuid, slot: 4))
+    manager.stopRangingBeacons(satisfying: device.beaconRegion(device.family.uuid, slot: 7))
+    manager.stopRangingBeacons(satisfying: device.beaconRegion(device.family.uuid, slot: 8))
   }
 }
 
@@ -192,7 +192,7 @@ public extension XYLocation {
 extension XYLocation: CLLocationManagerDelegate {
   
   // This callback drives the update cycle which ensures we are still connected to a device by testing the last ping time
-  public func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
+  public func locationManager(_ manager: CLLocationManager, didRange beacons: [CLBeacon], in region: CLBeaconRegion) {
     let processedBeacons = beacons.compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition, rssi: $0.rssi, updateRssiAndPower: true) }
     self.delegates.forEach {
       $1?.didRangeBeacons(processedBeacons,for: region.family)
