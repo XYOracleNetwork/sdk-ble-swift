@@ -27,6 +27,7 @@ public protocol XYBluetoothDevice: XYBluetoothBase {
   var connected: Bool { get }
   var markedForDeletion: Bool? { get }
   var isUpdatingFirmware: Bool { get }
+  var constraint: CLBeaconIdentityConstraint? 
   
   func stayConnected(_ value: Bool)
   func updatingFirmware(_ value: Bool)
@@ -154,7 +155,7 @@ public extension XYBluetoothDevice {
   func beaconRegion(_ uuid: UUID, slot: UInt16? = nil) -> CLBeaconRegion {
     if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {
       let computedMinor = slot == nil ? minor : ((minor & 0xfff0) | slot!)
-      let constraint = CLBeaconIdentityConstraint(uuid: uuid, major: major, minor: computedMinor)
+      constraint = CLBeaconIdentityConstraint(uuid: uuid, major: major, minor: computedMinor)
       return CLBeaconRegion(
         beaconIdentityConstraint: constraint,
         identifier: String(format:"%@:4", id))
