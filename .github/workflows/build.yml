@@ -7,14 +7,10 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    strategy: 
-      matrix:
-        destination: ['platform=iOS Simulator,OS=latest,name=iPhone11']
-
+    
     steps:
     - uses: actions/checkout@v2
     - name: build
       env: 
-        destination: ${{ matrix.destination }}
         podfile: $GITHUB_WORKSPACE/Podfile
       run: ./scripts/build.sh
