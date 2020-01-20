@@ -80,6 +80,7 @@ open class XYBluetoothDeviceBase: NSObject, XYBluetoothBase, XYBluetoothDevice {
     self.iBeacon = iBeacon
     super.init()
     self.rssi = rssi
+    self.constraint = constraint
   }
   
   open func detected(_ rssi: Int) {}
