@@ -91,7 +91,7 @@ extension XYLocation {
   public func startRanging(for devices: [XYBluetoothDevice]) {
     // Get the existing regions that location manager is looking for
     let rangedDevices = manager.rangedBeaconConstraints
-      .compactMap { $0 as? CLBeaconRegion }
+      .compactMap { $0 as? CLBeaconIdentityConstraint }
       .filter { $0.minor != nil && $0.major != nil }
       .compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
     
@@ -103,7 +103,7 @@ extension XYLocation {
   }
   
   public func startRanging(for device: XYBluetoothDevice) {
-    let beaconRegion = CLBeaconIdentityConstraint(uuid: device.family.uuid, identifier: device.id)
+    let beaconRegion = CLBeaconIdentityConstraint(uuid: device.family.uuid, major: device.id)
     manager.startRangingBeacons(satisfying: beaconRegion)
   }
   
@@ -147,7 +147,7 @@ public extension XYLocation {
   func startMonitoring(for devices: [XYBluetoothDevice]) {
     // Get the existing regions that location manager is looking for
     let monitoredDevices = manager.monitoredRegions
-      .compactMap { $0 as? CLBeaconRegion }
+      .compactMap { $0 as? CLBeaconIdentityConstraint }
       .filter { $0.minor != nil && $0.major != nil }
       .compactMap { XYBluetoothDeviceFactory.build(from: $0.xyiBeaconDefinition ) }
     
