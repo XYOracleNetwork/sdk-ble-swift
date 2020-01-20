@@ -106,7 +106,7 @@ public struct XYIBeaconDefinition: Equatable {
 extension CLBeacon {
     var xyiBeaconDefinition: XYIBeaconDefinition {
         return XYIBeaconDefinition(
-            uuid: self.proximityUUID,
+            uuid: self.uuid,
             major: self.major as? UInt16,
             minor: self.minor as? UInt16)
     }
@@ -120,7 +120,7 @@ extension CLBeacon {
 extension CLBeaconRegion {
     var xyiBeaconDefinition: XYIBeaconDefinition {
         return XYIBeaconDefinition(
-            uuid: self.proximityUUID,
+            uuid: self.uuid,
             major: self.major as? UInt16,
             minor: self.minor as? UInt16)
     }

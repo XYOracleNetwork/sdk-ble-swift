@@ -171,7 +171,6 @@ public extension XYBluetoothDevice {
     }
     
     return CLBeaconRegion(
-      uuid: uuid,
       beaconIdentityConstraint: CLBeaconIdentityConstraint,
       identifier: String(format:"%@:4", id))
   }
