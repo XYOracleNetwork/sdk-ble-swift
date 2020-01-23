@@ -102,7 +102,7 @@ Talking to a Bluetooth device using Core Bluetooth is a drag. The developer need
 The XyBleSdk provides a simple interface to communicating with an XY Finder or other Bluetooth device. Let's take a look at an example for an XY Finder device:
 
 ```swift
-let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+let device = XYBluetoothDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int?
 device.connection {
     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
@@ -114,14 +114,14 @@ device.connection {
 }
 ```
 
-The `XYFinderDeviceFactory` can build a device from a string, peripheral, etc. Using `connection` manages the wrangling of the `CBCentral` and associated `CBPeripheral` delegates, ensuring you have a connection before trying any GATT operation(s) in the block.
+The `XYBluetoothDeviceFactory` can build a device from a string, peripheral, etc. Using `connection` manages the wrangling of the `CBCentral` and associated `CBPeripheral` delegates, ensuring you have a connection before trying any GATT operation(s) in the block.
 
 The `get`, `set`, and `notify` methods operate on the specified device and block until the result is returned. This allows the developer to write syncronous code without waiting for a callback or delegate method to be called, or deal with the underlying promises directly. Each operation can also take a timeout if so desired; the default is 30 seconds.
 
 Once all the operations have completed, you can use `then` if there are post actions you wish to run:
 
 ```swift
-let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+let device = XYBluetoothDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
@@ -138,7 +138,7 @@ device.connection {
 You can check for an error from your operations by using `hasError` in the result. The error is of type `XYFinderBluetoothError`.
 
 ```swift
-let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+let device = XYBluetoothDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
@@ -156,7 +156,7 @@ device.connection {
 If you wish a specific action to always be run regardless of the result, you can use `always`:
 
 ```swift
-let device = XYFinderDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
+let device = XYBluetoothDeviceFactory.build(from: "xy:ibeacon:a44eacf4-0104-0000-0000-5f784c9977b5.20.28772")
 var batteryLevel: Int = 0
 device.connection {
     batteryLevel = device.get(BatteryService.level, timeout: .seconds(10)).asInteger
