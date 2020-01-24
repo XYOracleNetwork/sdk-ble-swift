@@ -8,12 +8,12 @@
 
 Pod::Spec.new do |s|
   s.name = 'XyBleSdk'
-  s.version = '3.0.8'
+  s.version = '3.1.0'
   s.license = { :type => 'LGPL3', :file => 'LICENSE' }
   s.summary = 'Swift BLE SDK for app developers who want better bluetooth performance'
   s.homepage = 'https://github.com/XYOracleNetwork/sdk-ble-swift'
   s.social_media_url = 'https://twitter.com/xyodevs'
-  s.authors = { 'XY - The Persistent Company' => 'developers@xyo.network' }
+  s.authors = { 'XYO Network' => 'developers@xyo.network' }
   s.source = { :git => 'https://github.com/XYOracleNetwork/sdk-ble-swift.git', :tag => s.version }
   s.documentation_url = 'https://github.com/XYOracleNetwork/sdk-ble-swift'
   s.swift_version = '5.0'
@@ -22,5 +22,5 @@ Pod::Spec.new do |s|
 
   s.source_files = 'Source/**/*.swift'
   
-  s.dependency 'PromisesSwift'
+  s.dependency 'XyBaseSdk'
 end

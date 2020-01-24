@@ -1,10 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
-   <FileRef
-      location = "group:XyBleSdk.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Pods/Pods.xcodeproj">
-   </FileRef>
+   <Group
+      location = "container:"
+      name = "Library">
+      <FileRef
+         location = "group:XyBleSdk.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:Pods/Pods.xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "SampleiOS">
+      <FileRef
+         location = "group:SampleiOS/SampleiOS.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:SampleiOS/Pods/Pods.xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "SampleMacOS">
+      <FileRef
+         location = "group:SampleMacOS/SampleMacOS.xcodeproj">
+      </FileRef>
+   </Group>
 </Workspace>

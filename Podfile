@@ -2,9 +2,9 @@ use_frameworks!
 platform :ios, '11.0'
 
 target 'XyBleSdk iOS' do
-  pod 'PromisesSwift'
+  pod 'XyBaseSdk'
 end
 
 target 'XyBleSdk macOS' do
-  pod 'PromisesSwift'
+  pod 'XyBaseSdk'
 end
