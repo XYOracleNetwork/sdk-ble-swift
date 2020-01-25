@@ -4,7 +4,7 @@ PODS:
     - PromisesObjC (= 1.2.8)
   - XyBaseSdk (1.0.1):
     - PromisesSwift
-  - XyBleSdk (3.0.8):
+  - XyBleSdk (3.1.0):
     - XyBaseSdk
 
 DEPENDENCIES:
@@ -24,7 +24,7 @@ SPEC CHECKSUMS:
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
   XyBaseSdk: 679d4f8ddbfc70ec1ff8a4cbdccf5bf81a1894f2
-  XyBleSdk: 21b21d7b4751fa68c279404df2a643381a5ded4b
+  XyBleSdk: 191f0480bcf1ad290cb795397d2d135c6777577a
 
 PODFILE CHECKSUM: 104c0252a97e5cf91ea89ad2a040c51d3d8e8ef6
 
