@@ -25,8 +25,6 @@
 		314B3F8721CDB176006E2EC3 /* XYGeocode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4821CDB176006E2EC3 /* XYGeocode.swift */; };
 		314B3F8821CDB176006E2EC3 /* Array+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */; };
 		314B3F8921CDB176006E2EC3 /* Array+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */; };
-		314B3F8A21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */; };
-		314B3F8B21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */; };
 		314B3F8C21CDB176006E2EC3 /* XY4BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */; };
 		314B3F8D21CDB176006E2EC3 /* XY4BluetoothDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */; };
 		314B3F8E21CDB176006E2EC3 /* XYConnectionAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314B3F4F21CDB176006E2EC3 /* XYConnectionAgent.swift */; };
@@ -147,7 +145,6 @@
 		314B3F4721CDB176006E2EC3 /* XYConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYConstants.swift; sourceTree = "<group>"; };
 		314B3F4821CDB176006E2EC3 /* XYGeocode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYGeocode.swift; sourceTree = "<group>"; };
 		314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+extensions.swift"; sourceTree = "<group>"; };
-		314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dispatch+extensions.swift"; sourceTree = "<group>"; };
 		314B3F4D21CDB176006E2EC3 /* XY4BluetoothDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XY4BluetoothDevice.swift; sourceTree = "<group>"; };
 		314B3F4F21CDB176006E2EC3 /* XYConnectionAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYConnectionAgent.swift; sourceTree = "<group>"; };
 		314B3F5021CDB176006E2EC3 /* XYCentralAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYCentralAgent.swift; sourceTree = "<group>"; };
@@ -306,7 +303,6 @@
 			isa = PBXGroup;
 			children = (
 				314B3F4A21CDB176006E2EC3 /* Array+extensions.swift */,
-				314B3F4B21CDB176006E2EC3 /* Dispatch+extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -639,7 +635,6 @@
 				314B3F9C21CDB176006E2EC3 /* XYBluetoothBase.swift in Sources */,
 				31BCE84B2254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */,
 				314B3F8021CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */,
-				314B3F8A21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */,
 				31BCE8392254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
 				31BCE8452254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
 				0ABBECC4236761F90054BCEE /* XYCBPeripheralManager .swift in Sources */,
@@ -704,7 +699,6 @@
 				314B3F9D21CDB176006E2EC3 /* XYBluetoothBase.swift in Sources */,
 				31BCE84C2254203B004799D7 /* XY4BluetoothDeviceCreator.swift in Sources */,
 				314B3F8121CDB176006E2EC3 /* XYFirmwareLoader.swift in Sources */,
-				314B3F8B21CDB176006E2EC3 /* Dispatch+extensions.swift in Sources */,
 				31BCE83A2254203B004799D7 /* XYMobileBluetoothDeviceCreator.swift in Sources */,
 				31BCE8462254203B004799D7 /* XY2BluetoothDeviceCreator.swift in Sources */,
 				0ABBECC5236761F90054BCEE /* XYCBPeripheralManager .swift in Sources */,

@@ -7,6 +7,7 @@
 
 import CoreBluetooth
 import Promises
+import XyBaseSdk
 
 // Used to inquire for all the characteristics of all the services the device has
 final class GattInquisitor: NSObject {
