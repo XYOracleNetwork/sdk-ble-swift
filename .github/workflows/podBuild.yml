@@ -1,0 +1,22 @@
+name: pod build
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install
+      run: | 
+        pod install
+        pod update
+    
+    - name: Clean
+      run: xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
+
+    - name: build
+      run: xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
