@@ -1,4 +1,4 @@
-name: pod release
+name: Pod Release
 
 on:
   push:
