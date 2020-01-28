@@ -31,5 +31,5 @@ jobs:
         destination: ${{ matrix.destination }}    
       run: xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}"
 
-      - name: Release
-        run: cd $GITHUB_WORKSPACE && bash $GITHUB_WORKSPACE/scripts/deploy.sh
+    - name: Release
+      run: cd $GITHUB_WORKSPACE && bash $GITHUB_WORKSPACE/scripts/deploy.sh
