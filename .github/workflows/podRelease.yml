@@ -1,0 +1,38 @@
+name: pod release
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+    strategy: 
+      matrix:
+        destination: ['platform=iOS Simulator,OS=13.3,name=iPhone 11']
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install
+      run: | 
+        pod install
+        pod update
+
+    - name: Force xcode 11
+      run: sudo xcode-select -switch /Applications/Xcode_11.3.app
+    
+    - name: Clean
+      env: 
+        destination: ${{ matrix.destination }}
+      run: xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}"
+
+    - name: build
+      env: 
+        destination: ${{ matrix.destination }}    
+      run: xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}"
+
+    - name: Release
+      run: cd $GITHUB_WORKSPACE && bash $GITHUB_WORKSPACE/scripts/deploy.sh
