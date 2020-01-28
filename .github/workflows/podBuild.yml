@@ -6,6 +6,9 @@ jobs:
   build:
 
     runs-on: macOS-latest
+    strategy: 
+      matrix:
+        destination: ['platform=iOS Simulator,OS=latest,name=iPhone11']
 
     steps:
     - uses: actions/checkout@v2
@@ -14,12 +17,16 @@ jobs:
       run: | 
         pod install
         pod update
-        
+
     - name: Force xcode 11
       run: sudo xcode-select -switch /Applications/Xcode_11.3.app
     
     - name: Clean
-      run: xcodebuild clean -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" 
+      env: 
+        destination: ${{ matrix.destination }}
+      run: xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}" -UseModernBuildSytem=YES
 
     - name: build
-      run: xcodebuild build -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
+      env: 
+        destination: ${{ matrix.destination }}    
+      run: xcodebuild build -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}" -UseModernBuildSytem=YES
