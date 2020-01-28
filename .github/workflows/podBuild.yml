@@ -11,9 +11,12 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: Install
-      run: | 
-        pod install
-        pod update
+    run: | 
+      pod install
+      pod update
+
+    - name: Force xcode 11
+      run: sudo xcode-select -switch /Applications/Xcode_11.3.app
     
     - name: Clean
       run: xcodebuild clean -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" 
