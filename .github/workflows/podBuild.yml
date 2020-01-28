@@ -16,7 +16,7 @@ jobs:
         pod update
     
     - name: Clean
-      run: xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -UseModernBuildSytem=YES
+      run: xcodebuild clean -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" 
 
     - name: build
-      run: xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -UseModernBuildSytem=YES
+      run: xcodebuild build -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS"
