@@ -17,6 +17,9 @@ jobs:
       run: | 
         pod install
         pod update
+
+    - name: Force xcode 11
+      run: sudo xcode-select -switch /Applications/Xcode_11.3.app
     
     - name: Clean
       env: 
