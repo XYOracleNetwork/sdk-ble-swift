@@ -1,6 +1,9 @@
 name: pod build
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - "master"
 
 jobs:
   build:
