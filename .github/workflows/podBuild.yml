@@ -31,5 +31,5 @@ jobs:
 
     - name: build
       env: 
-        destination: ${{ matrix.destination }}    
+        destination: ${{ matrix.destination }} 
       run: xcodebuild build -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}"
