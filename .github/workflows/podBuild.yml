@@ -24,9 +24,9 @@ jobs:
     - name: Clean
       env: 
         destination: ${{ matrix.destination }}
-      run: xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}" -UseModernBuildSytem=YES
+      run: xcodebuild clean -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}"
 
     - name: build
       env: 
         destination: ${{ matrix.destination }}    
-      run: xcodebuild build -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}" -UseModernBuildSytem=YES
+      run: xcodebuild build -UseModernBuildSytem=1 -workspace XyBleSdk.xcworkspace -scheme "XyBleSdk iOS" -destination "${destination}"
