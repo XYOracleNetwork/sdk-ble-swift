@@ -20,12 +20,12 @@
         }
       },
       {
-        "package": "sdk-base-swift",
+        "package": "XyBaseSdk",
         "repositoryURL": "https://github.com/XYOracleNetwork/sdk-base-swift.git",
         "state": {
           "branch": null,
-          "revision": "6c1c58e9dd614cabfb18e9c5ba879bbfb07e214f",
-          "version": "1.0.2"
+          "revision": "92b207c3b91a60bc9795e2229d72d9c41f5c64fe",
+          "version": "1.0.3"
         }
       },
       {
