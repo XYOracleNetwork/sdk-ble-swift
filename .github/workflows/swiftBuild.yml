@@ -14,5 +14,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build
       run: |
-        swift package resolve
         swift build -v
