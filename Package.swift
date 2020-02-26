@@ -12,7 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/google/promises", from: "1.2.8"),
-        .package(url: "https://github.com/XYOracleNetwork/sdk-base-swift.git", from: "1.0.3"),
+        .package(url: "https://github.com/XYOracleNetwork/sdk-base-swift.git", from: "1.0.4")
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
