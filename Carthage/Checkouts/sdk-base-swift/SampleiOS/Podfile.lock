@@ -1,0 +1,27 @@
+PODS:
+  - PromisesObjC (1.2.8)
+  - PromisesSwift (1.2.8):
+    - PromisesObjC (= 1.2.8)
+  - XyBaseSdk (1.0.1):
+    - PromisesSwift
+
+DEPENDENCIES:
+  - XyBaseSdk (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - PromisesObjC
+    - PromisesSwift
+
+EXTERNAL SOURCES:
+  XyBaseSdk:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
+  PromisesSwift: 37bad6f4daddb02f7c9c531efe91e8b21c13ee2f
+  XyBaseSdk: fa625d5e9dff34e9180e52b36ea5d7a5ee59a302
+
+PODFILE CHECKSUM: d4ee1eaf86bfe494c41e2e3c6285af286bc094cc
+
+COCOAPODS: 1.9.0.beta.2

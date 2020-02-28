@@ -1,1 +1,5 @@
-github "google/promises" "1.2.5"
+github "XYOracleNetwork/sdk-base-swift" "1.0.4"
+github "apollostack/apollo-ios" "0.23.1"
+github "daltoniam/Starscream" "3.1.1"
+github "google/promises" "1.2.8"
+github "stephencelis/SQLite.swift" "0.12.2"
