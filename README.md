@@ -6,7 +6,7 @@
 ![](https://github.com/XYOracleNetwork/sdk-ble-swift/workflows/Swift%20Build/badge.svg?branch=develop)
 
 [![BCH compliance](https://bettercodehub.com/edge/badge/XYOracleNetwork/sdk-ble-swift?branch=master)](https://bettercodehub.com/)
-[![](https://img.shields.io/cocoapods/v/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk)
+[![](https://img.shields.io/cocoapods/v/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 
 # sdk-ble-ios
@@ -40,7 +40,7 @@ A Bluetooth library, primarily for use with XY Finder devices but can be impleme
 ### Swift Package Manager 
 
 ```swift
-    .package(url: "https://github.com/XYOracleNetwork/sdk-ble-swift.git", from: "3.1.3")
+    .package(url: "https://github.com/XYOracleNetwork/sdk-ble-swift.git", from: "3.1.6")
 ```
 
 ### CocoaPods

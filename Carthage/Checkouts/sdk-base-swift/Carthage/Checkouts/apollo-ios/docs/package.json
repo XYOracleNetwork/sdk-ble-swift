@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "start": "gatsby develop --prefix-paths"
+  },
+  "dependencies": {
+    "gatsby": "2.3.4",
+    "gatsby-theme-apollo-docs": "0.2.44"
+  }
+}
