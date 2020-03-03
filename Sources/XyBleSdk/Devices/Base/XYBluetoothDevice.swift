@@ -155,7 +155,7 @@ public extension XYBluetoothDevice {
     if iBeacon?.hasMinor ?? false, let major = iBeacon?.major, let minor = iBeacon?.minor {
       let computedMinor = slot == nil ? minor : ((minor & 0xfff0) | slot!)
       return CLBeaconRegion(
-        proximityUUID: uuid,
+        uuid: uuid,
         major: major,
         minor: computedMinor,
         identifier: String(format:"%@:4", id))
@@ -163,13 +163,13 @@ public extension XYBluetoothDevice {
     
     if iBeacon?.hasMajor ?? false, let major = iBeacon?.major {
       return CLBeaconRegion(
-        proximityUUID: uuid,
+        uuid: uuid,
         major: major,
         identifier: String(format:"%@:4", id))
     }
     
     return CLBeaconRegion(
-      proximityUUID: uuid,
+      uuid: uuid,
       identifier: String(format:"%@:4", id))
   }
   #endif
