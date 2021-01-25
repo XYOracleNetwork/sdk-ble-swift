@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "XyBleSdk",
   platforms: [
-    .iOS(.v9),
+    .iOS(.v10),
     .macOS(.v10_13)
   ],
   products: [
