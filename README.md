@@ -9,7 +9,9 @@
 [![](https://img.shields.io/cocoapods/v/XyBleSdk.svg?style=flat)](https://cocoapods.org/pods/XyBleSdk) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 
-# sdk-ble-ios
+# Swift Bluetooth SDK
+
+> The XYO Foundation provides this source code available in our efforts to advance the understanding of the XYO Procotol and its possible uses. We continue to maintain this software in the interest of developer education. Usage of this source code is not intended for production.
 
 Table of Contents
 
