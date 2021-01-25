@@ -2,21 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "Apollo",
-        "repositoryURL": "https://github.com/apollographql/apollo-ios.git",
-        "state": {
-          "branch": null,
-          "revision": "6b1b04334f73879232a4ab5320c5431ad295020a",
-          "version": "0.23.0"
-        }
-      },
-      {
         "package": "Promises",
-        "repositoryURL": "https://github.com/google/promises",
+        "repositoryURL": "https://github.com/google/promises.git",
         "state": {
           "branch": null,
-          "revision": "6b6f4fe3385ed37389fb231bc40be81de2f1230f",
-          "version": "1.2.8"
+          "revision": "afa9a1ace74e116848d4f743599ab83e584ff8cb",
+          "version": "1.2.12"
         }
       },
       {
@@ -24,35 +15,8 @@
         "repositoryURL": "https://github.com/XYOracleNetwork/sdk-base-swift.git",
         "state": {
           "branch": null,
-          "revision": "837e268d9b167d02fa8a047b15b0f7cca6eff75b",
-          "version": "1.0.4"
-        }
-      },
-      {
-        "package": "SQLite.swift",
-        "repositoryURL": "https://github.com/stephencelis/SQLite.swift.git",
-        "state": {
-          "branch": null,
-          "revision": "0a9893ec030501a3956bee572d6b4fdd3ae158a1",
-          "version": "0.12.2"
-        }
-      },
-      {
-        "package": "Starscream",
-        "repositoryURL": "https://github.com/daltoniam/Starscream",
-        "state": {
-          "branch": null,
-          "revision": "e6b65c6d9077ea48b4a7bdda8994a1d3c6969c8d",
-          "version": "3.1.1"
-        }
-      },
-      {
-        "package": "swift-nio-zlib-support",
-        "repositoryURL": "https://github.com/apple/swift-nio-zlib-support.git",
-        "state": {
-          "branch": null,
-          "revision": "37760e9a52030bb9011972c5213c3350fa9d41fd",
-          "version": "1.0.0"
+          "revision": "0a7013ea79f00648f3197e21dd78504a7f30b368",
+          "version": "2.0.0"
         }
       }
     ]

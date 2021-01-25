@@ -312,7 +312,7 @@ private extension XYFirmwareUpdateManager {
                 let range = NSMakeRange(Int(self.blockStartByte + chunkStartByte), Int(currChunkSize))
 
                 // Copy the range bytes to the payload pointer and add to the update array
-                _ = self.firmwareData.copyBytes(to: &payload, from: Range(range)!)
+                self.firmwareData.copyBytes(to: &payload, from: Range(range)!)
                 chunkedUpdate.append(XYBluetoothResult(data: Data(payload)))
 
                 // On to the chunk

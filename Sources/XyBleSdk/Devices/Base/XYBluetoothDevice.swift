@@ -9,7 +9,6 @@
 import CoreBluetooth
 import CoreLocation
 import Promises
-import CoreLocation
 
 
 

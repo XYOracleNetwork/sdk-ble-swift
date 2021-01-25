@@ -40,11 +40,15 @@ internal final class XYConnectionAgent: XYCentralDelegate {
 
         // Timeout on connection to the peripheral
         let callTimeout = timeout ?? XYConnectionAgent.callTimeout
-        self.timer = DispatchSource.singleTimer(interval: callTimeout, queue: XYConnectionAgent.queue) { [weak self] in
-            guard let strong = self else { return }
-            strong.timer = nil
-            strong.promise.reject(XYBluetoothError.timedOut)
-        }
+      
+      self.timer = DispatchSource.makeTimerSource(queue: XYConnectionAgent.queue)
+      self.timer?.schedule(deadline: DispatchTime.now() + callTimeout)
+      self.timer?.setEventHandler(handler: { [weak self] in
+        guard let strong = self else { return }
+        strong.timer = nil
+        strong.promise.reject(XYBluetoothError.timedOut)
+      })
+      self.timer?.resume()
 
         // If we have no peripheral, we'll need to scan for the device
         if device.peripheral == nil {

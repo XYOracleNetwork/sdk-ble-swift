@@ -1,4 +1,0 @@
-#include "../Shared/Workspace-Target-Test.xcconfig"
-
-SDKROOT = macosx
-INFOPLIST_FILE = Tests/ApolloCodegenTests/Info.plist
