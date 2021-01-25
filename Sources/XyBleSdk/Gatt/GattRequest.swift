@@ -80,16 +80,19 @@ final class GattRequest: NSObject {
         print("START Get: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
-        timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
-            guard let strong = self else { return }
-            print("TIMEOUT Get: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
-            if let device = self as? XYFinderDevice {
-                XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .getOperation)])
-            }
-            strong.timer = nil
-            strong.status = .timedOut
-            strong.readPromise.reject(XYBluetoothError.timedOut)
+      timer = DispatchSource.makeTimerSource(queue: GattRequest.queue)
+      timer?.schedule(deadline: DispatchTime.now() + self.specifiedTimeout)
+      timer?.setEventHandler(handler: { [weak self] in
+        guard let strong = self else { return }
+        print("TIMEOUT Get: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
+        if let device = self as? XYFinderDevice {
+            XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .getOperation)])
         }
+        strong.timer = nil
+        strong.status = .timedOut
+        strong.readPromise.reject(XYBluetoothError.timedOut)
+      })
+      timer?.resume()
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
@@ -130,16 +133,19 @@ final class GattRequest: NSObject {
         print("START Set: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
-        timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
-            guard let strong = self else { return }
-            print("TIMEOUT Set: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
-            if let device = self as? XYFinderDevice {
-                XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .setOperation)])
-            }
-            strong.timer = nil
-            strong.status = .timedOut
-            strong.writePromise.reject(XYBluetoothError.timedOut)
+      timer = DispatchSource.makeTimerSource(queue: GattRequest.queue)
+      timer?.schedule(deadline: DispatchTime.now() + self.specifiedTimeout)
+      timer?.setEventHandler(handler: { [weak self] in
+        guard let strong = self else { return }
+        print("TIMEOUT Set: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
+        if let device = self as? XYFinderDevice {
+            XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .setOperation)])
         }
+        strong.timer = nil
+        strong.status = .timedOut
+        strong.writePromise.reject(XYBluetoothError.timedOut)
+      })
+      timer?.resume()
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the
@@ -180,17 +186,20 @@ final class GattRequest: NSObject {
         print("START Notify: \(device.id.shortId) for Service: \(self.serviceCharacteristic.displayName)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
-        timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattRequest.queue) { [weak self] in
-            guard let strong = self else { return }
-            print("TIMEOUT Notify: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
-            if let device = self as? XYFinderDevice {
-                XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .notifyOperation)])
-            }
-            strong.timer = nil
-            strong.status = .timedOut
-            strong.notifyPromise.reject(XYBluetoothError.timedOut)
-            operationPromise.reject(XYBluetoothError.timedOut)
+      timer = DispatchSource.makeTimerSource(queue: GattRequest.queue)
+      timer?.schedule(deadline: DispatchTime.now() + self.specifiedTimeout)
+      timer?.setEventHandler(handler: { [weak self] in
+        guard let strong = self else { return }
+        print("TIMEOUT Notify: \(device.id.shortId) for Service: \(strong.serviceCharacteristic.displayName)")
+        if let device = self as? XYFinderDevice {
+            XYFinderDeviceEventManager.report(events: [.timedOut(device: device, type: .notifyOperation)])
         }
+        strong.timer = nil
+        strong.status = .timedOut
+        strong.notifyPromise.reject(XYBluetoothError.timedOut)
+        operationPromise.reject(XYBluetoothError.timedOut)
+      })
+      timer?.resume()
 
         // Assign the pending operation promise to the results from getting services/characteristics and
         // reading the result from the characteristic. Always unsubscribe from the delegate to ensure the

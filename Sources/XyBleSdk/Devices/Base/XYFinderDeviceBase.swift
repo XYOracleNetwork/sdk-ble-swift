@@ -98,14 +98,17 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
     // triggered the exit while still being close by. Once the timer expires before it enters, we fire the notification
     public func startMonitorTimer() {
         if monitorTimer == nil {
-            self.monitorTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.monitorTimeout, queue: XYFinderDeviceBase.monitorTimerQueue) { [weak self] in
-                guard let strong = self else { return }
-                strong.monitorTimer = nil
-                if strong.iBeacon?.hasMajor ?? false && strong.iBeacon?.hasMinor ?? false {
-                    print("MONITOR TIMER EXPIRE: Device \(strong.id)")
-                    strong.verifyExit()
-                }
+          monitorTimer = DispatchSource.makeTimerSource(queue: XYFinderDeviceBase.monitorTimerQueue)
+          monitorTimer?.schedule(deadline: DispatchTime.now() + XYFinderDeviceBase.monitorTimeout)
+          monitorTimer?.setEventHandler(handler: { [weak self] in
+            guard let strong = self else { return }
+            strong.monitorTimer = nil
+            if strong.iBeacon?.hasMajor ?? false && strong.iBeacon?.hasMinor ?? false {
+                print("MONITOR TIMER EXPIRE: Device \(strong.id)")
+                strong.verifyExit()
             }
+          })
+          monitorTimer?.resume()
         }
     }
 
@@ -122,12 +125,15 @@ public class XYFinderDeviceBase: XYBluetoothDeviceBase, XYFinderDevice {
 
         // If the button has been pressed on a compatible devices, we add the appropriate event
         if powerLevel == 8, shouldCheckForButtonPressOnDetection {
-            if buttonTimer == nil {
-                self.buttonTimer = DispatchSource.singleTimer(interval: XYFinderDeviceBase.buttonTimeout, queue: XYFinderDeviceBase.buttonTimerQueue) { [weak self] in
-                    guard let strong = self else { return }
-                    strong.buttonTimer = nil
-                }
-                events.append(.buttonPressed(device: self, type: .single))
+            if buttonTimer == nil {              
+              buttonTimer = DispatchSource.makeTimerSource(queue: XYFinderDeviceBase.buttonTimerQueue)
+              buttonTimer?.schedule(deadline: DispatchTime.now() + XYFinderDeviceBase.buttonTimeout)
+              buttonTimer?.setEventHandler(handler: { [weak self] in
+                guard let strong = self else { return }
+                strong.buttonTimer = nil
+              })
+              buttonTimer?.resume()
+              events.append(.buttonPressed(device: self, type: .single))
             }
         }
 

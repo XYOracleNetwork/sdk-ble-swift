@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import Promises
 import CoreBluetooth
 import CoreLocation
+import Promises
 
 
 open class XYCBPeripheralManager : NSObject, CBPeripheralManagerDelegate {
@@ -65,7 +65,8 @@ open class XYCBPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         manager = nil
     }
 
-    public func startAdvertiseing (advertisementUUIDs: [CBUUID]?, deviceName: String?, beacon : CLBeaconRegion?) {
+  @available(OSX 10.15, *)
+  public func startAdvertiseing (advertisementUUIDs: [CBUUID]?, deviceName: String?, beacon : CLBeaconRegion?) {
         let peripheralData = beacon?.peripheralData(withMeasuredPower: nil)
         var adDataMap = ((peripheralData as? [String : Any]) ?? [String : Any]())
 

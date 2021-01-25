@@ -7,7 +7,6 @@
 
 import CoreBluetooth
 import Promises
-import XyBaseSdk
 
 // Used to inquire for all the characteristics of all the services the device has
 final class GattInquisitor: NSObject {
@@ -59,13 +58,16 @@ final class GattInquisitor: NSObject {
         print("START Inquire: \(device.id.shortId)")
 
         // Create timeout using the operation queue. Self-cleaning if we timeout
-        timer = DispatchSource.singleTimer(interval: self.specifiedTimeout, queue: GattInquisitor.queue) { [weak self] in
-            guard let s = self else { return }
-            print("TIMEOUT Inquire: \(device.id.shortId)")
-            s.timer = nil
-            s.status = .timedOut
-            s.inquireCharacteristicsPromise.reject(XYBluetoothError.timedOut)
-        }
+      timer = DispatchSource.makeTimerSource(queue: GattInquisitor.queue)
+      timer?.schedule(deadline: DispatchTime.now() + self.specifiedTimeout)
+      timer?.setEventHandler(handler: { [weak self] in
+        guard let s = self else { return }
+        print("TIMEOUT Inquire: \(device.id.shortId)")
+        s.timer = nil
+        s.status = .timedOut
+        s.inquireCharacteristicsPromise.reject(XYBluetoothError.timedOut)
+      })
+      timer?.resume()
 
         var characteristics = [CBCharacteristic]()
 
