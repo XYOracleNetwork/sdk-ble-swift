@@ -259,7 +259,7 @@ public extension XYSmartScan {
       }
       
       // Loop through known devices that are connected
-      let connectedDevices = XYDeviceConnectionManager.instance.connectedDevices
+      let connectedDevices = self.trackedDevices.values // XYDeviceConnectionManager.instance.connectedDevices
       for device in connectedDevices {
         guard
           let xyDevice = device as? XYFinderDevice,
