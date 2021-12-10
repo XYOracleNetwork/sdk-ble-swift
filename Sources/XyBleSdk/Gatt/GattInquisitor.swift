@@ -78,7 +78,7 @@ final class GattInquisitor: NSObject {
         // If we are not on the final service, we re-up the inquire promise
         self.inquireServices(device).then(on: self.workQueue) { services in
             for service in services {
-                characteristics += try await(self.inquireCharacteristics(device, service: service))
+                characteristics += try awaitPromise(self.inquireCharacteristics(device, service: service))
                 if services.last != service {
                     self.inquireCharacteristicsPromise = Promise<[CBCharacteristic]>.pending()
                 }

@@ -66,7 +66,7 @@ public extension XYBluetoothDevice {
   
   func get(_ serivceCharacteristic: XYServiceCharacteristic, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
     do {
-      return try await(serivceCharacteristic.get(from: self, timeout: timeout))
+      return try awaitPromise(serivceCharacteristic.get(from: self, timeout: timeout))
     } catch {
       return XYBluetoothResult(error: error as? XYBluetoothError)
     }
@@ -74,7 +74,7 @@ public extension XYBluetoothDevice {
   
   func set(_ serivceCharacteristic: XYServiceCharacteristic, value: XYBluetoothResult, timeout: DispatchTimeInterval? = nil, withResponse: Bool = true) -> XYBluetoothResult {
     do {
-      try await(serivceCharacteristic.set(to: self, value: value, timeout: timeout, withResponse: withResponse))
+      try awaitPromise(serivceCharacteristic.set(to: self, value: value, timeout: timeout, withResponse: withResponse))
       return XYBluetoothResult(data: nil)
     } catch {
       return XYBluetoothResult(error: error as? XYBluetoothError)
@@ -83,7 +83,7 @@ public extension XYBluetoothDevice {
   
   func notify(_ serivceCharacteristic: XYServiceCharacteristic, enabled: Bool, timeout: DispatchTimeInterval? = nil) -> XYBluetoothResult {
     do {
-      try await(serivceCharacteristic.notify(for: self, enabled: enabled, timeout: timeout))
+      try awaitPromise(serivceCharacteristic.notify(for: self, enabled: enabled, timeout: timeout))
       return XYBluetoothResult(data: nil)
     } catch {
       return XYBluetoothResult(error: error as? XYBluetoothError)
@@ -92,7 +92,7 @@ public extension XYBluetoothDevice {
   
   func inquire(_ timeout: DispatchTimeInterval? = nil, callback: @escaping (GattDeviceDescriptor) -> Void) -> XYBluetoothResult {
     do {
-      _ = try await(GattInquisitor(timeout).inquire(for: self).then { callback($0) })
+      _ = try awaitPromise(GattInquisitor(timeout).inquire(for: self).then { callback($0) })
       return XYBluetoothResult(data: nil)
     } catch {
       return XYBluetoothResult(error: error as? XYBluetoothError)
@@ -117,13 +117,13 @@ public extension XYBluetoothDevice {
       // If we don't have a powered on central, we'll see if we can't get that running
       if XYCentral.instance.state != .poweredOn {
         print("STEP 2a: Trying to power on Central for \(self.id.shortId)...")
-        try await(XYCentralAgent().powerOn())
+        try awaitPromise(XYCentralAgent().powerOn())
       }
       
       // If we are no connected, use the agent to handle that before running the operations block
       if self.peripheral?.state != .connected {
         print("STEP 3: Trying to connect for \(self.id.shortId)... STATE is \(self.peripheral?.state.rawValue ?? -1)")
-        try await(XYConnectionAgent(for: self).connect())
+        try awaitPromise(XYConnectionAgent(for: self).connect())
       }
       
       print("STEP 4: Trying to run operations for \(self.id.shortId)...")
