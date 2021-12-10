@@ -36,7 +36,7 @@ open class XYCBPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     }
     
     public func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
-        guard let service = services[request.characteristic.service.uuid.uuidString] else {
+        guard let service = services[request.characteristic.service?.uuid.uuidString ?? ""] else {
             return
         }
         
@@ -45,7 +45,7 @@ open class XYCBPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     
     public func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         for i in 0...requests.count - 1 {
-            guard let service = services[requests[i].characteristic.service.uuid.uuidString] else {
+            guard let service = services[requests[i].characteristic.service?.uuid.uuidString ?? ""] else {
                 return
             }
             
