@@ -49,7 +49,8 @@ public struct GattDeviceDescriptor {
   public let serviceCharacteristics: [GattServiceDescriptor: [GattCharacteristicDescriptor]]
   
   init(_ characteristics: [CBCharacteristic]) {
-      let services = characteristics.map { GattServiceDescriptor($0.service ?? CBMutableService(type: CBUUID.init(string: ""), primary: true)) }
+      let defaultService = CBMutableService(type: CBUUID.init(string: ""), primary: true)
+      let services = characteristics.map { GattServiceDescriptor($0.service ?? defaultService) }
     
     self.serviceCharacteristics = characteristics.reduce(into: [GattServiceDescriptor: [GattCharacteristicDescriptor]](), { initial, characteristic in
         let service = services.first(where: { service in service.uuid == characteristic.service?.uuid })!
