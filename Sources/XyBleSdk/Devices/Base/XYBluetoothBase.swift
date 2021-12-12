@@ -9,7 +9,7 @@
 import CoreBluetooth
 
 // Basic protocol for all BLE devices 
-public protocol XYBluetoothBase: class {
+public protocol XYBluetoothBase: AnyObject {
     var rssi: Int { get set }
     var powerLevel: UInt8 { get set }
     var name: String { get }

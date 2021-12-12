@@ -9,7 +9,7 @@
 import CoreLocation
 import CoreBluetooth
 
-public protocol XYLocationDelegate: class {
+public protocol XYLocationDelegate: AnyObject {
   func didRangeBeacons(_ beacons: [XYBluetoothDevice], for family: XYDeviceFamily?)
   func deviceEntered(_ device: XYBluetoothDevice)
   func deviceExited(_ device: XYBluetoothDevice)
