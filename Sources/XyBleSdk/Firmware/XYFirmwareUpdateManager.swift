@@ -69,7 +69,7 @@ public struct XYFirmwareUpdateParameters {
     }
 }
 
-public protocol XYFirmwareUpdateManagerProgressDelegate: class {
+public protocol XYFirmwareUpdateManagerProgressDelegate: AnyObject {
     func progressUpdated(value: Float, offset: Int32, count: Int32)
     func disconnected()
     func rebootStarted()

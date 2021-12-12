@@ -18,7 +18,7 @@ let package = Package(
   dependencies: [
     // Dependencies declare other packages that this package depends on.
     // .package(url: /* package url */, from: "1.0.0"),
-    .package(name: "Promises", url: "https://github.com/google/promises.git", from: "1.2.8"),
+    .package(name: "Promises", url: "https://github.com/google/promises.git", from: "2.0.0"),
     .package(name: "XyBaseSdk", url: "https://github.com/XYOracleNetwork/sdk-base-swift.git", from: "2.0.0")
   ],
   targets: [

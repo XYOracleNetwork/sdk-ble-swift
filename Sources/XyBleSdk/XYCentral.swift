@@ -132,7 +132,7 @@ public extension CBManagerState {
   }
 }
 
-internal protocol XYCentralDelegate: class {
+internal protocol XYCentralDelegate: AnyObject {
   func located(peripheral: XYPeripheral)
   func connected(peripheral: XYPeripheral)
   func timeout()
